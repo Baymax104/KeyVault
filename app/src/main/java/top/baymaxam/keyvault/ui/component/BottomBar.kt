@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
@@ -14,7 +13,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import top.baymaxam.keyvault.ui.screen.HomeTab
 import top.baymaxam.keyvault.ui.screen.SettingsTab
@@ -29,31 +27,15 @@ import top.baymaxam.keyvault.ui.theme.MainColor
 
 @Composable
 fun BottomBar(
-    onAddClick: () -> Unit
-) {
-    val tabNavigator = LocalTabNavigator.current
-    BottomBarContent(
-        onAddClick = onAddClick,
-        isHomeSelected = tabNavigator.current == HomeTab,
-        onHomeClick = { tabNavigator.current = HomeTab },
-        isSettingSelected = tabNavigator.current == SettingsTab,
-        onSettingClick = { tabNavigator.current = SettingsTab }
-    )
-}
-
-@Composable
-private fun BottomBarContent(
-    isHomeSelected: Boolean = false,
-    onHomeClick: () -> Unit = {},
     onAddClick: () -> Unit = {},
-    isSettingSelected: Boolean = false,
-    onSettingClick: () -> Unit = {}
+    isNavigationSelected: (Tab) -> Boolean = { false },
+    onNavigationItemClick: (Tab) -> Unit = {}
 ) {
     NavigationBar {
         TabNavigationItem(
             tab = HomeTab,
-            isSelected = isHomeSelected,
-            onClick = onHomeClick
+            isSelected = isNavigationSelected(HomeTab),
+            onClick = { onNavigationItemClick(HomeTab) }
         )
         IconButton(
             onClick = onAddClick,
@@ -68,8 +50,8 @@ private fun BottomBarContent(
         }
         TabNavigationItem(
             tab = SettingsTab,
-            isSelected = isSettingSelected,
-            onClick = onSettingClick
+            isSelected = isNavigationSelected(SettingsTab),
+            onClick = { onNavigationItemClick(SettingsTab) }
         )
     }
 }
@@ -89,7 +71,7 @@ private fun RowScope.TabNavigationItem(
                     painter = tab.options.icon!!,
                     contentDescription = tab.options.title,
                     tint = MainColor,
-                    modifier = Modifier.size(40.dp)
+                    modifier = Modifier.size(30.dp)
                 )
             }
         }
@@ -100,6 +82,6 @@ private fun RowScope.TabNavigationItem(
 @Composable
 private fun Preview() {
     AppTheme {
-        BottomBarContent()
+        BottomBar()
     }
 }

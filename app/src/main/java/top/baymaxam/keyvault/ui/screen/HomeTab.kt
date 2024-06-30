@@ -2,7 +2,6 @@ package top.baymaxam.keyvault.ui.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,9 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.filled.Home
@@ -27,11 +24,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
@@ -45,8 +43,12 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import top.baymaxam.keyvault.R
+import top.baymaxam.keyvault.model.domain.CardItem
+import top.baymaxam.keyvault.model.domain.PassItem
+import top.baymaxam.keyvault.model.domain.WebItem
 import top.baymaxam.keyvault.ui.component.ResentUsedList
 import top.baymaxam.keyvault.ui.component.SearchField
+import top.baymaxam.keyvault.ui.component.common.FillIcon
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.ui.theme.robotoFont
 import top.baymaxam.keyvault.ui.theme.surfaceVariantLight
@@ -74,7 +76,14 @@ object HomeTab : Tab {
 
     @Composable
     override fun Content() {
-        ContentLayout()
+        val list = remember {
+            mutableStateListOf(
+                WebItem(id = 0, name = "测试", username = "username"),
+                CardItem(id = 1, name = "TestCard", username = "code")
+            )
+        }
+
+        ContentLayout(items = list)
     }
 }
 
@@ -84,12 +93,13 @@ private fun ContentLayout(
     searchContent: MutableState<String> = mutableStateOf(""),
     onSearch: () -> Unit = {},
     onPasswordClick: () -> Unit = {},
-    onTagClick: () -> Unit = {}
+    onTagClick: () -> Unit = {},
+    items: SnapshotStateList<PassItem> = mutableStateListOf(),
+    onItemCopy: (PassItem) -> Unit = {},
+    onItemClick: (PassItem) -> Unit = {},
 ) {
     Column(
-        modifier = Modifier
-            .verticalScroll(rememberScrollState())
-            .fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Header(
@@ -99,7 +109,11 @@ private fun ContentLayout(
             onTagClick = onTagClick
         )
 
-        ResentUsed()
+        ResentUsed(
+            items = items,
+            onItemCopy = onItemCopy,
+            onItemClick = onItemClick
+        )
     }
 }
 
@@ -212,20 +226,14 @@ private fun CatalogCard(
                 .fillMaxSize()
                 .padding(horizontal = 12.dp)
         ) {
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(50))
-                    .background(iconBackgroundColor)
-                    .padding(7.dp)
-                    .size(28.dp)
-            ) {
-                Icon(
-                    painter = painterResource(id = icon),
-                    contentDescription = null,
-                    tint = iconColor,
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
+
+            FillIcon(
+                icon = painterResource(id = icon),
+                iconColor = iconColor,
+                iconBackgroundColor = iconBackgroundColor,
+                shape = RoundedCornerShape(50),
+                modifier = Modifier.size(30.dp)
+            )
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -251,7 +259,11 @@ private fun CatalogCard(
 
 
 @Composable
-private fun ResentUsed() {
+private fun ResentUsed(
+    items: SnapshotStateList<PassItem>,
+    onItemCopy: (PassItem) -> Unit,
+    onItemClick: (PassItem) -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -259,7 +271,9 @@ private fun ResentUsed() {
     ) {
         Text(
             text = "最近使用",
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .padding(bottom = 5.dp)
+                .fillMaxWidth(),
             style = TextStyle(
                 fontFamily = robotoFont,
                 fontWeight = FontWeight.Bold,
@@ -268,7 +282,10 @@ private fun ResentUsed() {
             )
         )
         ResentUsedList(
-
+            items = items,
+            onItemCopy = onItemCopy,
+            onItemClick = onItemClick,
+            modifier = Modifier.fillMaxWidth(),
         )
     }
 }
@@ -277,8 +294,16 @@ private fun ResentUsed() {
 @Preview(showBackground = true)
 @Composable
 private fun Preview() {
+    val list = remember {
+        mutableStateListOf(
+            WebItem(id = 0, name = "TestWeb", username = "username"),
+            CardItem(id = 1, name = "TestCard", username = "code")
+        )
+    }
     AppTheme {
-        ContentLayout()
+        ContentLayout(
+            items = list
+        )
 //        Header()
 //        CategoryList()
     }

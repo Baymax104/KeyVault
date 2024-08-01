@@ -4,9 +4,8 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.blankj.utilcode.util.Utils
-import top.baymaxam.keyvault.model.entity.AuthPassEntity
-import top.baymaxam.keyvault.model.entity.CardPassEntity
-import top.baymaxam.keyvault.model.entity.WebPassEntity
+import top.baymaxam.keyvault.model.entity.AuthEntity
+import top.baymaxam.keyvault.model.entity.PasswordEntity
 
 /**
  * Room数据库
@@ -15,9 +14,8 @@ import top.baymaxam.keyvault.model.entity.WebPassEntity
  */
 @Database(
     entities = [
-        WebPassEntity::class,
-        CardPassEntity::class,
-        AuthPassEntity::class,
+        PasswordEntity::class,
+        AuthEntity::class,
     ],
     version = 1,
     exportSchema = false
@@ -32,9 +30,7 @@ abstract class LocalDatabase : RoomDatabase() {
         ).build()
     }
 
-    abstract fun webPassDao(): WebPassDao
-
-    abstract fun cardPassDao(): CardPassDao
+    abstract fun passDao(): PassDao
 
     abstract fun authDao(): AuthDao
 

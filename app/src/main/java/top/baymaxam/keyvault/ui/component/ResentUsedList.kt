@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.CreditCard
 import androidx.compose.material.icons.rounded.Language
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,9 +34,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import top.baymaxam.keyvault.model.domain.CardItem
+import top.baymaxam.keyvault.model.domain.AuthItem
+import top.baymaxam.keyvault.model.domain.Item
 import top.baymaxam.keyvault.model.domain.PassItem
-import top.baymaxam.keyvault.model.domain.WebItem
+import top.baymaxam.keyvault.model.domain.PassType
 import top.baymaxam.keyvault.ui.component.common.FillIcon
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.ui.theme.MainColor
@@ -48,8 +51,8 @@ import top.baymaxam.keyvault.ui.theme.robotoFont
 
 @Composable
 fun ResentUsedList(
-    items: SnapshotStateList<PassItem>,
-    onItemClick: (PassItem) -> Unit,
+    items: SnapshotStateList<Item>,
+    onItemClick: (Item) -> Unit,
     onItemCopy: (PassItem) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -74,8 +77,8 @@ fun ResentUsedList(
 
 @Composable
 private fun ResentUsedItem(
-    item: PassItem,
-    onClick: (PassItem) -> Unit = {},
+    item: Item,
+    onClick: (Item) -> Unit = {},
     onCopy: (PassItem) -> Unit = {}
 ) {
     ElevatedCard(
@@ -90,44 +93,96 @@ private fun ResentUsedItem(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            FillIcon(
-                icon = if (item is WebItem) Icons.Rounded.Language else Icons.Rounded.CreditCard,
-                iconColor = MainColor,
-                iconBackgroundColor = Color(0xffd6ecff),
-                shape = RoundedCornerShape(20),
-                modifier = Modifier.size(30.dp)
-            )
-
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 10.dp)
-            ) {
-                Text(
-                    text = item.name,
-                    style = TextStyle(
-                        fontFamily = robotoFont,
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 16.sp
-                    )
-                )
-                Spacer(modifier = Modifier.height(5.dp))
-                Text(
-                    text = item.username,
-                    style = TextStyle(
-                        fontFamily = robotoFont,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Normal,
-                        color = Color.Gray
-                    )
-                )
-
-            }
-
-            IconButton(onClick = { onCopy(item) }) {
-                Icon(imageVector = Icons.Rounded.ContentCopy, contentDescription = null)
+            when (item) {
+                is PassItem -> PassItemLayout(item = item, onCopy = onCopy)
+                is AuthItem -> AuthItemLayout(item = item)
             }
         }
+    }
+}
+
+@Composable
+private fun RowScope.PassItemLayout(
+    item: PassItem,
+    onCopy: (PassItem) -> Unit
+) {
+    FillIcon(
+        icon = when (item.type) {
+            PassType.Website -> Icons.Rounded.Language
+            PassType.Card -> Icons.Rounded.CreditCard
+        },
+        iconColor = MainColor,
+        iconBackgroundColor = Color(0xffd6ecff),
+        shape = RoundedCornerShape(20),
+        modifier = Modifier.size(30.dp)
+    )
+
+    Column(
+        modifier = Modifier
+            .weight(1f)
+            .padding(horizontal = 10.dp)
+    ) {
+        Text(
+            text = item.name,
+            style = TextStyle(
+                fontFamily = robotoFont,
+                fontWeight = FontWeight.Normal,
+                fontSize = 16.sp
+            )
+        )
+        Spacer(modifier = Modifier.height(5.dp))
+        Text(
+            text = item.username,
+            style = TextStyle(
+                fontFamily = robotoFont,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Normal,
+                color = Color.Gray
+            )
+        )
+
+    }
+
+    IconButton(onClick = { onCopy(item) }) {
+        Icon(imageVector = Icons.Rounded.ContentCopy, contentDescription = null)
+    }
+}
+
+@Composable
+private fun RowScope.AuthItemLayout(
+    item: AuthItem,
+) {
+    FillIcon(
+        icon = Icons.Rounded.Person,
+        iconColor = MainColor,
+        iconBackgroundColor = Color(0xffd6ecff),
+        shape = RoundedCornerShape(20),
+        modifier = Modifier.size(30.dp)
+    )
+
+    Column(
+        modifier = Modifier
+            .weight(1f)
+            .padding(horizontal = 10.dp)
+    ) {
+        Text(
+            text = item.name,
+            style = TextStyle(
+                fontFamily = robotoFont,
+                fontWeight = FontWeight.Normal,
+                fontSize = 16.sp
+            )
+        )
+        Spacer(modifier = Modifier.height(5.dp))
+        Text(
+            text = item.authorization.username,
+            style = TextStyle(
+                fontFamily = robotoFont,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Normal,
+                color = Color.Gray
+            )
+        )
     }
 }
 
@@ -135,11 +190,10 @@ private fun ResentUsedItem(
 @Composable
 private fun Preview() {
     AppTheme {
-//        ResentUsedItem(item = CardItem(name = "Test", code = "test"))
         val list = remember {
-            mutableStateListOf(
-                WebItem(id = 0, name = "测试", username = "username"),
-                CardItem(id = 1, name = "TestCard", username = "code")
+            mutableStateListOf<Item>(
+                PassItem(id = 0, name = "测试", username = "username"),
+                PassItem(id = 1, name = "TestCard", username = "code")
             )
         }
         ResentUsedList(

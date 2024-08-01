@@ -43,9 +43,8 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import top.baymaxam.keyvault.R
-import top.baymaxam.keyvault.model.domain.CardItem
+import top.baymaxam.keyvault.model.domain.Item
 import top.baymaxam.keyvault.model.domain.PassItem
-import top.baymaxam.keyvault.model.domain.WebItem
 import top.baymaxam.keyvault.ui.component.ResentUsedList
 import top.baymaxam.keyvault.ui.component.SearchField
 import top.baymaxam.keyvault.ui.component.common.FillIcon
@@ -77,9 +76,9 @@ object HomeTab : Tab {
     @Composable
     override fun Content() {
         val list = remember {
-            mutableStateListOf(
-                WebItem(id = 0, name = "测试", username = "username"),
-                CardItem(id = 1, name = "TestCard", username = "code")
+            mutableStateListOf<Item>(
+                PassItem(id = 0, name = "测试", username = "username"),
+                PassItem(id = 1, name = "TestCard", username = "code")
             )
         }
 
@@ -94,9 +93,9 @@ private fun ContentLayout(
     onSearch: () -> Unit = {},
     onPasswordClick: () -> Unit = {},
     onTagClick: () -> Unit = {},
-    items: SnapshotStateList<PassItem> = mutableStateListOf(),
+    items: SnapshotStateList<Item> = mutableStateListOf(),
     onItemCopy: (PassItem) -> Unit = {},
-    onItemClick: (PassItem) -> Unit = {},
+    onItemClick: (Item) -> Unit = {},
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -149,6 +148,7 @@ private fun Header(
         )
 
         SearchField(
+            placeholder = "搜索条目",
             content = searchContent,
             onSearch = onSearch
         )
@@ -260,9 +260,9 @@ private fun CatalogCard(
 
 @Composable
 private fun ResentUsed(
-    items: SnapshotStateList<PassItem>,
+    items: SnapshotStateList<Item>,
     onItemCopy: (PassItem) -> Unit,
-    onItemClick: (PassItem) -> Unit
+    onItemClick: (Item) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -295,9 +295,9 @@ private fun ResentUsed(
 @Composable
 private fun Preview() {
     val list = remember {
-        mutableStateListOf(
-            WebItem(id = 0, name = "TestWeb", username = "username"),
-            CardItem(id = 1, name = "TestCard", username = "code")
+        mutableStateListOf<Item>(
+            PassItem(id = 0, name = "TestWeb", username = "username"),
+            PassItem(id = 1, name = "TestCard", username = "code")
         )
     }
     AppTheme {

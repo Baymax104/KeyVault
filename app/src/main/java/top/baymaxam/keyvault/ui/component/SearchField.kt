@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 @Composable
 fun SearchField(
     content: MutableState<String> = mutableStateOf(""),
+    placeholder: String = "",
     onSearch: () -> Unit = {}
 ) {
     OutlinedTextField(
@@ -54,7 +55,7 @@ fun SearchField(
         },
         singleLine = true,
         placeholder = {
-            Text(text = "搜索")
+            Text(text = placeholder)
         },
     )
 }

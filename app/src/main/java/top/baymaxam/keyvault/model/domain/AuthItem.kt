@@ -1,5 +1,7 @@
 package top.baymaxam.keyvault.model.domain
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import java.util.Date
 
 /**
@@ -7,10 +9,11 @@ import java.util.Date
  * @author John
  * @since 30 6月 2024
  */
+@Parcelize
 class AuthItem(
-    id: Long = 0,
-    name: String = "",
-    createDate: Date = Date(),
-    comment: String = "",
-    var authorization: WebItem = WebItem(),
-) : PassItem(id, name, createDate = createDate, comment = comment)
+    override val id: Long = 0,
+    var name: String = "",
+    var createDate: Date = Date(),
+    var authorization: PassItem = PassItem(),
+    var comment: String = "",
+) : Parcelable, Item

@@ -45,9 +45,9 @@ import cafe.adriel.voyager.navigator.tab.TabOptions
 import top.baymaxam.keyvault.R
 import top.baymaxam.keyvault.model.domain.Item
 import top.baymaxam.keyvault.model.domain.PassItem
+import top.baymaxam.keyvault.ui.component.FillIcon
 import top.baymaxam.keyvault.ui.component.ResentUsedList
 import top.baymaxam.keyvault.ui.component.SearchField
-import top.baymaxam.keyvault.ui.component.common.FillIcon
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.ui.theme.robotoFont
 import top.baymaxam.keyvault.ui.theme.surfaceVariantLight
@@ -148,7 +148,7 @@ private fun Header(
         )
 
         SearchField(
-            placeholder = "搜索条目",
+            placeholder = { Text(text = "搜索条目") },
             content = searchContent,
             onSearch = onSearch
         )

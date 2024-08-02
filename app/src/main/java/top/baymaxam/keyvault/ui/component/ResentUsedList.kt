@@ -38,7 +38,6 @@ import top.baymaxam.keyvault.model.domain.AuthItem
 import top.baymaxam.keyvault.model.domain.Item
 import top.baymaxam.keyvault.model.domain.PassItem
 import top.baymaxam.keyvault.model.domain.PassType
-import top.baymaxam.keyvault.ui.component.common.FillIcon
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.ui.theme.MainColor
 import top.baymaxam.keyvault.ui.theme.robotoFont

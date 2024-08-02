@@ -1,6 +1,5 @@
-package top.baymaxam.keyvault.ui.component.common
+package top.baymaxam.keyvault.ui.component
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -34,12 +33,14 @@ fun SelectionButton(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(60.dp)
-            .background(MaterialTheme.colorScheme.surface),
+            .height(60.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Button(
             onClick = onCancel,
+            colors = ButtonDefaults.textButtonColors(
+                containerColor = Color(0xffeaeaea)
+            ),
             modifier = Modifier
                 .fillMaxHeight()
                 .weight(0.5f)
@@ -48,7 +49,6 @@ fun SelectionButton(
             Text(
                 text = "取消",
                 style = MaterialTheme.typography.labelMedium,
-                color = Color.White
             )
         }
         Button(
@@ -61,7 +61,6 @@ fun SelectionButton(
             Text(
                 text = "确认",
                 style = MaterialTheme.typography.labelMedium,
-                color = Color.White
             )
         }
     }
@@ -117,6 +116,6 @@ fun SelectionHeader(
 @Composable
 private fun Preview() {
     AppTheme {
-        SelectionHeader("Hello", {}, {})
+        SelectionButton()
     }
 }

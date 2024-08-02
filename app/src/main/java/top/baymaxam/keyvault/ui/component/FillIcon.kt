@@ -1,4 +1,4 @@
-package top.baymaxam.keyvault.ui.component.common
+package top.baymaxam.keyvault.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

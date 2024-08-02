@@ -1,4 +1,4 @@
-package top.baymaxam.keyvault.ui.component.common
+package top.baymaxam.keyvault.ui.component
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -24,7 +24,6 @@ import top.baymaxam.keyvault.model.domain.Tag
 import top.baymaxam.keyvault.state.TagItemState
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.ui.theme.MainColor
-import top.baymaxam.keyvault.ui.theme.robotoFont
 
 /**
  * 标签文字
@@ -80,7 +79,6 @@ fun TagItem(
             Text(
                 text = tag.value.name,
                 style = TextStyle(
-                    fontFamily = robotoFont,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Normal
                 ),

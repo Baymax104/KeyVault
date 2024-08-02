@@ -1,7 +1,9 @@
 package top.baymaxam.keyvault.state
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import top.baymaxam.keyvault.model.domain.Tag
@@ -14,7 +16,13 @@ import top.baymaxam.keyvault.model.domain.Tag
 @Stable
 class AddScreenModel : ViewModel() {
 
+    val searchState: MutableState<String> = mutableStateOf("")
     val tagList: SnapshotStateList<TagItemState> = mutableStateListOf()
+
+    val nameState: MutableState<String> = mutableStateOf("")
+    val usernameState: MutableState<String> = mutableStateOf("")
+    val passwordState: MutableState<String> = mutableStateOf("")
+    val commentState: MutableState<String> = mutableStateOf("")
 
     init {
         tagList.addAll(

@@ -59,7 +59,7 @@ private fun ContentLayout(
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun Preview() {
     AppTheme {

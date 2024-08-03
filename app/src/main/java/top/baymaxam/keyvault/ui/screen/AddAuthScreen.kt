@@ -84,7 +84,7 @@ private fun ContentLayout(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.7f)
+            .fillMaxHeight(0.8f)
     ) {
         Header(onBack = onBack)
 

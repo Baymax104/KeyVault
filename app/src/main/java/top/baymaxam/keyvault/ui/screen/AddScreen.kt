@@ -1,10 +1,10 @@
 package top.baymaxam.keyvault.ui.screen
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.navigator.tab.TabNavigator
-import top.baymaxam.keyvault.ui.theme.AppTheme
+import cafe.adriel.voyager.core.screen.ScreenKey
+import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.transitions.SlideTransition
 
 /**
  * 添加页
@@ -13,18 +13,14 @@ import top.baymaxam.keyvault.ui.theme.AppTheme
  */
 class AddScreen : Screen {
 
+    override val key: ScreenKey
+        get() = "Add-Screen"
+
     @Composable
     override fun Content() {
-        TabNavigator(tab = AddInputTab())
+        Navigator(AddInputScreen()) { navigator ->
+            SlideTransition(navigator)
+        }
     }
 
-}
-
-
-@Preview(showBackground = true)
-@Composable
-private fun Preview() {
-    AppTheme {
-
-    }
 }

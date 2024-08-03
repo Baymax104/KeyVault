@@ -17,9 +17,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AppTheme {
-                BottomSheetNavigator(
-                    sheetShape = RoundedCornerShape(15.dp),
-                ) {
+                BottomSheetNavigator(sheetShape = RoundedCornerShape(15.dp)) {
                     Navigator(screen = MainScreen())
                 }
             }

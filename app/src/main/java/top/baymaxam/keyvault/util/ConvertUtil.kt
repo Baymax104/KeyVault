@@ -49,15 +49,16 @@ object PassTypeConverter {
     @TypeConverter
     fun type2Int(type: PassType): Int {
         return when (type) {
-            PassType.Website -> 1
-            PassType.Card -> 2
+            PassType.Website -> 0
+            PassType.Card -> 1
         }
     }
 
     @TypeConverter
     fun int2Type(i: Int): PassType {
         return when (i) {
-            2 -> PassType.Card
+            0 -> PassType.Website
+            1 -> PassType.Card
             else -> PassType.Website
         }
     }

@@ -10,7 +10,7 @@ import java.util.Date
  * @since 28 6月 2024
  */
 @Parcelize
-data class PassItem(
+data class PassKeyItem(
     override val id: Long = 0,
     var name: String = "",
     val type: PassType = PassType.Website,
@@ -19,4 +19,4 @@ data class PassItem(
     var username: String = "",
     var password: String = "",
     var comment: String = ""
-) : Parcelable, Item
+) : Parcelable, KeyItem

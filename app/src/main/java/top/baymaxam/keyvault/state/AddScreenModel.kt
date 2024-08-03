@@ -1,11 +1,14 @@
 package top.baymaxam.keyvault.state
 
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import cafe.adriel.voyager.core.model.ScreenModel
+import top.baymaxam.keyvault.model.domain.KeyItem
+import top.baymaxam.keyvault.model.domain.PassKeyItem
+import top.baymaxam.keyvault.model.domain.PassType
 import top.baymaxam.keyvault.model.domain.Tag
+import kotlin.properties.Delegates
 
 /**
  * AddScreenViewModel
@@ -15,17 +18,24 @@ import top.baymaxam.keyvault.model.domain.Tag
 @Stable
 class AddScreenModel : ScreenModel {
 
-    val searchState: MutableState<String> = mutableStateOf("")
     val tags = mutableStateListOf<TagItemState>()
-    val tagsCache = mutableListOf<TagItemState>()
+    private val tagsCache by Delegates.observable(mutableListOf<TagItemState>()) { _, _, newValue ->
+        if (newValue.isNotEmpty()) {
+            tags.addAll(newValue)
+        }
+    }
 
-    val nameState: MutableState<String> = mutableStateOf("")
-    val usernameState: MutableState<String> = mutableStateOf("")
-    val passwordState: MutableState<String> = mutableStateOf("")
-    val commentState: MutableState<String> = mutableStateOf("")
+    val passItems = mutableStateListOf<PassKeyItem>()
+    private val passItemsCache by Delegates.observable(mutableListOf<PassKeyItem>()) { _, _, newValue ->
+        if (newValue.isNotEmpty()) {
+            passItems.addAll(newValue)
+        }
+    }
+
+    val selectedPassItem = mutableStateOf<PassKeyItem?>(null)
 
     init {
-        tags.addAll(
+        tagsCache.addAll(
             listOf(
                 TagItemState(Tag(id = 0, name = "Hello")),
                 TagItemState(Tag(id = 1, name = "Hello1")),
@@ -34,23 +44,38 @@ class AddScreenModel : ScreenModel {
                 TagItemState(Tag(id = 4, name = "Hello4")),
             )
         )
-        tagsCache.addAll(tags)
 
-
+        passItemsCache.addAll(
+            listOf(
+                PassKeyItem(id = 0, name = "test1", type = PassType.Website, username = "Hello"),
+                PassKeyItem(id = 1, name = "test2", type = PassType.Card, username = "Hello"),
+                PassKeyItem(id = 2, name = "test3", type = PassType.Website, username = "Hello"),
+                PassKeyItem(id = 3, name = "test4", type = PassType.Website, username = "Hello"),
+                PassKeyItem(id = 4, name = "test5", type = PassType.Card, username = "Hello"),
+            )
+        )
     }
 
-    fun searchTag() {
-        tags.filter {
-            it.value.name.contains(searchState.value, true)
-        }.let {
-            tags.clear()
-            tags.addAll(it)
-        }
-
+    fun searchTag(content: String) {
+        tagsCache.filter { it.value.name.contains(content, true) }
+            .let { tags.refresh(it) }
     }
 
-    fun refreshTags() {
-        tags.clear()
-        tags.addAll(tagsCache)
+    fun searchPassItem(content: String) {
+        passItemsCache.filter { it.name.contains(content, true) }
+            .let { passItems.refresh(it) }
+    }
+
+    fun refreshTags() = tags.refresh(tagsCache)
+
+    fun refreshPassItems() = passItems.refresh(passItemsCache)
+
+    private fun <E> MutableList<E>.refresh(items: Collection<E>) {
+        clear()
+        addAll(items)
+    }
+
+    fun addItem(keyItem: KeyItem): Result<Unit> {
+        return Result.success(Unit)
     }
 }

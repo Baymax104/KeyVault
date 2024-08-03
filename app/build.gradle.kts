@@ -98,4 +98,6 @@ dependencies {
     implementation(libs.voyager.screenModel)
     implementation(libs.voyager.bottomSheetNavigator)
     implementation(libs.voyager.tabNavigator)
+    implementation(libs.voyager.koin)
+    implementation(libs.koin)
 }

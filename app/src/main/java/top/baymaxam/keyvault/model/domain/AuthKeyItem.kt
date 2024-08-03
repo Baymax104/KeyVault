@@ -10,10 +10,10 @@ import java.util.Date
  * @since 30 6月 2024
  */
 @Parcelize
-class AuthItem(
+class AuthKeyItem(
     override val id: Long = 0,
     var name: String = "",
     var createDate: Date = Date(),
-    var authorization: PassItem = PassItem(),
+    var authorization: PassKeyItem = PassKeyItem(),
     var comment: String = "",
-) : Parcelable, Item
+) : Parcelable, KeyItem

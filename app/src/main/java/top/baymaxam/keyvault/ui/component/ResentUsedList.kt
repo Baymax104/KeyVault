@@ -34,13 +34,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import top.baymaxam.keyvault.model.domain.AuthItem
-import top.baymaxam.keyvault.model.domain.Item
-import top.baymaxam.keyvault.model.domain.PassItem
+import top.baymaxam.keyvault.model.domain.AuthKeyItem
+import top.baymaxam.keyvault.model.domain.KeyItem
+import top.baymaxam.keyvault.model.domain.PassKeyItem
 import top.baymaxam.keyvault.model.domain.PassType
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.ui.theme.MainColor
-import top.baymaxam.keyvault.ui.theme.robotoFont
 
 /**
  * 最近使用密码列表
@@ -50,9 +49,9 @@ import top.baymaxam.keyvault.ui.theme.robotoFont
 
 @Composable
 fun ResentUsedList(
-    items: SnapshotStateList<Item>,
-    onItemClick: (Item) -> Unit,
-    onItemCopy: (PassItem) -> Unit,
+    keyItems: SnapshotStateList<KeyItem>,
+    onItemClick: (KeyItem) -> Unit,
+    onItemCopy: (PassKeyItem) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -62,11 +61,11 @@ fun ResentUsedList(
         contentPadding = PaddingValues(vertical = 10.dp)
     ) {
         items(
-            items = items,
+            items = keyItems,
             key = { it.id }
         ) {
             ResentUsedItem(
-                item = it,
+                keyItem = it,
                 onClick = onItemClick,
                 onCopy = onItemCopy
             )
@@ -76,14 +75,14 @@ fun ResentUsedList(
 
 @Composable
 private fun ResentUsedItem(
-    item: Item,
-    onClick: (Item) -> Unit = {},
-    onCopy: (PassItem) -> Unit = {}
+    keyItem: KeyItem,
+    onClick: (KeyItem) -> Unit = {},
+    onCopy: (PassKeyItem) -> Unit = {}
 ) {
     ElevatedCard(
         shape = RoundedCornerShape(20.dp),
         modifier = Modifier.fillMaxWidth(),
-        onClick = { onClick(item) }
+        onClick = { onClick(keyItem) }
     ) {
         Row(
             modifier = Modifier
@@ -92,9 +91,9 @@ private fun ResentUsedItem(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            when (item) {
-                is PassItem -> PassItemLayout(item = item, onCopy = onCopy)
-                is AuthItem -> AuthItemLayout(item = item)
+            when (keyItem) {
+                is PassKeyItem -> PassItemLayout(item = keyItem, onCopy = onCopy)
+                is AuthKeyItem -> AuthItemLayout(item = keyItem)
             }
         }
     }
@@ -102,8 +101,8 @@ private fun ResentUsedItem(
 
 @Composable
 private fun RowScope.PassItemLayout(
-    item: PassItem,
-    onCopy: (PassItem) -> Unit
+    item: PassKeyItem,
+    onCopy: (PassKeyItem) -> Unit
 ) {
     FillIcon(
         icon = when (item.type) {
@@ -124,7 +123,6 @@ private fun RowScope.PassItemLayout(
         Text(
             text = item.name,
             style = TextStyle(
-                fontFamily = robotoFont,
                 fontWeight = FontWeight.Normal,
                 fontSize = 16.sp
             )
@@ -133,13 +131,11 @@ private fun RowScope.PassItemLayout(
         Text(
             text = item.username,
             style = TextStyle(
-                fontFamily = robotoFont,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Normal,
                 color = Color.Gray
             )
         )
-
     }
 
     IconButton(onClick = { onCopy(item) }) {
@@ -149,7 +145,7 @@ private fun RowScope.PassItemLayout(
 
 @Composable
 private fun RowScope.AuthItemLayout(
-    item: AuthItem,
+    item: AuthKeyItem,
 ) {
     FillIcon(
         icon = Icons.Rounded.Person,
@@ -167,7 +163,6 @@ private fun RowScope.AuthItemLayout(
         Text(
             text = item.name,
             style = TextStyle(
-                fontFamily = robotoFont,
                 fontWeight = FontWeight.Normal,
                 fontSize = 16.sp
             )
@@ -176,7 +171,6 @@ private fun RowScope.AuthItemLayout(
         Text(
             text = item.authorization.username,
             style = TextStyle(
-                fontFamily = robotoFont,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Normal,
                 color = Color.Gray
@@ -190,13 +184,13 @@ private fun RowScope.AuthItemLayout(
 private fun Preview() {
     AppTheme {
         val list = remember {
-            mutableStateListOf<Item>(
-                PassItem(id = 0, name = "测试", username = "username"),
-                PassItem(id = 1, name = "TestCard", username = "code")
+            mutableStateListOf<KeyItem>(
+                PassKeyItem(id = 0, name = "测试", username = "username"),
+                PassKeyItem(id = 1, name = "TestCard", username = "code")
             )
         }
         ResentUsedList(
-            items = list,
+            keyItems = list,
             onItemCopy = {},
             onItemClick = {}
         )

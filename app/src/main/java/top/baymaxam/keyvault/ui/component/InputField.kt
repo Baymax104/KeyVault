@@ -1,7 +1,7 @@
 package top.baymaxam.keyvault.ui.component
 
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Search
@@ -13,8 +13,11 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import top.baymaxam.keyvault.ui.theme.AppTheme
 
@@ -26,25 +29,38 @@ import top.baymaxam.keyvault.ui.theme.AppTheme
 
 @Composable
 fun SearchField(
-    content: MutableState<String> = mutableStateOf(""),
-    placeholder: @Composable () -> Unit,
+    contentState: MutableState<String>,
+    modifier: Modifier = Modifier,
+    placeholder: @Composable () -> Unit = {},
     onSearch: () -> Unit = {}
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
     OutlinedTextField(
-        value = content.value,
-        onValueChange = { content.value = it },
-        modifier = Modifier.fillMaxWidth(),
+        value = contentState.value,
+        onValueChange = { contentState.value = it },
+        modifier = modifier,
         shape = RoundedCornerShape(50),
+        singleLine = true,
         colors = OutlinedTextFieldDefaults.colors(
             unfocusedContainerColor = Color.White,
             focusedContainerColor = Color.White,
             unfocusedLeadingIconColor = Color.Black,
             focusedLeadingIconColor = MaterialTheme.colorScheme.primary
         ),
-        singleLine = true,
+        keyboardActions = KeyboardActions(
+            onDone = {
+                onSearch()
+                defaultKeyboardAction(ImeAction.Done)
+            }
+        ),
         placeholder = placeholder,
         leadingIcon = {
-            IconButton(onClick = onSearch) {
+            IconButton(
+                onClick = {
+                    onSearch()
+                    keyboardController?.hide()
+                }
+            ) {
                 Icon(
                     imageVector = Icons.Rounded.Search,
                     contentDescription = null,
@@ -52,8 +68,8 @@ fun SearchField(
             }
         },
         trailingIcon = {
-            if (content.value.isNotEmpty()) {
-                IconButton(onClick = { content.value = "" }) {
+            if (contentState.value.isNotEmpty()) {
+                IconButton(onClick = { contentState.value = "" }) {
                     Icon(imageVector = Icons.Rounded.Close, contentDescription = null)
                 }
             }
@@ -63,27 +79,28 @@ fun SearchField(
 
 @Composable
 fun InfoField(
-    content: MutableState<String> = mutableStateOf(""),
+    contentState: MutableState<String>,
+    modifier: Modifier = Modifier,
     placeholder: @Composable () -> Unit = {},
     leadingIcon: @Composable () -> Unit = {},
 ) {
     OutlinedTextField(
-        value = content.value,
-        onValueChange = { content.value = it },
-        modifier = Modifier.fillMaxWidth(),
+        value = contentState.value,
+        onValueChange = { contentState.value = it },
+        modifier = modifier,
         shape = RoundedCornerShape(50),
+        singleLine = true,
         colors = OutlinedTextFieldDefaults.colors(
             unfocusedContainerColor = Color.White,
             focusedContainerColor = Color.White,
             unfocusedLeadingIconColor = Color.Black,
             focusedLeadingIconColor = MaterialTheme.colorScheme.primary
         ),
-        singleLine = true,
         placeholder = placeholder,
         leadingIcon = leadingIcon,
         trailingIcon = {
-            if (content.value.isNotEmpty()) {
-                IconButton(onClick = { content.value = "" }) {
+            if (contentState.value.isNotEmpty()) {
+                IconButton(onClick = { contentState.value = "" }) {
                     Icon(imageVector = Icons.Rounded.Close, contentDescription = null)
                 }
             }
@@ -96,7 +113,7 @@ fun InfoField(
 @Composable
 private fun Preview() {
     AppTheme {
-        InfoField()
+        InfoField(remember { mutableStateOf("") })
     }
 }
 

@@ -1,24 +1,13 @@
 package top.baymaxam.keyvault.ui.screen
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableIntState
@@ -30,9 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -40,12 +27,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import top.baymaxam.keyvault.R
-import top.baymaxam.keyvault.model.domain.Item
-import top.baymaxam.keyvault.model.domain.PassItem
-import top.baymaxam.keyvault.ui.component.FillIcon
+import top.baymaxam.keyvault.model.domain.KeyItem
+import top.baymaxam.keyvault.model.domain.PassKeyItem
+import top.baymaxam.keyvault.ui.component.CatalogBlock
 import top.baymaxam.keyvault.ui.component.ResentUsedList
 import top.baymaxam.keyvault.ui.component.SearchField
 import top.baymaxam.keyvault.ui.theme.AppTheme
@@ -58,6 +46,10 @@ import top.baymaxam.keyvault.ui.theme.surfaceVariantLight
  * @since 22 6月 2024
  */
 object HomeTab : Tab {
+
+    override val key: ScreenKey
+        get() = "Home-Tab"
+
     override val options: TabOptions
         @Composable
         get() {
@@ -76,13 +68,13 @@ object HomeTab : Tab {
     @Composable
     override fun Content() {
         val list = remember {
-            mutableStateListOf<Item>(
-                PassItem(id = 0, name = "测试", username = "username"),
-                PassItem(id = 1, name = "TestCard", username = "code")
+            mutableStateListOf<KeyItem>(
+                PassKeyItem(id = 0, name = "测试", username = "username"),
+                PassKeyItem(id = 1, name = "TestCard", username = "code")
             )
         }
 
-        ContentLayout(items = list)
+        ContentLayout(keyItems = list)
     }
 }
 
@@ -93,9 +85,9 @@ private fun ContentLayout(
     onSearch: () -> Unit = {},
     onPasswordClick: () -> Unit = {},
     onTagClick: () -> Unit = {},
-    items: SnapshotStateList<Item> = mutableStateListOf(),
-    onItemCopy: (PassItem) -> Unit = {},
-    onItemClick: (Item) -> Unit = {},
+    keyItems: SnapshotStateList<KeyItem> = mutableStateListOf(),
+    onItemCopy: (PassKeyItem) -> Unit = {},
+    onItemClick: (KeyItem) -> Unit = {},
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -109,7 +101,7 @@ private fun ContentLayout(
         )
 
         ResentUsed(
-            items = items,
+            keyItems = keyItems,
             onItemCopy = onItemCopy,
             onItemClick = onItemClick
         )
@@ -148,12 +140,13 @@ private fun Header(
         )
 
         SearchField(
+            contentState = searchContent,
             placeholder = { Text(text = "搜索条目") },
-            content = searchContent,
-            onSearch = onSearch
+            onSearch = onSearch,
+            modifier = Modifier.fillMaxWidth()
         )
 
-        CatalogList(
+        CatalogBlock(
             passwordCount = passwordCount,
             tagCount = tagCount,
             onPasswordClick = onPasswordClick,
@@ -164,105 +157,10 @@ private fun Header(
 
 
 @Composable
-private fun CatalogList(
-    passwordCount: MutableIntState = mutableIntStateOf(0),
-    tagCount: MutableIntState = mutableIntStateOf(0),
-    onPasswordClick: () -> Unit = {},
-    onTagClick: () -> Unit = {}
-) {
-    Row(
-        modifier = Modifier
-            .padding(vertical = 15.dp)
-            .fillMaxWidth(),
-    ) {
-
-        CatalogCard(
-            modifier = Modifier
-                .height(110.dp)
-                .weight(1f),
-            icon = R.drawable.ic_key,
-            iconColor = Color(0xff11834f),
-            iconBackgroundColor = Color(0xffd5ffd3),
-            text = "${passwordCount.intValue}条密码",
-            onClick = onPasswordClick
-        )
-
-        Spacer(modifier = Modifier.width(10.dp))
-
-        CatalogCard(
-            modifier = Modifier
-                .height(110.dp)
-                .weight(1f),
-            icon = R.drawable.ic_tag,
-            iconColor = Color(0xffe78529),
-            iconBackgroundColor = Color(0xffffe8d3),
-            text = "${tagCount.intValue}个标签",
-            onClick = onTagClick
-        )
-    }
-}
-
-@Composable
-private fun CatalogCard(
-    modifier: Modifier = Modifier,
-    icon: Int,
-    iconColor: Color,
-    iconBackgroundColor: Color,
-    text: String,
-    onClick: () -> Unit
-) {
-
-    ElevatedCard(
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.elevatedCardColors(
-            containerColor = Color.White
-        ),
-        onClick = onClick,
-        modifier = modifier
-    ) {
-        Column(
-            verticalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 12.dp)
-        ) {
-
-            FillIcon(
-                icon = painterResource(id = icon),
-                iconColor = iconColor,
-                iconBackgroundColor = iconBackgroundColor,
-                shape = RoundedCornerShape(50),
-                modifier = Modifier.size(30.dp)
-            )
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = text,
-                    style = TextStyle(
-                        fontFamily = robotoFont,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
-                    )
-                )
-                Icon(
-                    imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
-                    contentDescription = null
-                )
-            }
-        }
-    }
-}
-
-
-@Composable
 private fun ResentUsed(
-    items: SnapshotStateList<Item>,
-    onItemCopy: (PassItem) -> Unit,
-    onItemClick: (Item) -> Unit
+    keyItems: SnapshotStateList<KeyItem>,
+    onItemCopy: (PassKeyItem) -> Unit,
+    onItemClick: (KeyItem) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -282,7 +180,7 @@ private fun ResentUsed(
             )
         )
         ResentUsedList(
-            items = items,
+            keyItems = keyItems,
             onItemCopy = onItemCopy,
             onItemClick = onItemClick,
             modifier = Modifier.fillMaxWidth(),
@@ -295,16 +193,14 @@ private fun ResentUsed(
 @Composable
 private fun Preview() {
     val list = remember {
-        mutableStateListOf<Item>(
-            PassItem(id = 0, name = "TestWeb", username = "username"),
-            PassItem(id = 1, name = "TestCard", username = "code")
+        mutableStateListOf<KeyItem>(
+            PassKeyItem(id = 0, name = "TestWeb", username = "username"),
+            PassKeyItem(id = 1, name = "TestCard", username = "code")
         )
     }
     AppTheme {
         ContentLayout(
-            items = list
+            keyItems = list
         )
-//        Header()
-//        CategoryList()
     }
 }

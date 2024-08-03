@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import top.baymaxam.keyvault.ui.theme.AppTheme
 
 /**
@@ -27,13 +28,12 @@ import top.baymaxam.keyvault.ui.theme.AppTheme
 
 @Composable
 fun SelectionButton(
+    modifier: Modifier = Modifier,
     onConfirm: () -> Unit = {},
     onCancel: () -> Unit = {}
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(60.dp),
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Button(
@@ -48,6 +48,7 @@ fun SelectionButton(
         ) {
             Text(
                 text = "取消",
+                fontSize = 16.sp,
                 style = MaterialTheme.typography.labelMedium,
             )
         }
@@ -60,6 +61,7 @@ fun SelectionButton(
         ) {
             Text(
                 text = "确认",
+                fontSize = 16.sp,
                 style = MaterialTheme.typography.labelMedium,
             )
         }

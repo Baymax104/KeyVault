@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.Tab
@@ -22,6 +23,8 @@ import top.baymaxam.keyvault.ui.theme.AppTheme
  */
 class MainScreen : Screen {
 
+    override val key: ScreenKey
+        get() = "Main-Screen"
 
     @Composable
     override fun Content() {

@@ -5,6 +5,6 @@ package top.baymaxam.keyvault.model.domain
  * @author John
  * @since 04 7月 2024
  */
-interface Item {
+interface KeyItem {
     val id: Long
 }

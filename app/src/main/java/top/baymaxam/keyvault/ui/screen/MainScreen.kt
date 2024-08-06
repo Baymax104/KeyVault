@@ -4,12 +4,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
-import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
+import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.bottomSheet.BottomSheetNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
@@ -28,19 +33,31 @@ class MainScreen : Screen {
 
     @Composable
     override fun Content() {
-        val bottomSheetNavigator = LocalBottomSheetNavigator.current
-        TabNavigator(tab = HomeTab) { navigator ->
-            ContentLayout(
-                onAddClick = { bottomSheetNavigator.show(AddScreen()) },
-                isNavigationSelected = { navigator.current == it },
-                onNavigationItemClick = { navigator.current = it }
-            ) {
-                CurrentTab()
+        BottomSheetNavigator(
+            sheetShape = RoundedCornerShape(15.dp)
+        ) { bottomSheetNavigator ->
+            TabNavigator(HomeTab) { tabNavigator ->
+                ContentLayout(
+                    onAddClick = { bottomSheetNavigator.show(AddScreen()) },
+                    isNavigationSelected = { tabNavigator.current == it },
+                    onNavigationItemClick = { tabNavigator.current = it }
+                ) {
+                    CurrentTab()
+                }
             }
         }
     }
-
 }
+
+val ProvidableCompositionLocal<Navigator?>.root: Navigator
+    @Composable
+    get() {
+        var current = currentOrThrow
+        while (current.level != 0) {
+            current = current.parent ?: error("CompositionLocal is null")
+        }
+        return current
+    }
 
 @Composable
 private fun ContentLayout(

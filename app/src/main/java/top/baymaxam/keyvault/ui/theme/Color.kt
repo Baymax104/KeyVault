@@ -1,8 +1,6 @@
 package top.baymaxam.keyvault.ui.theme
 import androidx.compose.ui.graphics.Color
 
-val MainColor = Color(0xff1e90ff)
-
 
 val primaryLight = Color(0xff1e90ff)
 val onPrimaryLight = Color(0xFFFFFFFF)

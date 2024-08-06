@@ -21,6 +21,7 @@ import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
@@ -39,7 +40,6 @@ import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.PassKeyItem
 import top.baymaxam.keyvault.model.domain.PassType
 import top.baymaxam.keyvault.ui.theme.AppTheme
-import top.baymaxam.keyvault.ui.theme.MainColor
 
 /**
  * 最近使用密码列表
@@ -109,7 +109,7 @@ private fun RowScope.PassItemLayout(
             PassType.Website -> Icons.Rounded.Language
             PassType.Card -> Icons.Rounded.CreditCard
         },
-        iconColor = MainColor,
+        iconColor = MaterialTheme.colorScheme.primary,
         iconBackgroundColor = Color(0xffd6ecff),
         shape = RoundedCornerShape(20),
         modifier = Modifier.size(30.dp)
@@ -149,7 +149,7 @@ private fun RowScope.AuthItemLayout(
 ) {
     FillIcon(
         icon = Icons.Rounded.Person,
-        iconColor = MainColor,
+        iconColor = MaterialTheme.colorScheme.primary,
         iconBackgroundColor = Color(0xffd6ecff),
         shape = RoundedCornerShape(20),
         modifier = Modifier.size(30.dp)

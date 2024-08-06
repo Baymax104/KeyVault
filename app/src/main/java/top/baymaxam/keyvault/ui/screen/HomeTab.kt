@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.ScreenKey
+import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import top.baymaxam.keyvault.R
@@ -54,19 +55,14 @@ object HomeTab : Tab {
         @Composable
         get() {
             val icon = rememberVectorPainter(image = Icons.Filled.Home)
-            return remember {
-                TabOptions(
-                    index = 0u,
-                    title = "首页",
-                    icon = icon
-                )
-            }
+            return remember { TabOptions(index = 0u, title = "首页", icon = icon) }
         }
 
     private fun readResolve(): Any = HomeTab
 
     @Composable
     override fun Content() {
+        val navigator = LocalNavigator.root
         val list = remember {
             mutableStateListOf<KeyItem>(
                 PassKeyItem(id = 0, name = "测试", username = "username"),
@@ -74,7 +70,12 @@ object HomeTab : Tab {
             )
         }
 
-        ContentLayout(keyItems = list)
+        ContentLayout(
+            keyItems = list,
+            onPasswordClick = {
+                navigator += ItemListScreen()
+            }
+        )
     }
 }
 

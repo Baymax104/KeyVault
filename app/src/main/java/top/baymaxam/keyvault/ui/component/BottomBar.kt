@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.runtime.Composable
@@ -17,7 +18,6 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import top.baymaxam.keyvault.ui.screen.HomeTab
 import top.baymaxam.keyvault.ui.screen.SettingsTab
 import top.baymaxam.keyvault.ui.theme.AppTheme
-import top.baymaxam.keyvault.ui.theme.MainColor
 
 /**
  * 底部导航栏
@@ -44,7 +44,7 @@ fun BottomBar(
             Icon(
                 imageVector = Icons.Filled.AddCircle,
                 contentDescription = "添加",
-                tint = MainColor,
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(40.dp)
             )
         }
@@ -70,7 +70,7 @@ private fun RowScope.TabNavigationItem(
                 Icon(
                     painter = tab.options.icon!!,
                     contentDescription = tab.options.title,
-                    tint = MainColor,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(30.dp)
                 )
             }

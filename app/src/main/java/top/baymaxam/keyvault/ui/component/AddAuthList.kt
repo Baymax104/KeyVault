@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CreditCard
 import androidx.compose.material.icons.rounded.Language
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
@@ -33,7 +34,6 @@ import androidx.compose.ui.unit.sp
 import top.baymaxam.keyvault.model.domain.PassKeyItem
 import top.baymaxam.keyvault.model.domain.PassType
 import top.baymaxam.keyvault.ui.theme.AppTheme
-import top.baymaxam.keyvault.ui.theme.MainColor
 
 /**
  * 授权条目列表
@@ -82,7 +82,7 @@ private fun AddAuthItem(
                 PassType.Website -> Icons.Rounded.Language
                 PassType.Card -> Icons.Rounded.CreditCard
             },
-            iconColor = MainColor,
+            iconColor = MaterialTheme.colorScheme.primary,
             iconBackgroundColor = Color(0xffd6ecff),
             shape = RoundedCornerShape(20),
             modifier = Modifier.size(30.dp)

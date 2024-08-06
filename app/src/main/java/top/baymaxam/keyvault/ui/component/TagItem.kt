@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.sp
 import top.baymaxam.keyvault.model.domain.Tag
 import top.baymaxam.keyvault.state.TagItemState
 import top.baymaxam.keyvault.ui.theme.AppTheme
-import top.baymaxam.keyvault.ui.theme.MainColor
 
 /**
  * 标签文字
@@ -36,7 +35,7 @@ fun TagTextItem(
     tag: Tag,
     modifier: Modifier = Modifier,
     fontSize: TextUnit = TextUnit.Unspecified,
-    color: Color = MainColor
+    color: Color = MaterialTheme.colorScheme.primary
 ) {
     Box(
         modifier = Modifier

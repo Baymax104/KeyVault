@@ -24,13 +24,7 @@ object SettingsTab : Tab {
     override val options: TabOptions
         @Composable get() {
             val icon = rememberVectorPainter(image = Icons.Filled.Settings)
-            return remember {
-                TabOptions(
-                    index = 1u,
-                    title = "设置",
-                    icon = icon
-                )
-            }
+            return remember { TabOptions(index = 1u, title = "设置", icon = icon) }
         }
 
     private fun readResolve(): Any = SettingsTab

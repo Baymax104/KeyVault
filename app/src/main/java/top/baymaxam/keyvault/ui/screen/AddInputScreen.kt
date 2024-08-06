@@ -114,7 +114,7 @@ class AddInputScreen : Screen {
             tagListState = tagListState,
             onSearch = { viewModel.searchTag(searchState.value) },
             onCancel = { bottomSheetNavigator.hide() },
-            onSelectAuth = { navigator.push(AddAuthScreen()) },
+            onSelectAuth = { navigator += AddAuthScreen() },
             onConfirm = onConfirm@{
                 if (typeSelectedState.intValue == 2 && viewModel.selectedPassItem.value == null) {
                     infoToast("授权条目未设置")

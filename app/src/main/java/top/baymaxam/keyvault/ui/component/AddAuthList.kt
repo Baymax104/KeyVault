@@ -22,7 +22,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,8 +30,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import top.baymaxam.keyvault.model.domain.PassKeyItem
-import top.baymaxam.keyvault.model.domain.PassType
+import top.baymaxam.keyvault.model.domain.KeyItem
+import top.baymaxam.keyvault.model.domain.KeyType
 import top.baymaxam.keyvault.ui.theme.AppTheme
 
 /**
@@ -42,10 +41,10 @@ import top.baymaxam.keyvault.ui.theme.AppTheme
  */
 @Composable
 fun AddAuthList(
-    items: SnapshotStateList<PassKeyItem>,
+    items: List<KeyItem>,
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
-    onItemClick: (PassKeyItem) -> Unit = {}
+    onItemClick: (KeyItem) -> Unit = {}
 ) {
     LazyColumn(
         state = state,
@@ -66,8 +65,8 @@ fun AddAuthList(
 
 @Composable
 private fun AddAuthItem(
-    item: PassKeyItem,
-    onClick: (PassKeyItem) -> Unit
+    item: KeyItem,
+    onClick: (KeyItem) -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -79,8 +78,9 @@ private fun AddAuthItem(
     ) {
         FillIcon(
             icon = when (item.type) {
-                PassType.Website -> Icons.Rounded.Language
-                PassType.Card -> Icons.Rounded.CreditCard
+                KeyType.Website -> Icons.Rounded.Language
+                KeyType.Card -> Icons.Rounded.CreditCard
+                KeyType.Authorization -> throw IllegalArgumentException("Item is authorization type.")
             },
             iconColor = MaterialTheme.colorScheme.primary,
             iconBackgroundColor = Color(0xffd6ecff),
@@ -119,8 +119,8 @@ private fun Preview() {
     AppTheme {
         val list = remember {
             mutableStateListOf(
-                PassKeyItem(id = 0, name = "测试", username = "username"),
-                PassKeyItem(id = 1, name = "TestCard", username = "code")
+                KeyItem(id = 0, name = "测试", username = "username"),
+                KeyItem(id = 1, name = "TestCard", username = "code")
             )
         }
         AddAuthList(items = list)

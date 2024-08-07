@@ -1,5 +1,6 @@
 package top.baymaxam.keyvault.ui.component
 
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,14 +22,16 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,20 +39,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.KeyType
+import top.baymaxam.keyvault.state.ItemSelectedState
 import top.baymaxam.keyvault.ui.theme.AppTheme
 
 /**
- * 最近使用密码列表
+ * 条目列表
  * @author John
- * @since 27 6月 2024
+ * @since 07 8月 2024
  */
-
 @Composable
-fun ResentUsedList(
-    keyItems: List<KeyItem>,
-    onItemClick: (KeyItem) -> Unit,
-    onItemCopy: (KeyItem) -> Unit,
-    modifier: Modifier = Modifier
+fun ItemList(
+    items: List<ItemSelectedState<KeyItem>>,
+    modifier: Modifier = Modifier,
+    editableState: MutableState<Boolean> = mutableStateOf(false),
+    onItemClick: (KeyItem) -> Unit = {},
+    onItemCopy: (KeyItem) -> Unit = {}
 ) {
     LazyColumn(
         modifier = modifier,
@@ -58,25 +62,48 @@ fun ResentUsedList(
         contentPadding = PaddingValues(vertical = 10.dp)
     ) {
         items(
-            items = keyItems,
-            key = { it.id }
-        ) {
-            RecentUsedItem(item = it, onClick = onItemClick, onCopy = onItemCopy)
+            items = items,
+            key = { it.value.id }
+        ) { item ->
+            KeyItemLayout(
+                item = item,
+                editableState = editableState,
+                onClick = onItemClick,
+                onCopy = onItemCopy
+            )
         }
     }
 }
 
 
 @Composable
-private fun RecentUsedItem(
-    item: KeyItem,
-    onClick: (KeyItem) -> Unit,
-    onCopy: (KeyItem) -> Unit
+private fun KeyItemLayout(
+    item: ItemSelectedState<KeyItem>,
+    editableState: MutableState<Boolean> = mutableStateOf(false),
+    onClick: (KeyItem) -> Unit = {},
+    onCopy: (KeyItem) -> Unit = {},
 ) {
     ElevatedCard(
         shape = RoundedCornerShape(20.dp),
-        modifier = Modifier.fillMaxWidth(),
-        onClick = { onClick(item) }
+        modifier = Modifier
+            .fillMaxWidth()
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onLongPress = {
+                        if (!editableState.value) {
+                            editableState.value = true
+                            item.selected.value = true
+                        }
+                    }
+                )
+            },
+        onClick = {
+            if (editableState.value) {
+                item.selected.value = !item.selected.value
+            } else {
+                onClick(item.value)
+            }
+        }
     ) {
         Row(
             modifier = Modifier
@@ -86,7 +113,7 @@ private fun RecentUsedItem(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             FillIcon(
-                icon = when (item.type) {
+                icon = when (item.value.type) {
                     KeyType.Website -> Icons.Rounded.Language
                     KeyType.Card -> Icons.Rounded.CreditCard
                     KeyType.Authorization -> Icons.Rounded.Person
@@ -103,7 +130,7 @@ private fun RecentUsedItem(
                     .padding(horizontal = 10.dp)
             ) {
                 Text(
-                    text = item.name,
+                    text = item.value.name,
                     style = TextStyle(
                         fontWeight = FontWeight.Normal,
                         fontSize = 16.sp
@@ -111,9 +138,9 @@ private fun RecentUsedItem(
                 )
                 Spacer(modifier = Modifier.height(5.dp))
                 Text(
-                    text = when (item.type) {
-                        KeyType.Authorization -> item.authorization?.name ?: ""
-                        else -> item.username
+                    text = when (item.value.type) {
+                        KeyType.Authorization -> item.value.authorization?.name ?: ""
+                        else -> item.value.username
                     },
                     style = TextStyle(
                         fontSize = 14.sp,
@@ -123,8 +150,13 @@ private fun RecentUsedItem(
                 )
             }
 
-            if (item.type != KeyType.Authorization) {
-                IconButton(onClick = { onCopy(item) }) {
+            if (editableState.value) {
+                RadioButton(
+                    selected = item.selected.value,
+                    onClick = { item.selected.value = !item.selected.value }
+                )
+            } else if (item.value.type != KeyType.Authorization) {
+                IconButton(onClick = { onCopy(item.value) }) {
                     Icon(imageVector = Icons.Rounded.ContentCopy, contentDescription = null)
                 }
             }
@@ -132,20 +164,23 @@ private fun RecentUsedItem(
     }
 }
 
-@Preview(showBackground = true)
+
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun Preview() {
     AppTheme {
-        val list = remember {
-            mutableStateListOf(
-                KeyItem(id = 0, name = "测试", username = "username"),
-                KeyItem(id = 1, name = "TestCard", username = "code", type = KeyType.Card)
-            )
-        }
-        ResentUsedList(
-            keyItems = list,
-            onItemCopy = {},
-            onItemClick = {}
+        val list = listOf(
+            ItemSelectedState(KeyItem(id = 0, name = "Hello")),
+            ItemSelectedState(KeyItem(id = 1, name = "Hello")),
+            ItemSelectedState(KeyItem(id = 2, name = "Hello")),
+            ItemSelectedState(KeyItem(id = 3, name = "Hello")),
+            ItemSelectedState(KeyItem(id = 4, name = "Hello")),
+            ItemSelectedState(KeyItem(id = 5, name = "Hello")),
+            ItemSelectedState(KeyItem(id = 6, name = "Hello")),
+            ItemSelectedState(KeyItem(id = 7, name = "Hello")),
         )
+        ItemList(items = list)
     }
 }
+
+

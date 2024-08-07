@@ -5,7 +5,8 @@ package top.baymaxam.keyvault.model.domain
  * @author John
  * @since 04 7月 2024
  */
-enum class PassType {
+enum class KeyType {
     Website,
-    Card
+    Card,
+    Authorization
 }

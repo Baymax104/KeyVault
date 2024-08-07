@@ -39,7 +39,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,12 +54,11 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
-import top.baymaxam.keyvault.model.domain.AuthKeyItem
 import top.baymaxam.keyvault.model.domain.KeyItem
-import top.baymaxam.keyvault.model.domain.PassKeyItem
-import top.baymaxam.keyvault.model.domain.PassType
+import top.baymaxam.keyvault.model.domain.KeyType
+import top.baymaxam.keyvault.model.domain.Tag
 import top.baymaxam.keyvault.state.AddScreenModel
-import top.baymaxam.keyvault.state.TagItemState
+import top.baymaxam.keyvault.state.ItemSelectedState
 import top.baymaxam.keyvault.ui.component.InfoField
 import top.baymaxam.keyvault.ui.component.SearchField
 import top.baymaxam.keyvault.ui.component.SelectionButton
@@ -110,7 +108,7 @@ class AddInputScreen : Screen {
             usernameContentState = usernameContentState,
             passwordContentState = passwordContentState,
             commentContentState = commentContentState,
-            selectedPassItemState = viewModel.selectedPassItem,
+            selectedItemState = viewModel.selectedPassItem,
             tagListState = tagListState,
             onSearch = { viewModel.searchTag(searchState.value) },
             onCancel = { bottomSheetNavigator.hide() },
@@ -121,23 +119,23 @@ class AddInputScreen : Screen {
                     return@onConfirm
                 }
                 val item: KeyItem? = when (typeSelectedState.intValue) {
-                    0 -> PassKeyItem(
+                    0 -> KeyItem(
                         name = nameContentState.value,
                         username = usernameContentState.value,
                         password = passwordContentState.value,
                         comment = commentContentState.value,
-                        type = PassType.Website
+                        type = KeyType.Website
                     )
 
-                    1 -> PassKeyItem(
+                    1 -> KeyItem(
                         name = nameContentState.value,
                         username = usernameContentState.value,
                         password = passwordContentState.value,
                         comment = commentContentState.value,
-                        type = PassType.Card
+                        type = KeyType.Card
                     )
 
-                    2 -> AuthKeyItem(
+                    2 -> KeyItem(
                         name = nameContentState.value,
                         comment = commentContentState.value,
                         authorization = viewModel.selectedPassItem.value!!
@@ -164,13 +162,13 @@ class AddInputScreen : Screen {
 @Composable
 private fun ContentLayout(
     searchContentState: MutableState<String> = mutableStateOf(""),
-    tags: SnapshotStateList<TagItemState> = mutableStateListOf(),
-    typeSelectedState: MutableIntState = mutableIntStateOf(2),
+    tags: List<ItemSelectedState<Tag>> = mutableStateListOf(),
+    typeSelectedState: MutableIntState = mutableIntStateOf(0),
     nameContentState: MutableState<String> = mutableStateOf(""),
     usernameContentState: MutableState<String> = mutableStateOf(""),
     passwordContentState: MutableState<String> = mutableStateOf(""),
     commentContentState: MutableState<String> = mutableStateOf(""),
-    selectedPassItemState: MutableState<PassKeyItem?> = mutableStateOf(null),
+    selectedItemState: MutableState<KeyItem?> = mutableStateOf(null),
     tagListState: LazyListState = rememberLazyListState(),
     onSearch: () -> Unit = {},
     onConfirm: () -> Unit = {},
@@ -259,30 +257,15 @@ private fun ContentLayout(
                     onClick = { typeSelectedState.intValue = 2 }
                 )
             }
-            when (typeSelectedState.intValue) {
-                0 -> PassFields(
-                    typeIndex = typeSelectedState,
-                    nameState = nameContentState,
-                    usernameState = usernameContentState,
-                    passwordState = passwordContentState,
-                    commentState = commentContentState
-                )
-
-                1 -> PassFields(
-                    typeIndex = typeSelectedState,
-                    nameState = nameContentState,
-                    usernameState = usernameContentState,
-                    passwordState = passwordContentState,
-                    commentState = commentContentState
-                )
-
-                2 -> AuthFields(
-                    nameState = nameContentState,
-                    commentState = commentContentState,
-                    onSelectAuth = onSelectAuth,
-                    selectedPassItemState = selectedPassItemState
-                )
-            }
+            PassFields(
+                typeIndex = typeSelectedState,
+                nameState = nameContentState,
+                usernameState = usernameContentState,
+                passwordState = passwordContentState,
+                commentState = commentContentState,
+                selectedItemState = selectedItemState,
+                onSelectAuth = onSelectAuth
+            )
             Spacer(modifier = Modifier.height(5.dp))
         }
         SelectionButton(
@@ -298,11 +281,13 @@ private fun ContentLayout(
 
 @Composable
 private fun PassFields(
-    typeIndex: MutableIntState = mutableIntStateOf(0),
+    typeIndex: MutableIntState = mutableIntStateOf(2),
     nameState: MutableState<String> = mutableStateOf(""),
     usernameState: MutableState<String> = mutableStateOf(""),
     passwordState: MutableState<String> = mutableStateOf(""),
-    commentState: MutableState<String> = mutableStateOf("")
+    commentState: MutableState<String> = mutableStateOf(""),
+    selectedItemState: MutableState<KeyItem?> = mutableStateOf(null),
+    onSelectAuth: () -> Unit = {},
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -314,12 +299,14 @@ private fun PassFields(
                 when (typeIndex.intValue) {
                     0 -> Text(text = "网站名称")
                     1 -> Text(text = "卡片名称")
+                    2 -> Text(text = "授权名称")
                 }
             },
             leadingIcon = {
                 val icon = when (typeIndex.intValue) {
                     0 -> Icons.Rounded.Language
                     1 -> Icons.Rounded.CreditCard
+                    2 -> Icons.Rounded.Person
                     else -> null
                 }
                 if (icon != null) {
@@ -331,108 +318,74 @@ private fun PassFields(
             },
             modifier = Modifier.fillMaxWidth()
         )
-        InfoField(
-            contentState = usernameState,
-            placeholder = {
-                when (typeIndex.intValue) {
-                    0 -> Text(text = "用户名")
-                    1 -> Text(text = "卡号")
-                }
-            },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Rounded.Person,
-                    contentDescription = null,
-                )
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
-        InfoField(
-            contentState = passwordState,
-            placeholder = { Text(text = "密码") },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Rounded.Key,
-                    contentDescription = null,
-                )
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
-        InfoField(
-            contentState = commentState,
-            placeholder = { Text(text = "备注") },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Rounded.Description,
-                    contentDescription = null,
-                )
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
-    }
-}
-
-@Composable
-private fun AuthFields(
-    nameState: MutableState<String> = mutableStateOf(""),
-    commentState: MutableState<String> = mutableStateOf(""),
-    selectedPassItemState: MutableState<PassKeyItem?> = mutableStateOf(null),
-    onSelectAuth: () -> Unit = {},
-) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(15.dp)
-    ) {
-        InfoField(
-            contentState = nameState,
-            placeholder = {
-                Text(text = "授权名称")
-            },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Rounded.Person,
-                    contentDescription = null,
-                )
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
-        InfoField(
-            contentState = commentState,
-            placeholder = { Text(text = "备注") },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Rounded.Description,
-                    contentDescription = null,
-                )
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .clip(RoundedCornerShape(50))
-                .clickable(onClick = onSelectAuth)
-        ) {
-            OutlinedTextField(
-                value = if (selectedPassItemState.value != null) selectedPassItemState.value!!.name else "授权",
-                onValueChange = {},
-                enabled = false,
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(50),
-                colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedContainerColor = Color.White,
-                    focusedContainerColor = Color.White,
-                    unfocusedLeadingIconColor = Color.Black,
-                    focusedLeadingIconColor = MaterialTheme.colorScheme.primary,
-                    disabledBorderColor = Color.Black,
-                    disabledLeadingIconColor = Color.Black,
-                    disabledTextColor = Color.Black
-                ),
-                singleLine = true,
-                leadingIcon = {
-                    Icon(imageVector = Icons.Rounded.Language, contentDescription = null)
+        if (typeIndex.intValue != 2) {
+            InfoField(
+                contentState = usernameState,
+                placeholder = {
+                    when (typeIndex.intValue) {
+                        0 -> Text(text = "用户名")
+                        1 -> Text(text = "卡号")
+                    }
                 },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Rounded.Person,
+                        contentDescription = null,
+                    )
+                },
+                modifier = Modifier.fillMaxWidth()
             )
+            InfoField(
+                contentState = passwordState,
+                placeholder = { Text(text = "密码") },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Rounded.Key,
+                        contentDescription = null,
+                    )
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+        InfoField(
+            contentState = commentState,
+            placeholder = { Text(text = "备注") },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Rounded.Description,
+                    contentDescription = null,
+                )
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
+        if (typeIndex.intValue == 2) {
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(50))
+                    .clickable(onClick = onSelectAuth)
+            ) {
+                OutlinedTextField(
+                    value = if (selectedItemState.value != null) selectedItemState.value!!.name else "授权",
+                    onValueChange = {},
+                    enabled = false,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(50),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedContainerColor = Color.White,
+                        focusedContainerColor = Color.White,
+                        unfocusedLeadingIconColor = Color.Black,
+                        focusedLeadingIconColor = MaterialTheme.colorScheme.primary,
+                        disabledBorderColor = Color.Black,
+                        disabledLeadingIconColor = Color.Black,
+                        disabledTextColor = Color.Black
+                    ),
+                    singleLine = true,
+                    leadingIcon = {
+                        Icon(imageVector = Icons.Rounded.Language, contentDescription = null)
+                    },
+                )
+            }
+
         }
     }
 }

@@ -2,7 +2,7 @@ package top.baymaxam.keyvault.util
 
 import androidx.room.TypeConverter
 import kotlinx.serialization.json.Json
-import top.baymaxam.keyvault.model.domain.PassType
+import top.baymaxam.keyvault.model.domain.KeyType
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -47,19 +47,20 @@ object DateConverter {
 object PassTypeConverter {
 
     @TypeConverter
-    fun type2Int(type: PassType): Int {
+    fun type2Int(type: KeyType): Int {
         return when (type) {
-            PassType.Website -> 0
-            PassType.Card -> 1
+            KeyType.Website -> 0
+            KeyType.Card -> 1
+            else -> 0
         }
     }
 
     @TypeConverter
-    fun int2Type(i: Int): PassType {
+    fun int2Type(i: Int): KeyType {
         return when (i) {
-            0 -> PassType.Website
-            1 -> PassType.Card
-            else -> PassType.Website
+            0 -> KeyType.Website
+            1 -> KeyType.Card
+            else -> KeyType.Website
         }
     }
 }

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableIntState
@@ -16,7 +17,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -33,13 +33,11 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import top.baymaxam.keyvault.R
 import top.baymaxam.keyvault.model.domain.KeyItem
-import top.baymaxam.keyvault.model.domain.PassKeyItem
 import top.baymaxam.keyvault.ui.component.CatalogBlock
 import top.baymaxam.keyvault.ui.component.ResentUsedList
 import top.baymaxam.keyvault.ui.component.SearchField
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.ui.theme.robotoFont
-import top.baymaxam.keyvault.ui.theme.surfaceVariantLight
 
 /**
  * 首页
@@ -64,9 +62,10 @@ object HomeTab : Tab {
     override fun Content() {
         val navigator = LocalNavigator.root
         val list = remember {
-            mutableStateListOf<KeyItem>(
-                PassKeyItem(id = 0, name = "测试", username = "username"),
-                PassKeyItem(id = 1, name = "TestCard", username = "code")
+            mutableStateListOf(
+                KeyItem(id = 0, name = "测试", username = "username"),
+                KeyItem(id = 1, name = "TestCard", username = "code"),
+                KeyItem(id = 2, name = "AuthTest")
             )
         }
 
@@ -86,8 +85,8 @@ private fun ContentLayout(
     onSearch: () -> Unit = {},
     onPasswordClick: () -> Unit = {},
     onTagClick: () -> Unit = {},
-    keyItems: SnapshotStateList<KeyItem> = mutableStateListOf(),
-    onItemCopy: (PassKeyItem) -> Unit = {},
+    keyItems: List<KeyItem> = mutableStateListOf(),
+    onItemCopy: (KeyItem) -> Unit = {},
     onItemClick: (KeyItem) -> Unit = {},
 ) {
     Column(
@@ -121,7 +120,7 @@ private fun Header(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(surfaceVariantLight)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
             .padding(horizontal = 15.dp)
             .statusBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -159,8 +158,8 @@ private fun Header(
 
 @Composable
 private fun ResentUsed(
-    keyItems: SnapshotStateList<KeyItem>,
-    onItemCopy: (PassKeyItem) -> Unit,
+    keyItems: List<KeyItem>,
+    onItemCopy: (KeyItem) -> Unit,
     onItemClick: (KeyItem) -> Unit
 ) {
     Column(
@@ -194,9 +193,9 @@ private fun ResentUsed(
 @Composable
 private fun Preview() {
     val list = remember {
-        mutableStateListOf<KeyItem>(
-            PassKeyItem(id = 0, name = "TestWeb", username = "username"),
-            PassKeyItem(id = 1, name = "TestCard", username = "code")
+        mutableStateListOf(
+            KeyItem(id = 0, name = "TestWeb", username = "username"),
+            KeyItem(id = 1, name = "TestCard", username = "code")
         )
     }
     AppTheme {

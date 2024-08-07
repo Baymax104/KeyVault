@@ -5,9 +5,9 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import cafe.adriel.voyager.core.model.ScreenModel
 import top.baymaxam.keyvault.model.domain.KeyItem
-import top.baymaxam.keyvault.model.domain.PassKeyItem
-import top.baymaxam.keyvault.model.domain.PassType
+import top.baymaxam.keyvault.model.domain.KeyType
 import top.baymaxam.keyvault.model.domain.Tag
+import top.baymaxam.keyvault.util.replaceAll
 import kotlin.properties.Delegates
 
 /**
@@ -18,64 +18,59 @@ import kotlin.properties.Delegates
 @Stable
 class AddScreenModel : ScreenModel {
 
-    val tags = mutableStateListOf<TagItemState>()
-    private val tagsCache by Delegates.observable(mutableListOf<TagItemState>()) { _, _, newValue ->
-        if (newValue.isNotEmpty()) {
-            tags.addAll(newValue)
+    val tags = mutableStateListOf<ItemSelectedState<Tag>>()
+    private val tagsCache by Delegates.observable(mutableListOf<ItemSelectedState<Tag>>()) { _, _, value ->
+        if (value.isNotEmpty()) {
+            tags.replaceAll(value)
         }
     }
 
-    val passItems = mutableStateListOf<PassKeyItem>()
-    private val passItemsCache by Delegates.observable(mutableListOf<PassKeyItem>()) { _, _, newValue ->
-        if (newValue.isNotEmpty()) {
-            passItems.addAll(newValue)
+    val passItems = mutableStateListOf<KeyItem>()
+    private val passItemsCache by Delegates.observable(mutableListOf<KeyItem>()) { _, _, value ->
+        if (value.isNotEmpty()) {
+            passItems.replaceAll(value)
         }
     }
 
-    val selectedPassItem = mutableStateOf<PassKeyItem?>(null)
+    val selectedPassItem = mutableStateOf<KeyItem?>(null)
 
     init {
         tagsCache.addAll(
             listOf(
-                TagItemState(Tag(id = 0, name = "Hello")),
-                TagItemState(Tag(id = 1, name = "Hello1")),
-                TagItemState(Tag(id = 2, name = "Hello2")),
-                TagItemState(Tag(id = 3, name = "Hello3")),
-                TagItemState(Tag(id = 4, name = "Hello4")),
+                ItemSelectedState(Tag(id = 0, name = "Hello")),
+                ItemSelectedState(Tag(id = 1, name = "Hello1")),
+                ItemSelectedState(Tag(id = 2, name = "Hello2")),
+                ItemSelectedState(Tag(id = 3, name = "Hello3")),
+                ItemSelectedState(Tag(id = 4, name = "Hello4")),
             )
         )
 
         passItemsCache.addAll(
             listOf(
-                PassKeyItem(id = 0, name = "test1", type = PassType.Website, username = "Hello"),
-                PassKeyItem(id = 1, name = "test2", type = PassType.Card, username = "Hello"),
-                PassKeyItem(id = 2, name = "test3", type = PassType.Website, username = "Hello"),
-                PassKeyItem(id = 3, name = "test4", type = PassType.Website, username = "Hello"),
-                PassKeyItem(id = 4, name = "test5", type = PassType.Card, username = "Hello"),
+                KeyItem(id = 0, name = "test1", type = KeyType.Website, username = "Hello"),
+                KeyItem(id = 1, name = "test2", type = KeyType.Card, username = "Hello"),
+                KeyItem(id = 2, name = "test3", type = KeyType.Website, username = "Hello"),
+                KeyItem(id = 3, name = "test4", type = KeyType.Website, username = "Hello"),
+                KeyItem(id = 4, name = "test5", type = KeyType.Card, username = "Hello"),
             )
         )
     }
 
     fun searchTag(content: String) {
         tagsCache.filter { it.value.name.contains(content, true) }
-            .let { tags.refresh(it) }
+            .let { tags.replaceAll(it) }
     }
 
     fun searchPassItem(content: String) {
         passItemsCache.filter { it.name.contains(content, true) }
-            .let { passItems.refresh(it) }
+            .let { passItems.replaceAll(it) }
     }
 
-    fun refreshTags() = tags.refresh(tagsCache)
+    fun refreshTags() = tags.replaceAll(tagsCache)
 
-    fun refreshPassItems() = passItems.refresh(passItemsCache)
+    fun refreshPassItems() = passItems.replaceAll(passItemsCache)
 
-    private fun <E> MutableList<E>.refresh(items: Collection<E>) {
-        clear()
-        addAll(items)
-    }
-
-    fun addItem(keyItem: KeyItem): Result<Unit> {
+    suspend fun addItem(keyItem: KeyItem): Result<Unit> {
         return Result.success(Unit)
     }
 }

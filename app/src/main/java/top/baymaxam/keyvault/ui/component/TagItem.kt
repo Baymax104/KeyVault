@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import top.baymaxam.keyvault.model.domain.Tag
-import top.baymaxam.keyvault.state.TagItemState
+import top.baymaxam.keyvault.state.ItemSelectedState
 import top.baymaxam.keyvault.ui.theme.AppTheme
 
 /**
@@ -57,9 +57,9 @@ fun TagTextItem(
 
 @Composable
 fun TagItem(
-    tag: TagItemState,
+    tag: ItemSelectedState<Tag>,
     modifier: Modifier = Modifier,
-    onClick: (TagItemState) -> Unit = {}
+    onClick: (ItemSelectedState<Tag>) -> Unit = {}
 ) {
     val borderModifier = if (tag.selected.value) {
         modifier.border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(15.dp))
@@ -92,7 +92,7 @@ fun TagItem(
 private fun Preview() {
     AppTheme {
         TagItem(
-            tag = TagItemState(Tag(name = "Hello")),
+            tag = ItemSelectedState(Tag(name = "Hello")),
             modifier = Modifier
                 .height(50.dp)
                 .width(80.dp),

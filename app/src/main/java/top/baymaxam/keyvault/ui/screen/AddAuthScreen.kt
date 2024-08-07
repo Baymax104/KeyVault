@@ -18,7 +18,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -29,7 +28,7 @@ import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.koin.koinNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import top.baymaxam.keyvault.model.domain.PassKeyItem
+import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.state.AddScreenModel
 import top.baymaxam.keyvault.ui.component.AddAuthList
 import top.baymaxam.keyvault.ui.component.SearchField
@@ -61,7 +60,7 @@ class AddAuthScreen : Screen {
 
         ContentLayout(
             searchContentState = searchContentState,
-            passItems = viewModel.passItems,
+            items = viewModel.passItems,
             onSearch = { viewModel.searchPassItem(searchContentState.value) },
             onBack = { navigator.pop() },
             onPassItemClick = {
@@ -75,11 +74,11 @@ class AddAuthScreen : Screen {
 @Composable
 private fun ContentLayout(
     searchContentState: MutableState<String> = mutableStateOf(""),
-    passItems: SnapshotStateList<PassKeyItem> = mutableStateListOf(),
-    passItemListState: LazyListState = rememberLazyListState(),
+    items: List<KeyItem> = mutableStateListOf(),
+    itemListState: LazyListState = rememberLazyListState(),
     onBack: () -> Unit = {},
     onSearch: () -> Unit = {},
-    onPassItemClick: (PassKeyItem) -> Unit = {}
+    onPassItemClick: (KeyItem) -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -98,8 +97,8 @@ private fun ContentLayout(
         )
 
         AddAuthList(
-            state = passItemListState,
-            items = passItems,
+            state = itemListState,
+            items = items,
             modifier = Modifier.weight(1f),
             onItemClick = onPassItemClick
         )
@@ -135,12 +134,12 @@ private fun Preview() {
     AppTheme {
         val list = remember {
             mutableStateListOf(
-                PassKeyItem(id = 0, name = "测试", username = "username"),
-                PassKeyItem(id = 1, name = "TestCard", username = "code")
+                KeyItem(id = 0, name = "测试", username = "username"),
+                KeyItem(id = 1, name = "TestCard", username = "code")
             )
         }
         ContentLayout(
-            passItems = list
+            items = list
         )
     }
 }

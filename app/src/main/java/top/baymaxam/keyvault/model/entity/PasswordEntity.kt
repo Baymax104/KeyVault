@@ -3,7 +3,7 @@ package top.baymaxam.keyvault.model.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
-import top.baymaxam.keyvault.model.domain.PassType
+import top.baymaxam.keyvault.model.domain.KeyType
 import top.baymaxam.keyvault.util.DateConverter
 import top.baymaxam.keyvault.util.PassTypeConverter
 import java.util.Date
@@ -23,5 +23,5 @@ data class PasswordEntity(
     var createDate: Date = Date(),
     var comment: String = "",
     var lastUsedDate: Date = Date(),
-    var type: PassType = PassType.Website
+    var type: KeyType = KeyType.Website
 )

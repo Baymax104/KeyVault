@@ -3,18 +3,37 @@
 package top.baymaxam.keyvault.ui.screen
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
+import kotlinx.coroutines.launch
+import top.baymaxam.keyvault.R
+import top.baymaxam.keyvault.model.domain.KeyItem
+import top.baymaxam.keyvault.state.ItemListScreenModel
+import top.baymaxam.keyvault.state.ItemSelectedState
+import top.baymaxam.keyvault.ui.component.ItemList
 import top.baymaxam.keyvault.ui.component.TopBackBar
 import top.baymaxam.keyvault.ui.theme.AppTheme
 
@@ -31,29 +50,80 @@ class ItemListScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.root
+        val editableState = remember { mutableStateOf(false) }
+        val viewModel = koinScreenModel<ItemListScreenModel>()
+        val pagerState = rememberPagerState { 3 }
+
+        LaunchedEffect(pagerState) {
+            snapshotFlow { pagerState.settledPage }
+                .collect { viewModel.loadItems(it) }
+        }
+
+
         ContentLayout(
-            onBack = { navigator.pop() }
+            pagerState = pagerState,
+            onLoadItems = {
+                when (it) {
+                    0 -> viewModel.webItems
+                    1 -> viewModel.cardItems
+                    2 -> viewModel.authItems
+                    else -> throw IndexOutOfBoundsException("page is out of range.")
+                }
+            },
+            editableState = editableState,
+            onBack = { navigator.pop() },
+            onItemClick = {},
+            onItemCopy = {}
         )
     }
 }
 
 @Composable
 private fun ContentLayout(
-    onBack: () -> Unit = {}
+    pagerState: PagerState = rememberPagerState { 3 },
+    onLoadItems: (Int) -> List<ItemSelectedState<KeyItem>> = { emptyList() },
+    editableState: MutableState<Boolean> = mutableStateOf(false),
+    onBack: () -> Unit = {},
+    onItemClick: (KeyItem) -> Unit = {},
+    onItemCopy: (KeyItem) -> Unit = {},
 ) {
-    val pagerState = rememberPagerState { 3 }
+    val scope = rememberCoroutineScope()
     Scaffold(
         topBar = { TopBackBar(title = "密码本", onBack = onBack) },
     ) { paddingValues ->
-        HorizontalPager(
-            state = pagerState,
-            modifier = Modifier.padding(paddingValues)
-        ) { page ->
-            Text(
-                text = "$page",
-                modifier = Modifier.fillMaxSize()
-            )
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize(),
+        ) {
+            TabRow(selectedTabIndex = pagerState.currentPage) {
+                listOf("网站", "卡片", "授权").forEachIndexed { index, text ->
+                    Tab(
+                        selected = pagerState.currentPage == index,
+                        text = { Text(text = text) },
+                        onClick = { scope.launch { pagerState.animateScrollToPage(index) } }
+                    )
+                }
+            }
 
+            HorizontalPager(state = pagerState) { page ->
+                val items = onLoadItems(page)
+                if (items.isNotEmpty()) {
+                    ItemList(
+                        items = items,
+                        editableState = editableState,
+                        onItemClick = onItemClick,
+                        onItemCopy = onItemCopy,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(id = R.drawable.img_no_data),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
         }
     }
 }
@@ -63,6 +133,16 @@ private fun ContentLayout(
 @Composable
 private fun Preview() {
     AppTheme {
-        ContentLayout()
+        ContentLayout(
+            onLoadItems = {
+                listOf(
+                    ItemSelectedState(KeyItem(id = 0, name = "hello1")),
+                    ItemSelectedState(KeyItem(id = 1, name = "hello1")),
+                    ItemSelectedState(KeyItem(id = 2, name = "hello1")),
+                    ItemSelectedState(KeyItem(id = 3, name = "hello1")),
+                    ItemSelectedState(KeyItem(id = 4, name = "hello1")),
+                )
+            }
+        )
     }
 }

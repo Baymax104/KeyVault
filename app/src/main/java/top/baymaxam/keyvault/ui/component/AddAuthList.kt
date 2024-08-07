@@ -71,6 +71,7 @@ private fun AddAuthItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .height(70.dp)
             .clickable { onClick(item) }
             .padding(vertical = 10.dp, horizontal = 15.dp),
         verticalAlignment = Alignment.CenterVertically,

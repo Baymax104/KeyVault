@@ -5,6 +5,7 @@ package top.baymaxam.keyvault.ui.screen
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
@@ -24,6 +25,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.koin.koinScreenModel
@@ -56,20 +58,12 @@ class ItemListScreen : Screen {
 
         LaunchedEffect(pagerState) {
             snapshotFlow { pagerState.settledPage }
-                .collect { viewModel.loadItems(it) }
+                .collect { viewModel.loadPage(it) }
         }
-
 
         ContentLayout(
             pagerState = pagerState,
-            onLoadItems = {
-                when (it) {
-                    0 -> viewModel.webItems
-                    1 -> viewModel.cardItems
-                    2 -> viewModel.authItems
-                    else -> throw IndexOutOfBoundsException("page is out of range.")
-                }
-            },
+            items = viewModel.items,
             editableState = editableState,
             onBack = { navigator.pop() },
             onItemClick = {},
@@ -81,7 +75,7 @@ class ItemListScreen : Screen {
 @Composable
 private fun ContentLayout(
     pagerState: PagerState = rememberPagerState { 3 },
-    onLoadItems: (Int) -> List<ItemSelectedState<KeyItem>> = { emptyList() },
+    items: List<List<ItemSelectedState<KeyItem>>> = emptyList(),
     editableState: MutableState<Boolean> = mutableStateOf(false),
     onBack: () -> Unit = {},
     onItemClick: (KeyItem) -> Unit = {},
@@ -106,11 +100,14 @@ private fun ContentLayout(
                 }
             }
 
-            HorizontalPager(state = pagerState) { page ->
-                val items = onLoadItems(page)
-                if (items.isNotEmpty()) {
+            HorizontalPager(
+                state = pagerState,
+                contentPadding = PaddingValues(horizontal = 10.dp),
+                pageSpacing = 10.dp
+            ) {
+                if (items[it].isNotEmpty()) {
                     ItemList(
-                        items = items,
+                        items = items[it],
                         editableState = editableState,
                         onItemClick = onItemClick,
                         onItemCopy = onItemCopy,
@@ -134,7 +131,7 @@ private fun ContentLayout(
 private fun Preview() {
     AppTheme {
         ContentLayout(
-            onLoadItems = {
+            items = listOf(
                 listOf(
                     ItemSelectedState(KeyItem(id = 0, name = "hello1")),
                     ItemSelectedState(KeyItem(id = 1, name = "hello1")),
@@ -142,7 +139,7 @@ private fun Preview() {
                     ItemSelectedState(KeyItem(id = 3, name = "hello1")),
                     ItemSelectedState(KeyItem(id = 4, name = "hello1")),
                 )
-            }
+            )
         )
     }
 }

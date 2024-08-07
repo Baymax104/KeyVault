@@ -1,6 +1,7 @@
 package top.baymaxam.keyvault.util
 
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import kotlin.properties.Delegates
 
 /**
@@ -9,17 +10,25 @@ import kotlin.properties.Delegates
  * @since 07 8月 2024
  */
 
-fun <E> MutableList<E>.replaceAll(items: Collection<E>) {
+typealias StateList<E> = SnapshotStateList<E>
+
+fun <E> MutableList<E>.replaceAllBy(items: Collection<E>) {
     clear()
     addAll(items)
 }
 
 
-class LazyStateList<E> {
+class CachedStateList<E> {
     val state = mutableStateListOf<E>()
-    val cache by Delegates.observable(mutableListOf<E>()) { _, _, value ->
+    private val cache by Delegates.observable(mutableListOf<E>()) { _, _, value ->
         if (value.isNotEmpty()) {
-            state.replaceAll(value)
+            state.replaceAllBy(value)
         }
     }
+
+    val originList: List<E> get() = cache
+
+    fun refreshState(elements: Collection<E>? = null) = state.replaceAllBy(elements ?: cache)
+
+    fun addAll(elements: Collection<E>) = cache.addAll(elements)
 }

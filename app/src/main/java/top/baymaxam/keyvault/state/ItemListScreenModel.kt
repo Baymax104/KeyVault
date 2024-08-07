@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateListOf
 import cafe.adriel.voyager.core.model.ScreenModel
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.KeyType
+import top.baymaxam.keyvault.util.StateList
 
 /**
  * ItemsListScreenModel
@@ -15,15 +16,15 @@ import top.baymaxam.keyvault.model.domain.KeyType
 class ItemListScreenModel : ScreenModel {
 
 
-    val webItems = mutableStateListOf<ItemSelectedState<KeyItem>>()
+    val items = listOf<StateList<ItemSelectedState<KeyItem>>>(
+        mutableStateListOf(),
+        mutableStateListOf(),
+        mutableStateListOf(),
+    )
 
-    val cardItems = mutableStateListOf<ItemSelectedState<KeyItem>>()
 
-    val authItems = mutableStateListOf<ItemSelectedState<KeyItem>>()
-
-
-    suspend fun loadItems(page: Int) {
-        val list = listOf(
+    suspend fun loadPage(page: Int) {
+        val list0 = listOf(
             ItemSelectedState(KeyItem(id = 0, name = "test0-web", type = KeyType.Website)),
             ItemSelectedState(KeyItem(id = 1, name = "test1-web", type = KeyType.Website)),
             ItemSelectedState(KeyItem(id = 2, name = "test2-web", type = KeyType.Website)),
@@ -44,18 +45,14 @@ class ItemListScreenModel : ScreenModel {
             ItemSelectedState(KeyItem(id = 3, name = "test3-auth", type = KeyType.Authorization)),
             ItemSelectedState(KeyItem(id = 4, name = "test4-auth", type = KeyType.Authorization)),
         )
-        when (page) {
-            0 -> if (webItems.isEmpty()) {
-                webItems.addAll(list)
-            }
-
-            1 -> if (cardItems.isEmpty()) {
-                cardItems.addAll(list1)
-            }
-
-            2 -> if (authItems.isEmpty()) {
-                authItems.addAll(list2)
-            }
+        val list = when (page) {
+            0 -> list0
+            1 -> list1
+            2 -> list2
+            else -> null
+        }
+        if (items[page].isEmpty() && list != null) {
+            items[page].addAll(list)
         }
     }
 }

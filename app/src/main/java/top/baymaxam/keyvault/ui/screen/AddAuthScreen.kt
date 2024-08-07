@@ -53,14 +53,14 @@ class AddAuthScreen : Screen {
 
         if (searchContentState.value.isEmpty()) {
             LaunchedEffect(Unit) {
-                viewModel.refreshPassItems()
+                viewModel.passItems.refreshState()
                 passItemListState.scrollToItem(0)
             }
         }
 
         ContentLayout(
             searchContentState = searchContentState,
-            items = viewModel.passItems,
+            items = viewModel.passItems.state,
             onSearch = { viewModel.searchPassItem(searchContentState.value) },
             onBack = { navigator.pop() },
             onPassItemClick = {

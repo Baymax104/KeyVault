@@ -95,14 +95,14 @@ class AddInputScreen : Screen {
 
         if (searchState.value.isEmpty()) {
             LaunchedEffect(Unit) {
-                viewModel.refreshTags()
+                viewModel.tags.refreshState()
                 tagListState.scrollToItem(0)
             }
         }
 
         ContentLayout(
             searchContentState = searchState,
-            tags = viewModel.tags,
+            tags = viewModel.tags.state,
             typeSelectedState = typeSelectedState,
             nameContentState = nameContentState,
             usernameContentState = usernameContentState,

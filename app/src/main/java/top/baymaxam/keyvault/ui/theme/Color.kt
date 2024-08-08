@@ -5,7 +5,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-
+import top.baymaxam.keyvault.ui.component.FillIconDefaults
 
 val primaryLight = Color(0xff1e90ff)
 val onPrimaryLight = Color(0xFFFFFFFF)
@@ -23,9 +23,9 @@ val errorLight = Color(0xFFBA1A1A)
 val onErrorLight = Color(0xFFFFFFFF)
 val errorContainerLight = Color(0xFFFFDAD6)
 val onErrorContainerLight = Color(0xFF410002)
-val backgroundLight = Color(0xFFF9F9FF)
+val backgroundLight = Color(0xfffbfbfb)
 val onBackgroundLight = Color(0xFF181C22)
-val surfaceLight = Color(0xFFF9F9FF)
+val surfaceLight = Color(0xFFFFFFFF)
 val onSurfaceLight = Color(0xFF181C22)
 val surfaceVariantLight = Color(0xffe7f0ff)
 val onSurfaceVariantLight = Color(0xFF404753)
@@ -54,7 +54,7 @@ val errorContainerDark = Color(0xFF93000A)
 val onErrorContainerDark = Color(0xFFFFDAD6)
 val backgroundDark = Color(0xFF10141A)
 val onBackgroundDark = Color(0xFFE0E2EC)
-val surfaceDark = Color(0xFF10141A)
+val surfaceDark = Color(0xff1c232e)
 val onSurfaceDark = Color(0xFFE0E2EC)
 val surfaceVariantDark = Color(0xFF404753)
 val onSurfaceVariantDark = Color(0xFFC0C7D6)
@@ -74,4 +74,42 @@ val MaterialTheme.outlinedTextFieldColor: TextFieldColors
         unfocusedLeadingIconColor = colorScheme.onBackground,
         focusedLeadingIconColor = colorScheme.primary
     )
+
+object IconColors {
+
+    val CatalogKey
+        @Composable
+        get() = FillIconDefaults.colors(
+            iconColor = Color(0xff11834f),
+            backgroundColor = Color(0xffd5ffd3)
+        )
+
+    val CatalogTag
+        @Composable
+        get() = FillIconDefaults.colors(
+            iconColor = Color(0xffe78529),
+            backgroundColor = Color(0xffffe8d3)
+        )
+
+    val WebItem
+        @Composable
+        get() = FillIconDefaults.colors(
+            iconColor = Color(0xff1e90ff),
+            backgroundColor = Color(0xffd9ecff)
+        )
+
+    val CardItem
+        @Composable
+        get() = FillIconDefaults.colors(
+            iconColor = Color(0xFF673AB7),
+            backgroundColor = Color(0xffede3ff)
+        )
+
+    val AuthItem
+        @Composable
+        get() = FillIconDefaults.colors(
+            iconColor = Color(0xFFF57C00),
+            backgroundColor = Color(0xffffecdb)
+        )
+}
 

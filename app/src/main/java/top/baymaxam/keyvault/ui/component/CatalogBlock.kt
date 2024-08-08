@@ -13,17 +13,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableIntState
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -32,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import top.baymaxam.keyvault.R
 import top.baymaxam.keyvault.ui.theme.AppTheme
+import top.baymaxam.keyvault.ui.theme.IconColors
 import top.baymaxam.keyvault.ui.theme.robotoFont
 
 /**
@@ -42,8 +38,8 @@ import top.baymaxam.keyvault.ui.theme.robotoFont
 
 @Composable
 fun CatalogBlock(
-    passwordCount: MutableIntState = mutableIntStateOf(0),
-    tagCount: MutableIntState = mutableIntStateOf(0),
+    passwordCount: Int = 0,
+    tagCount: Int = 0,
     onPasswordClick: () -> Unit = {},
     onTagClick: () -> Unit = {}
 ) {
@@ -58,9 +54,8 @@ fun CatalogBlock(
                 .height(110.dp)
                 .weight(1f),
             icon = R.drawable.ic_key,
-            iconColor = Color(0xff11834f),
-            iconBackgroundColor = Color(0xffd5ffd3),
-            text = "${passwordCount.intValue}条密码",
+            iconColors = IconColors.CatalogKey,
+            text = "${passwordCount}条密码",
             onClick = onPasswordClick
         )
 
@@ -71,9 +66,8 @@ fun CatalogBlock(
                 .height(110.dp)
                 .weight(1f),
             icon = R.drawable.ic_tag,
-            iconColor = Color(0xffe78529),
-            iconBackgroundColor = Color(0xffffe8d3),
-            text = "${tagCount.intValue}个标签",
+            iconColors = IconColors.CatalogTag,
+            text = "${tagCount}个标签",
             onClick = onTagClick
         )
     }
@@ -83,18 +77,14 @@ fun CatalogBlock(
 private fun CatalogCard(
     modifier: Modifier = Modifier,
     icon: Int,
-    iconColor: Color,
-    iconBackgroundColor: Color,
+    iconColors: FillIconColors,
     text: String,
     onClick: () -> Unit
 ) {
-
-    Card(
+    Surface(
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.background
-        ),
         onClick = onClick,
+        tonalElevation = 0.dp,
         modifier = modifier
     ) {
         Column(
@@ -106,10 +96,9 @@ private fun CatalogCard(
 
             FillIcon(
                 icon = painterResource(id = icon),
-                iconColor = iconColor,
-                iconBackgroundColor = iconBackgroundColor,
                 shape = RoundedCornerShape(50),
-                modifier = Modifier.size(30.dp)
+                modifier = Modifier.size(40.dp),
+                colors = iconColors
             )
 
             Row(

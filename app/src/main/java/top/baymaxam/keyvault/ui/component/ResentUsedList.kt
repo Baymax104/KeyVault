@@ -17,12 +17,10 @@ import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.CreditCard
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.Person
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
@@ -37,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.KeyType
 import top.baymaxam.keyvault.ui.theme.AppTheme
+import top.baymaxam.keyvault.ui.theme.IconColors
 
 /**
  * 最近使用密码列表
@@ -73,9 +72,11 @@ private fun RecentUsedItem(
     onClick: (KeyItem) -> Unit,
     onCopy: (KeyItem) -> Unit
 ) {
-    ElevatedCard(
+    Surface(
         shape = RoundedCornerShape(20.dp),
         modifier = Modifier.fillMaxWidth(),
+        tonalElevation = 0.dp,
+        shadowElevation = 1.dp,
         onClick = { onClick(item) }
     ) {
         Row(
@@ -91,10 +92,13 @@ private fun RecentUsedItem(
                     KeyType.Card -> Icons.Rounded.CreditCard
                     KeyType.Authorization -> Icons.Rounded.Person
                 },
-                iconColor = MaterialTheme.colorScheme.primary,
-                iconBackgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(10.dp),
                 shape = RoundedCornerShape(20),
-                modifier = Modifier.size(30.dp)
+                modifier = Modifier.size(40.dp),
+                colors = when (item.type) {
+                    KeyType.Website -> IconColors.WebItem
+                    KeyType.Card -> IconColors.CardItem
+                    KeyType.Authorization -> IconColors.AuthItem
+                }
             )
 
             Column(

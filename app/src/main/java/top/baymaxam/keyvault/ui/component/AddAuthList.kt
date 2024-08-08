@@ -19,7 +19,6 @@ import androidx.compose.material.icons.rounded.CreditCard
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
@@ -33,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.KeyType
 import top.baymaxam.keyvault.ui.theme.AppTheme
+import top.baymaxam.keyvault.ui.theme.IconColors
 
 /**
  * 授权条目列表
@@ -81,12 +81,15 @@ private fun AddAuthItem(
             icon = when (item.type) {
                 KeyType.Website -> Icons.Rounded.Language
                 KeyType.Card -> Icons.Rounded.CreditCard
-                KeyType.Authorization -> throw IllegalArgumentException("Item is authorization type.")
+                else -> throw IllegalArgumentException("Item is authorization type.")
             },
-            iconColor = MaterialTheme.colorScheme.primary,
-            iconBackgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(10.dp),
             shape = RoundedCornerShape(20),
-            modifier = Modifier.size(30.dp)
+            modifier = Modifier.size(40.dp),
+            colors = when (item.type) {
+                KeyType.Website -> IconColors.WebItem
+                KeyType.Card -> IconColors.CardItem
+                else -> throw IllegalArgumentException("Item is authorization type.")
+            }
         )
 
         Column(

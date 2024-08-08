@@ -18,13 +18,11 @@ import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.CreditCard
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.Person
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -41,6 +39,7 @@ import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.KeyType
 import top.baymaxam.keyvault.state.ItemSelectedState
 import top.baymaxam.keyvault.ui.theme.AppTheme
+import top.baymaxam.keyvault.ui.theme.IconColors
 
 /**
  * 条目列表
@@ -83,8 +82,11 @@ private fun KeyItemLayout(
     onClick: (KeyItem) -> Unit = {},
     onCopy: (KeyItem) -> Unit = {},
 ) {
-    ElevatedCard(
+    val (keyItem, selectedState) = item
+    Surface(
         shape = RoundedCornerShape(20.dp),
+        shadowElevation = 1.dp,
+        tonalElevation = 0.dp,
         modifier = Modifier
             .fillMaxWidth()
             .pointerInput(Unit) {
@@ -92,16 +94,16 @@ private fun KeyItemLayout(
                     onLongPress = {
                         if (!editableState.value) {
                             editableState.value = true
-                            item.selected.value = true
+                            selectedState.value = true
                         }
                     }
                 )
             },
         onClick = {
             if (editableState.value) {
-                item.selected.value = !item.selected.value
+                selectedState.value = !selectedState.value
             } else {
-                onClick(item.value)
+                onClick(keyItem)
             }
         }
     ) {
@@ -114,15 +116,18 @@ private fun KeyItemLayout(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             FillIcon(
-                icon = when (item.value.type) {
+                icon = when (keyItem.type) {
                     KeyType.Website -> Icons.Rounded.Language
                     KeyType.Card -> Icons.Rounded.CreditCard
                     KeyType.Authorization -> Icons.Rounded.Person
                 },
-                iconColor = MaterialTheme.colorScheme.primary,
-                iconBackgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(10.dp),
                 shape = RoundedCornerShape(20),
-                modifier = Modifier.size(30.dp)
+                modifier = Modifier.size(40.dp),
+                colors = when (keyItem.type) {
+                    KeyType.Website -> IconColors.WebItem
+                    KeyType.Card -> IconColors.CardItem
+                    KeyType.Authorization -> IconColors.AuthItem
+                }
             )
 
             Column(
@@ -131,7 +136,7 @@ private fun KeyItemLayout(
                     .padding(horizontal = 10.dp)
             ) {
                 Text(
-                    text = item.value.name,
+                    text = keyItem.name,
                     style = TextStyle(
                         fontWeight = FontWeight.Normal,
                         fontSize = 16.sp
@@ -139,9 +144,9 @@ private fun KeyItemLayout(
                 )
                 Spacer(modifier = Modifier.height(5.dp))
                 Text(
-                    text = when (item.value.type) {
-                        KeyType.Authorization -> item.value.authorization?.name ?: ""
-                        else -> item.value.username
+                    text = when (keyItem.type) {
+                        KeyType.Authorization -> keyItem.authorization?.name ?: ""
+                        else -> keyItem.username
                     },
                     style = TextStyle(
                         fontSize = 14.sp,
@@ -153,11 +158,11 @@ private fun KeyItemLayout(
 
             if (editableState.value) {
                 RadioButton(
-                    selected = item.selected.value,
-                    onClick = { item.selected.value = !item.selected.value }
+                    selected = selectedState.value,
+                    onClick = { selectedState.value = !selectedState.value }
                 )
-            } else if (item.value.type != KeyType.Authorization) {
-                IconButton(onClick = { onCopy(item.value) }) {
+            } else if (keyItem.type != KeyType.Authorization) {
+                IconButton(onClick = { onCopy(keyItem) }) {
                     Icon(imageVector = Icons.Rounded.ContentCopy, contentDescription = null)
                 }
             }

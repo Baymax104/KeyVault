@@ -2,12 +2,14 @@ package top.baymaxam.keyvault.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ShapeDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
@@ -22,48 +24,91 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun FillIcon(
-    icon: Painter,
-    iconColor: Color,
-    iconBackgroundColor: Color,
-    shape: Shape,
-    modifier: Modifier = Modifier
+    icon: ImageVector,
+    modifier: Modifier = Modifier,
+    colors: FillIconColors = FillIconDefaults.colors(),
+    shape: Shape = FillIconDefaults.shape
 ) {
     Box(
-        modifier = Modifier
-            .clip(shape)
-            .background(iconBackgroundColor)
-            .padding(5.dp)
-            .then(modifier)
-    ) {
-        Icon(
-            painter = icon,
-            contentDescription = null,
-            tint = iconColor,
-            modifier = Modifier.fillMaxSize()
+        modifier = modifier.defaultMinSize(
+            minHeight = FillIconDefaults.minHeight,
+            minWidth = FillIconDefaults.minWidth
         )
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(colors.backgroundColor, shape)
+                .padding(5.dp)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = colors.iconColor,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
     }
 }
 
+
 @Composable
 fun FillIcon(
-    icon: ImageVector,
-    iconColor: Color,
-    iconBackgroundColor: Color,
-    shape: Shape,
-    modifier: Modifier = Modifier
+    icon: Painter,
+    modifier: Modifier = Modifier,
+    colors: FillIconColors = FillIconDefaults.colors(),
+    shape: Shape = FillIconDefaults.shape
 ) {
     Box(
-        modifier = Modifier
-            .clip(shape)
-            .background(iconBackgroundColor)
-            .padding(5.dp)
-            .then(modifier)
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = iconColor,
-            modifier = Modifier.fillMaxSize()
+        modifier = modifier.defaultMinSize(
+            minHeight = FillIconDefaults.minHeight,
+            minWidth = FillIconDefaults.minWidth
         )
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(colors.backgroundColor, shape)
+                .padding(5.dp)
+        ) {
+            Icon(
+                painter = icon,
+                contentDescription = null,
+                tint = colors.iconColor,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
     }
 }
+
+object FillIconDefaults {
+
+    val minWidth = 35.dp
+
+    val minHeight = 35.dp
+
+    val shape get() = ShapeDefaults.ExtraSmall
+
+
+    internal val defaultFillIconColors
+        @Composable
+        get() = FillIconColors(
+            iconColor = MaterialTheme.colorScheme.primary,
+            backgroundColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+
+    @Composable
+    fun colors() = defaultFillIconColors
+
+    @Composable
+    fun colors(
+        iconColor: Color = Color.Unspecified,
+        backgroundColor: Color = Color.Unspecified
+    ) = FillIconColors(iconColor, backgroundColor)
+
+}
+
+class FillIconColors(
+    val iconColor: Color,
+    val backgroundColor: Color
+)

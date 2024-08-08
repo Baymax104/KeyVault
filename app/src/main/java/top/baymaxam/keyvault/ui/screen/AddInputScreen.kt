@@ -1,6 +1,7 @@
 package top.baymaxam.keyvault.ui.screen
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -179,6 +180,7 @@ private fun ContentLayout(
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight(0.8f)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -200,7 +202,7 @@ private fun ContentLayout(
                 onSearch = onSearch,
                 modifier = Modifier.fillMaxWidth()
             )
-            if (tags.size > 0) {
+            if (tags.isNotEmpty()) {
                 LazyRow(
                     state = tagListState,
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -231,7 +233,7 @@ private fun ContentLayout(
                         .fillMaxWidth()
                         .height(50.dp)
                 ) {
-                    Text(text = "未找到标签")
+                    Text(text = "未找到标签", color = MaterialTheme.colorScheme.onBackground)
                 }
             }
             Row(
@@ -240,7 +242,7 @@ private fun ContentLayout(
                     .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(text = "条目类型：")
+                Text(text = "条目类型：", color = MaterialTheme.colorScheme.onBackground)
                 TypeSelection(
                     text = "网站",
                     selected = typeSelectedState.intValue == 0,
@@ -257,7 +259,7 @@ private fun ContentLayout(
                     onClick = { typeSelectedState.intValue = 2 }
                 )
             }
-            PassFields(
+            InfoFields(
                 typeIndex = typeSelectedState,
                 nameState = nameContentState,
                 usernameState = usernameContentState,
@@ -280,7 +282,7 @@ private fun ContentLayout(
 }
 
 @Composable
-private fun PassFields(
+private fun InfoFields(
     typeIndex: MutableIntState = mutableIntStateOf(2),
     nameState: MutableState<String> = mutableStateOf(""),
     usernameState: MutableState<String> = mutableStateOf(""),
@@ -310,10 +312,7 @@ private fun PassFields(
                     else -> null
                 }
                 if (icon != null) {
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = null,
-                    )
+                    Icon(imageVector = icon, contentDescription = null)
                 }
             },
             modifier = Modifier.fillMaxWidth()
@@ -328,10 +327,7 @@ private fun PassFields(
                     }
                 },
                 leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Rounded.Person,
-                        contentDescription = null,
-                    )
+                    Icon(imageVector = Icons.Rounded.Person, contentDescription = null)
                 },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -339,10 +335,7 @@ private fun PassFields(
                 contentState = passwordState,
                 placeholder = { Text(text = "密码") },
                 leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Rounded.Key,
-                        contentDescription = null,
-                    )
+                    Icon(imageVector = Icons.Rounded.Key, contentDescription = null)
                 },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -351,10 +344,7 @@ private fun PassFields(
             contentState = commentState,
             placeholder = { Text(text = "备注") },
             leadingIcon = {
-                Icon(
-                    imageVector = Icons.Rounded.Description,
-                    contentDescription = null,
-                )
+                Icon(imageVector = Icons.Rounded.Description, contentDescription = null)
             },
             modifier = Modifier.fillMaxWidth()
         )
@@ -370,16 +360,16 @@ private fun PassFields(
                     enabled = false,
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(50),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedContainerColor = Color.White,
-                        focusedContainerColor = Color.White,
-                        unfocusedLeadingIconColor = Color.Black,
-                        focusedLeadingIconColor = MaterialTheme.colorScheme.primary,
-                        disabledBorderColor = Color.Black,
-                        disabledLeadingIconColor = Color.Black,
-                        disabledTextColor = Color.Black
-                    ),
                     singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                        focusedContainerColor = MaterialTheme.colorScheme.background,
+                        unfocusedLeadingIconColor = MaterialTheme.colorScheme.onBackground,
+                        focusedLeadingIconColor = MaterialTheme.colorScheme.primary,
+                        disabledBorderColor = MaterialTheme.colorScheme.onBackground,
+                        disabledLeadingIconColor = MaterialTheme.colorScheme.onBackground,
+                        disabledTextColor = MaterialTheme.colorScheme.onBackground
+                    ),
                     leadingIcon = {
                         Icon(imageVector = Icons.Rounded.Language, contentDescription = null)
                     },
@@ -398,7 +388,7 @@ private fun TypeSelection(
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         RadioButton(selected = selected, onClick = onClick)
-        Text(text = text)
+        Text(text = text, color = MaterialTheme.colorScheme.onBackground)
     }
 }
 

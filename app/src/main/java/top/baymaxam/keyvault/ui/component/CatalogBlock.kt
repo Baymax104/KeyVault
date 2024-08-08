@@ -13,9 +13,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableIntState
@@ -26,9 +27,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import top.baymaxam.keyvault.R
+import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.ui.theme.robotoFont
 
 /**
@@ -86,10 +89,10 @@ private fun CatalogCard(
     onClick: () -> Unit
 ) {
 
-    ElevatedCard(
+    Card(
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.elevatedCardColors(
-            containerColor = Color.White
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.background
         ),
         onClick = onClick,
         modifier = modifier
@@ -130,3 +133,12 @@ private fun CatalogCard(
         }
     }
 }
+
+@Preview
+@Composable
+private fun Preview() {
+    AppTheme {
+        CatalogBlock()
+    }
+}
+

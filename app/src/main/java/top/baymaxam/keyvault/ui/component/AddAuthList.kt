@@ -19,13 +19,13 @@ import androidx.compose.material.icons.rounded.CreditCard
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -84,7 +84,7 @@ private fun AddAuthItem(
                 KeyType.Authorization -> throw IllegalArgumentException("Item is authorization type.")
             },
             iconColor = MaterialTheme.colorScheme.primary,
-            iconBackgroundColor = Color(0xffd6ecff),
+            iconBackgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(10.dp),
             shape = RoundedCornerShape(20),
             modifier = Modifier.size(30.dp)
         )
@@ -96,19 +96,16 @@ private fun AddAuthItem(
         ) {
             Text(
                 text = item.name,
-                style = TextStyle(
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 16.sp
-                )
+                fontWeight = FontWeight.Normal,
+                fontSize = 16.sp,
+                color = MaterialTheme.colorScheme.onBackground,
             )
             Spacer(modifier = Modifier.height(5.dp))
             Text(
                 text = item.username,
-                style = TextStyle(
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = Color.Gray
-                )
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Normal,
+                color = Color.Gray,
             )
         }
     }

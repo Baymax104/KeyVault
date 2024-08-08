@@ -132,7 +132,8 @@ private fun Header(
                 fontFamily = robotoFont,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Black,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onBackground
             ),
             modifier = Modifier
                 .padding(vertical = 10.dp)
@@ -164,7 +165,8 @@ private fun ResentUsed(
 ) {
     Column(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .padding(15.dp)
     ) {
         Text(
@@ -176,7 +178,8 @@ private fun ResentUsed(
                 fontFamily = robotoFont,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
-                letterSpacing = 2.sp
+                letterSpacing = 2.sp,
+                color = MaterialTheme.colorScheme.onBackground
             )
         )
         ResentUsedList(

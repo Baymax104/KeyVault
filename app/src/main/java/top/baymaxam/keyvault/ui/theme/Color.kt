@@ -1,4 +1,9 @@
 package top.baymaxam.keyvault.ui.theme
+
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 
@@ -59,3 +64,14 @@ val scrimDark = Color(0xFF000000)
 val inverseSurfaceDark = Color(0xFFE0E2EC)
 val inverseOnSurfaceDark = Color(0xFF2D3138)
 val inversePrimaryDark = Color(0xFF005FAF)
+
+
+val MaterialTheme.outlinedTextFieldColor: TextFieldColors
+    @Composable
+    get() = OutlinedTextFieldDefaults.colors(
+        unfocusedContainerColor = colorScheme.background,
+        focusedContainerColor = colorScheme.background,
+        unfocusedLeadingIconColor = colorScheme.onBackground,
+        focusedLeadingIconColor = colorScheme.primary
+    )
+

@@ -1,5 +1,6 @@
 package top.baymaxam.keyvault.ui.screen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -11,6 +12,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -84,6 +87,7 @@ private fun ContentLayout(
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight(0.8f)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         Header(onBack = onBack)
 
@@ -116,13 +120,17 @@ private fun Header(
     ) {
         IconButton(
             onClick = onBack,
-            modifier = Modifier.align(Alignment.CenterStart)
+            modifier = Modifier.align(Alignment.CenterStart),
+            colors = IconButtonDefaults.iconButtonColors(
+                contentColor = MaterialTheme.colorScheme.onBackground
+            )
         ) {
             Icon(imageVector = Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = null)
         }
         Text(
             text = "选择授权",
             fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.align(Alignment.Center)
         )
     }

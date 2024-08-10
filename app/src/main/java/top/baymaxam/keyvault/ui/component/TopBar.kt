@@ -42,7 +42,7 @@ fun TopBackBar(
             }
         },
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = MaterialTheme.colorScheme.inverseOnSurface
         )
     )
 }

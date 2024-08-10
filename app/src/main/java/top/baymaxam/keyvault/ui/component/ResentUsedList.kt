@@ -13,12 +13,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.CreditCard
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.Person
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,21 +31,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.KeyType
+import top.baymaxam.keyvault.model.domain.Tag
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.ui.theme.IconColors
 
 /**
- * 最近使用密码列表
+ * 最近使用条目列表
  * @author John
  * @since 27 6月 2024
  */
 
 @Composable
 fun ResentUsedList(
-    keyItems: List<KeyItem>,
-    onItemClick: (KeyItem) -> Unit,
-    onItemCopy: (KeyItem) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    keyItems: List<KeyItem> = mutableListOf(),
+    onItemClick: (KeyItem) -> Unit = {},
+    onLoadTags: (KeyItem) -> List<Tag> = { emptyList() }
 ) {
     LazyColumn(
         modifier = modifier,
@@ -60,7 +58,11 @@ fun ResentUsedList(
             items = keyItems,
             key = { it.id }
         ) {
-            RecentUsedItem(item = it, onClick = onItemClick, onCopy = onItemCopy)
+            RecentUsedItem(
+                item = it,
+                tags = onLoadTags(it),
+                onClick = onItemClick
+            )
         }
     }
 }
@@ -68,9 +70,9 @@ fun ResentUsedList(
 
 @Composable
 private fun RecentUsedItem(
-    item: KeyItem,
+    item: KeyItem = KeyItem(),
+    tags: List<Tag> = mutableListOf(),
     onClick: (KeyItem) -> Unit,
-    onCopy: (KeyItem) -> Unit
 ) {
     Surface(
         shape = RoundedCornerShape(20.dp),
@@ -79,57 +81,71 @@ private fun RecentUsedItem(
         shadowElevation = 1.dp,
         onClick = { onClick(item) }
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+                .padding(10.dp)
         ) {
-            FillIcon(
-                icon = when (item.type) {
-                    KeyType.Website -> Icons.Rounded.Language
-                    KeyType.Card -> Icons.Rounded.CreditCard
-                    KeyType.Authorization -> Icons.Rounded.Person
-                },
-                shape = RoundedCornerShape(20),
-                modifier = Modifier.size(40.dp),
-                colors = when (item.type) {
-                    KeyType.Website -> IconColors.WebItem
-                    KeyType.Card -> IconColors.CardItem
-                    KeyType.Authorization -> IconColors.AuthItem
-                }
-            )
-
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 10.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(
-                    text = item.name,
-                    style = TextStyle(
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 16.sp
-                    )
-                )
-                Spacer(modifier = Modifier.height(5.dp))
-                Text(
-                    text = when (item.type) {
-                        KeyType.Authorization -> item.authorization?.name ?: ""
-                        else -> item.username
+                FillIcon(
+                    icon = when (item.type) {
+                        KeyType.Website -> Icons.Rounded.Language
+                        KeyType.Card -> Icons.Rounded.CreditCard
+                        KeyType.Authorization -> Icons.Rounded.Person
                     },
-                    style = TextStyle(
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Normal,
-                        color = Color.Gray
-                    )
+                    shape = RoundedCornerShape(20),
+                    modifier = Modifier.size(45.dp),
+                    colors = when (item.type) {
+                        KeyType.Website -> IconColors.WebItem
+                        KeyType.Card -> IconColors.CardItem
+                        KeyType.Authorization -> IconColors.AuthItem
+                    }
                 )
-            }
 
-            if (item.type != KeyType.Authorization) {
-                IconButton(onClick = { onCopy(item) }) {
-                    Icon(imageVector = Icons.Rounded.ContentCopy, contentDescription = null)
+                Column(
+                    verticalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier
+                        .height(45.dp)
+                        .padding(horizontal = 10.dp)
+                ) {
+                    Text(
+                        text = item.name,
+                        style = TextStyle(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 17.sp
+                        )
+                    )
+                    Text(
+                        text = when (item.type) {
+                            KeyType.Authorization -> item.authorization?.name ?: ""
+                            else -> item.username
+                        },
+                        style = TextStyle(
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Normal,
+                            color = Color.Gray
+                        )
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    tags.take(3).forEach {
+                        SelectableTag(
+                            text = it.name,
+                            enabled = false,
+                            shape = RoundedCornerShape(50),
+                        )
+                    }
                 }
             }
         }
@@ -142,13 +158,13 @@ private fun Preview() {
     AppTheme {
         val list = remember {
             mutableStateListOf(
-                KeyItem(id = 0, name = "测试", username = "username"),
-                KeyItem(id = 1, name = "TestCard", username = "code", type = KeyType.Card)
+                KeyItem(id = 0, name = "测试", username = "username", type = KeyType.Website),
+                KeyItem(id = 1, name = "TestCard", username = "code", type = KeyType.Card),
+                KeyItem(id = 2, name = "TestCard", username = "code", type = KeyType.Authorization),
             )
         }
         ResentUsedList(
             keyItems = list,
-            onItemCopy = {},
             onItemClick = {}
         )
     }

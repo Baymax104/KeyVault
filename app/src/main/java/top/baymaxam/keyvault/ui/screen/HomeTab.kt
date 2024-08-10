@@ -31,6 +31,7 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import top.baymaxam.keyvault.R
 import top.baymaxam.keyvault.model.domain.KeyItem
+import top.baymaxam.keyvault.model.domain.KeyType
 import top.baymaxam.keyvault.ui.component.CatalogBlock
 import top.baymaxam.keyvault.ui.component.ResentUsedList
 import top.baymaxam.keyvault.ui.component.SearchField
@@ -61,17 +62,17 @@ object HomeTab : Tab {
         val navigator = LocalNavigator.root
         val list = remember {
             mutableStateListOf(
-                KeyItem(id = 0, name = "测试", username = "username"),
-                KeyItem(id = 1, name = "TestCard", username = "code"),
-                KeyItem(id = 2, name = "AuthTest")
+                KeyItem(id = 0, name = "测试", username = "username", type = KeyType.Website),
+                KeyItem(id = 1, name = "TestCard", username = "code", type = KeyType.Card),
+                KeyItem(id = 2, name = "AuthTest", type = KeyType.Authorization)
             )
         }
 
         ContentLayout(
-            keyItems = list,
             onPasswordClick = {
                 navigator += ItemListScreen()
-            }
+            },
+            keyItems = list
         )
     }
 }
@@ -84,7 +85,6 @@ private fun ContentLayout(
     onPasswordClick: () -> Unit = {},
     onTagClick: () -> Unit = {},
     keyItems: List<KeyItem> = mutableStateListOf(),
-    onItemCopy: (KeyItem) -> Unit = {},
     onItemClick: (KeyItem) -> Unit = {},
 ) {
     Column(
@@ -100,7 +100,6 @@ private fun ContentLayout(
 
         ResentUsed(
             keyItems = keyItems,
-            onItemCopy = onItemCopy,
             onItemClick = onItemClick
         )
     }
@@ -158,7 +157,6 @@ private fun Header(
 @Composable
 private fun ResentUsed(
     keyItems: List<KeyItem>,
-    onItemCopy: (KeyItem) -> Unit,
     onItemClick: (KeyItem) -> Unit
 ) {
     Column(
@@ -182,7 +180,6 @@ private fun ResentUsed(
         )
         ResentUsedList(
             keyItems = keyItems,
-            onItemCopy = onItemCopy,
             onItemClick = onItemClick,
             modifier = Modifier.fillMaxWidth(),
         )

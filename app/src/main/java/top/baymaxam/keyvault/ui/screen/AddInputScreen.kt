@@ -62,8 +62,8 @@ import top.baymaxam.keyvault.state.AddScreenModel
 import top.baymaxam.keyvault.state.ItemSelectedState
 import top.baymaxam.keyvault.ui.component.InfoField
 import top.baymaxam.keyvault.ui.component.SearchField
+import top.baymaxam.keyvault.ui.component.SelectableTag
 import top.baymaxam.keyvault.ui.component.SelectionButton
-import top.baymaxam.keyvault.ui.component.TagItem
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.util.errorToast
 import top.baymaxam.keyvault.util.infoToast
@@ -206,21 +206,24 @@ private fun ContentLayout(
                 LazyRow(
                     state = tagListState,
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
                     contentPadding = PaddingValues(horizontal = 5.dp),
                     modifier = Modifier
                         .padding(vertical = 10.dp)
                         .fillMaxWidth()
-                        .height(50.dp)
                 ) {
                     items(
                         items = tags,
                         key = { it.value.id }
                     ) {
-                        TagItem(
-                            tag = it,
-                            onClick = { tag -> tag.selected.value = !tag.selected.value },
+                        val (item, selectedState) = it
+                        SelectableTag(
+                            text = item.name,
+                            selected = selectedState.value,
+                            shape = RoundedCornerShape(30),
+                            onClick = { selectedState.value = !selectedState.value },
                             modifier = Modifier
-                                .fillMaxHeight()
+                                .height(40.dp)
                                 .width(80.dp)
                         )
                     }
@@ -405,7 +408,15 @@ private fun LineHeader(modifier: Modifier = Modifier) {
 @Composable
 private fun Preview() {
     AppTheme {
-        ContentLayout()
+        val tags = listOf(
+            ItemSelectedState(Tag(id = 0, name = "Hello0")),
+            ItemSelectedState(Tag(id = 1, name = "Hello1")),
+            ItemSelectedState(Tag(id = 2, name = "Hello2")),
+            ItemSelectedState(Tag(id = 3, name = "Hello3")),
+        )
+        ContentLayout(
+            tags = tags
+        )
     }
 }
 

@@ -23,7 +23,7 @@ class AddScreenModel : ScreenModel {
     val selectedPassItem = mutableStateOf<KeyItem?>(null)
 
     init {
-        tags.addAll(
+        tags.replaceAll(
             listOf(
                 ItemSelectedState(Tag(id = 0, name = "Hello")),
                 ItemSelectedState(Tag(id = 1, name = "Hello1")),
@@ -33,7 +33,7 @@ class AddScreenModel : ScreenModel {
             )
         )
 
-        passItems.addAll(
+        passItems.replaceAll(
             listOf(
                 KeyItem(id = 0, name = "test1", type = KeyType.Website, username = "Hello"),
                 KeyItem(id = 1, name = "test2", type = KeyType.Card, username = "Hello"),

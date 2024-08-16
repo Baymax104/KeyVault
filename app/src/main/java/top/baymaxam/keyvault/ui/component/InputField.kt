@@ -1,5 +1,6 @@
 package top.baymaxam.keyvault.ui.component
 
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
@@ -14,9 +15,11 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.ui.theme.outlinedTextFieldColor
 
@@ -37,7 +40,10 @@ fun SearchField(
     OutlinedTextField(
         value = contentState.value,
         onValueChange = { contentState.value = it },
-        modifier = modifier,
+        modifier = modifier.defaultMinSize(
+            minWidth = InputFieldDefaults.MinWidth,
+            minHeight = InputFieldDefaults.MinHeight
+        ),
         shape = RoundedCornerShape(50),
         singleLine = true,
         colors = MaterialTheme.outlinedTextFieldColor,
@@ -75,16 +81,22 @@ fun SearchField(
 fun InfoField(
     contentState: MutableState<String>,
     modifier: Modifier = Modifier,
-    placeholder: @Composable () -> Unit = {},
-    leadingIcon: @Composable () -> Unit = {},
+    shape: Shape = InputFieldDefaults.shape,
+    label: (@Composable () -> Unit)? = null,
+    placeholder: (@Composable () -> Unit)? = null,
+    leadingIcon: (@Composable () -> Unit)? = null,
 ) {
     OutlinedTextField(
         value = contentState.value,
         onValueChange = { contentState.value = it },
-        modifier = modifier,
-        shape = RoundedCornerShape(50),
+        modifier = modifier.defaultMinSize(
+            minWidth = InputFieldDefaults.MinWidth,
+            minHeight = InputFieldDefaults.MinHeight
+        ),
+        shape = shape,
         singleLine = true,
         colors = MaterialTheme.outlinedTextFieldColor,
+        label = label,
         placeholder = placeholder,
         leadingIcon = leadingIcon,
         trailingIcon = {
@@ -95,6 +107,13 @@ fun InfoField(
             }
         }
     )
+}
+
+
+object InputFieldDefaults {
+    val MinWidth = 280.dp
+    val MinHeight = 56.dp
+    val shape = RoundedCornerShape(50)
 }
 
 

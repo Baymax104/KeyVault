@@ -18,7 +18,7 @@ data class AuthEntity(
     var id: Long = 0,
     var name: String = "",
     var authorization: Long = 0,
-    var createDate: Date = Date(),
+    var createDate: Date = Date(0),
     var comment: String = "",
-    var lastUsedDate: Date = Date(),
+    var lastUsedDate: Date = Date(0),
 )

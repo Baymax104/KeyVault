@@ -62,17 +62,27 @@ object HomeTab : Tab {
         val navigator = LocalNavigator.root
         val list = remember {
             mutableStateListOf(
-                KeyItem(id = 0, name = "测试", username = "username", type = KeyType.Website),
+                KeyItem(
+                    id = 0,
+                    name = "测试",
+                    username = "wzy1048168235@bjut.edu.cn",
+                    type = KeyType.Website,
+                    password = "wzy1048168235."
+                ),
                 KeyItem(id = 1, name = "TestCard", username = "code", type = KeyType.Card),
                 KeyItem(id = 2, name = "AuthTest", type = KeyType.Authorization)
             )
         }
 
+        val searchContentState = remember { mutableStateOf("") }
+
         ContentLayout(
-            onPasswordClick = {
-                navigator += ItemListScreen()
-            },
-            keyItems = list
+            searchContentState = searchContentState,
+            keyItems = list,
+            onSearch = {},
+            onPasswordClick = { navigator += ItemListScreen() },
+            onTagClick = {},
+            onItemClick = { navigator += ItemInfoScreen(it) }
         )
     }
 }
@@ -80,11 +90,11 @@ object HomeTab : Tab {
 
 @Composable
 private fun ContentLayout(
-    searchContent: MutableState<String> = mutableStateOf(""),
+    searchContentState: MutableState<String> = mutableStateOf(""),
+    keyItems: List<KeyItem> = mutableStateListOf(),
     onSearch: () -> Unit = {},
     onPasswordClick: () -> Unit = {},
     onTagClick: () -> Unit = {},
-    keyItems: List<KeyItem> = mutableStateListOf(),
     onItemClick: (KeyItem) -> Unit = {},
 ) {
     Column(
@@ -92,7 +102,7 @@ private fun ContentLayout(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Header(
-            searchContent = searchContent,
+            searchContentState = searchContentState,
             onSearch = onSearch,
             onPasswordClick = onPasswordClick,
             onTagClick = onTagClick
@@ -107,7 +117,7 @@ private fun ContentLayout(
 
 @Composable
 private fun Header(
-    searchContent: MutableState<String> = mutableStateOf(""),
+    searchContentState: MutableState<String> = mutableStateOf(""),
     onSearch: () -> Unit = {},
     passwordCount: Int = 0,
     tagCount: Int = 0,
@@ -138,7 +148,7 @@ private fun Header(
         )
 
         SearchField(
-            contentState = searchContent,
+            contentState = searchContentState,
             placeholder = { Text(text = "搜索条目") },
             onSearch = onSearch,
             modifier = Modifier.fillMaxWidth()

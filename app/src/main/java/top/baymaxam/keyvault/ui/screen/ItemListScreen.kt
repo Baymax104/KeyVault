@@ -2,11 +2,15 @@
 
 package top.baymaxam.keyvault.ui.screen
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
@@ -17,11 +21,14 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,6 +40,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import kotlinx.coroutines.launch
 import top.baymaxam.keyvault.R
 import top.baymaxam.keyvault.model.domain.KeyItem
+import top.baymaxam.keyvault.model.domain.Tag
 import top.baymaxam.keyvault.state.ItemListScreenModel
 import top.baymaxam.keyvault.state.ItemSelectedState
 import top.baymaxam.keyvault.ui.component.ItemList
@@ -55,19 +63,41 @@ class ItemListScreen : Screen {
         val editableState = remember { mutableStateOf(false) }
         val viewModel = koinScreenModel<ItemListScreenModel>()
         val pagerState = rememberPagerState { 3 }
+        val selectedNumberState = remember { mutableIntStateOf(0) }
+
+        fun clearEditState() {
+            editableState.value = false
+            selectedNumberState.intValue = 0
+            viewModel.items[pagerState.settledPage].forEach { it.selected.value = false }
+        }
 
         LaunchedEffect(pagerState) {
             snapshotFlow { pagerState.settledPage }
                 .collect { viewModel.loadPage(it) }
         }
 
+        BackHandler(editableState.value) {
+            clearEditState()
+        }
+
         ContentLayout(
             pagerState = pagerState,
             items = viewModel.items,
             editableState = editableState,
-            onBack = { navigator.pop() },
+            selectedNumberState = selectedNumberState,
+            onBack = {
+                if (editableState.value) {
+                    clearEditState()
+                } else {
+                    navigator.pop()
+                }
+            },
             onItemClick = {},
-            onItemCopy = {}
+            onItemCopy = {},
+            onSelected = {
+                selectedNumberState.intValue += if (it.selected.value) 1 else -1
+            },
+            onLoadTags = { emptyList() }
         )
     }
 }
@@ -76,10 +106,13 @@ class ItemListScreen : Screen {
 private fun ContentLayout(
     pagerState: PagerState = rememberPagerState { 3 },
     items: List<List<ItemSelectedState<KeyItem>>> = emptyList(),
-    editableState: MutableState<Boolean> = mutableStateOf(false),
+    editableState: MutableState<Boolean> = mutableStateOf(true),
+    selectedNumberState: MutableIntState = mutableIntStateOf(0),
     onBack: () -> Unit = {},
     onItemClick: (KeyItem) -> Unit = {},
     onItemCopy: (KeyItem) -> Unit = {},
+    onSelected: (ItemSelectedState<KeyItem>) -> Unit = {},
+    onLoadTags: (KeyItem) -> List<Tag> = { emptyList() }
 ) {
     val scope = rememberCoroutineScope()
     Scaffold(
@@ -90,18 +123,36 @@ private fun ContentLayout(
                 .padding(paddingValues)
                 .fillMaxSize(),
         ) {
-            TabRow(selectedTabIndex = pagerState.currentPage) {
-                listOf("网站", "卡片", "授权").forEachIndexed { index, text ->
-                    Tab(
-                        selected = pagerState.currentPage == index,
-                        text = { Text(text = text) },
-                        onClick = { scope.launch { pagerState.animateScrollToPage(index) } }
+            if (!editableState.value) {
+                TabRow(
+                    selectedTabIndex = pagerState.currentPage,
+                    modifier = Modifier.height(50.dp)
+                ) {
+                    listOf("网站", "卡片", "授权").forEachIndexed { index, text ->
+                        Tab(
+                            selected = pagerState.currentPage == index,
+                            text = { Text(text = text) },
+                            onClick = { scope.launch { pagerState.animateScrollToPage(index) } }
+                        )
+                    }
+                }
+            } else {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                        .padding(vertical = 5.dp, horizontal = 10.dp)
+                ) {
+                    Text(
+                        text = "已选：${selectedNumberState.intValue}项，共${items[pagerState.settledPage].size}项"
                     )
                 }
             }
 
             HorizontalPager(
                 state = pagerState,
+                userScrollEnabled = !editableState.value,
                 contentPadding = PaddingValues(horizontal = 10.dp),
                 pageSpacing = 10.dp
             ) {
@@ -111,6 +162,8 @@ private fun ContentLayout(
                         editableState = editableState,
                         onItemClick = onItemClick,
                         onItemCopy = onItemCopy,
+                        onSelected = onSelected,
+                        onLoadTags = onLoadTags,
                         modifier = Modifier.fillMaxSize()
                     )
                 } else {

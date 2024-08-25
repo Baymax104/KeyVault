@@ -1,6 +1,7 @@
 package top.baymaxam.keyvault.ui.component
 
-import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -29,7 +30,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.KeyType
+import top.baymaxam.keyvault.model.domain.Tag
 import top.baymaxam.keyvault.state.ItemSelectedState
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.ui.theme.IconColors
@@ -52,7 +53,9 @@ fun ItemList(
     modifier: Modifier = Modifier,
     editableState: MutableState<Boolean> = mutableStateOf(false),
     onItemClick: (KeyItem) -> Unit = {},
-    onItemCopy: (KeyItem) -> Unit = {}
+    onItemCopy: (KeyItem) -> Unit = {},
+    onSelected: (ItemSelectedState<KeyItem>) -> Unit = {},
+    onLoadTags: (KeyItem) -> List<Tag> = { emptyList() }
 ) {
     LazyColumn(
         modifier = modifier,
@@ -63,107 +66,137 @@ fun ItemList(
         items(
             items = items,
             key = { it.value.id }
-        ) { item ->
+        ) {
             KeyItemLayout(
-                item = item,
+                item = it,
+                tags = it.value.tags,
                 editableState = editableState,
                 onClick = onItemClick,
-                onCopy = onItemCopy
+                onCopy = onItemCopy,
+                onSelected = onSelected
             )
         }
     }
 }
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun KeyItemLayout(
     item: ItemSelectedState<KeyItem>,
+    tags: List<Tag> = mutableListOf(),
     editableState: MutableState<Boolean> = mutableStateOf(false),
     onClick: (KeyItem) -> Unit = {},
     onCopy: (KeyItem) -> Unit = {},
+    onSelected: (ItemSelectedState<KeyItem>) -> Unit = {},
 ) {
     val (keyItem, selectedState) = item
     Surface(
         shape = RoundedCornerShape(20.dp),
         shadowElevation = 1.dp,
         tonalElevation = 0.dp,
-        modifier = Modifier
-            .fillMaxWidth()
-            .pointerInput(Unit) {
-                detectTapGestures(
-                    onLongPress = {
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .combinedClickable(
+                    onLongClick = {
                         if (!editableState.value) {
                             editableState.value = true
                             selectedState.value = true
+                            onSelected(item)
+                        }
+                    },
+                    onClick = {
+                        if (editableState.value) {
+                            selectedState.value = !selectedState.value
+                            onSelected(item)
+                        } else {
+                            onClick(keyItem)
                         }
                     }
                 )
-            },
-        onClick = {
-            if (editableState.value) {
-                selectedState.value = !selectedState.value
-            } else {
-                onClick(keyItem)
-            }
-        }
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(70.dp)
-                .padding(10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+                .padding(10.dp)
         ) {
-            FillIcon(
-                icon = when (keyItem.type) {
-                    KeyType.Website -> Icons.Rounded.Language
-                    KeyType.Card -> Icons.Rounded.CreditCard
-                    KeyType.Authorization -> Icons.Rounded.Person
-                },
-                shape = RoundedCornerShape(20),
-                modifier = Modifier.size(40.dp),
-                colors = when (keyItem.type) {
-                    KeyType.Website -> IconColors.WebItem
-                    KeyType.Card -> IconColors.CardItem
-                    KeyType.Authorization -> IconColors.AuthItem
-                }
-            )
-
-            Column(
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 10.dp)
+                    .fillMaxWidth()
+                    .height(40.dp)
             ) {
-                Text(
-                    text = keyItem.name,
-                    style = TextStyle(
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 16.sp
-                    )
-                )
-                Spacer(modifier = Modifier.height(5.dp))
-                Text(
-                    text = when (keyItem.type) {
-                        KeyType.Authorization -> keyItem.authorization?.name ?: ""
-                        else -> keyItem.username
+                FillIcon(
+                    icon = when (keyItem.type) {
+                        KeyType.Website -> Icons.Rounded.Language
+                        KeyType.Card -> Icons.Rounded.CreditCard
+                        KeyType.Authorization -> Icons.Rounded.Person
                     },
-                    style = TextStyle(
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Normal,
-                        color = Color.Gray
-                    )
+                    shape = RoundedCornerShape(20),
+                    modifier = Modifier.size(40.dp),
+                    colors = when (keyItem.type) {
+                        KeyType.Website -> IconColors.WebItem
+                        KeyType.Card -> IconColors.CardItem
+                        KeyType.Authorization -> IconColors.AuthItem
+                    }
                 )
-            }
 
-            if (editableState.value) {
-                RadioButton(
-                    selected = selectedState.value,
-                    onClick = { selectedState.value = !selectedState.value }
-                )
-            } else if (keyItem.type != KeyType.Authorization) {
-                IconButton(onClick = { onCopy(keyItem) }) {
-                    Icon(imageVector = Icons.Rounded.ContentCopy, contentDescription = null)
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 10.dp)
+                ) {
+                    Text(
+                        text = keyItem.name,
+                        style = TextStyle(
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 16.sp
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Text(
+                        text = when (keyItem.type) {
+                            KeyType.Authorization -> keyItem.authorization?.name ?: ""
+                            else -> keyItem.username
+                        },
+                        style = TextStyle(
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Normal,
+                            color = Color.Gray
+                        )
+                    )
+                }
+
+                if (editableState.value) {
+                    RadioButton(
+                        selected = selectedState.value,
+                        onClick = { selectedState.value = !selectedState.value }
+                    )
+                } else if (keyItem.type != KeyType.Authorization) {
+                    IconButton(onClick = { onCopy(keyItem) }) {
+                        Icon(imageVector = Icons.Rounded.ContentCopy, contentDescription = null)
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                if (tags.isNotEmpty()) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        tags.take(3).forEach {
+                            SelectableTag(
+                                text = it.name,
+                                enabled = false,
+                                shape = RoundedCornerShape(50),
+                            )
+                        }
+                    }
+                } else {
+                    Text(text = "暂无标签", color = Color.Gray, fontSize = 14.sp)
                 }
             }
         }

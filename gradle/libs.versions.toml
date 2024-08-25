@@ -17,6 +17,7 @@ coroutines = "1.8.0"
 toasty = "1.5.2"
 voyager = "1.1.0-beta02"
 koin = "4.0.0-RC1"
+live-event-bus-x = "1.8.0"
 
 
 [libraries]
@@ -52,6 +53,7 @@ voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", vers
 voyager-tabNavigator = { module = "cafe.adriel.voyager:voyager-tab-navigator", version.ref = "voyager" }
 voyager-koin = { module = "cafe.adriel.voyager:voyager-koin", version.ref = "voyager" }
 koin = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
+live-event-bus = { module = "io.github.jeremyliao:live-event-bus-x", version.ref = "live-event-bus-x" }
 
 
 [plugins]

@@ -135,17 +135,21 @@ private fun RecentUsedItem(
             Row(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    tags.take(3).forEach {
-                        SelectableTag(
-                            text = it.name,
-                            enabled = false,
-                            shape = RoundedCornerShape(50),
-                        )
+                if (tags.isNotEmpty()) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        tags.take(3).forEach {
+                            SelectableTag(
+                                text = it.name,
+                                enabled = false,
+                                shape = RoundedCornerShape(50),
+                            )
+                        }
                     }
+                } else {
+                    Text(text = "暂无标签", color = Color.Gray, fontSize = 14.sp)
                 }
             }
         }
@@ -165,7 +169,7 @@ private fun Preview() {
         }
         ResentUsedList(
             keyItems = list,
-            onItemClick = {}
+            onLoadTags = { emptyList() },
         )
     }
 }

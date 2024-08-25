@@ -20,7 +20,7 @@ data class KeyItem(
     var password: String = "",
     var comment: String = "",
     var authorization: KeyItem? = null,
-    val tagIds: MutableList<Int> = mutableListOf()
+    val tags: MutableList<Tag> = mutableListOf()
 ) : Parcelable {
     init {
         if (authorization != null && authorization!!.type == KeyType.Authorization) {

@@ -15,13 +15,11 @@ import top.baymaxam.keyvault.util.StateList
 @Stable
 class ItemListScreenModel : ScreenModel {
 
-
     val items = listOf<StateList<ItemSelectedState<KeyItem>>>(
         mutableStateListOf(),
         mutableStateListOf(),
         mutableStateListOf(),
     )
-
 
     suspend fun loadPage(page: Int) {
         val list0 = listOf(
@@ -54,5 +52,9 @@ class ItemListScreenModel : ScreenModel {
         if (items[page].isEmpty() && list != null) {
             items[page].addAll(list)
         }
+    }
+
+    suspend fun removePages() {
+
     }
 }

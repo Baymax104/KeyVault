@@ -26,12 +26,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.ScreenKey
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import top.baymaxam.keyvault.R
 import top.baymaxam.keyvault.model.domain.KeyItem
-import top.baymaxam.keyvault.model.domain.KeyType
+import top.baymaxam.keyvault.state.HomeScreenModel
 import top.baymaxam.keyvault.ui.component.CatalogBlock
 import top.baymaxam.keyvault.ui.component.ResentUsedList
 import top.baymaxam.keyvault.ui.component.SearchField
@@ -60,25 +61,12 @@ object HomeTab : Tab {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.root
-        val list = remember {
-            mutableStateListOf(
-                KeyItem(
-                    id = 0,
-                    name = "测试",
-                    username = "wzy1048168235@bjut.edu.cn",
-                    type = KeyType.Website,
-                    password = "wzy1048168235."
-                ),
-                KeyItem(id = 1, name = "TestCard", username = "code", type = KeyType.Card),
-                KeyItem(id = 2, name = "AuthTest", type = KeyType.Authorization)
-            )
-        }
-
+        val viewModel = koinScreenModel<HomeScreenModel>()
         val searchContentState = remember { mutableStateOf("") }
 
         ContentLayout(
             searchContentState = searchContentState,
-            keyItems = list,
+            keyItems = viewModel.resentUsedItems,
             onSearch = {},
             onPasswordClick = { navigator += ItemListScreen() },
             onTagClick = {},

@@ -5,6 +5,8 @@ package top.baymaxam.keyvault.ui.screen
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -15,6 +17,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -37,10 +48,10 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.bottomSheet.BottomSheetNavigator
 import kotlinx.coroutines.launch
 import top.baymaxam.keyvault.R
 import top.baymaxam.keyvault.model.domain.KeyItem
-import top.baymaxam.keyvault.model.domain.Tag
 import top.baymaxam.keyvault.state.ItemListScreenModel
 import top.baymaxam.keyvault.state.ItemSelectedState
 import top.baymaxam.keyvault.ui.component.ItemList
@@ -64,6 +75,7 @@ class ItemListScreen : Screen {
         val viewModel = koinScreenModel<ItemListScreenModel>()
         val pagerState = rememberPagerState { 3 }
         val selectedNumberState = remember { mutableIntStateOf(0) }
+        val scope = rememberCoroutineScope()
 
         fun clearEditState() {
             editableState.value = false
@@ -80,25 +92,36 @@ class ItemListScreen : Screen {
             clearEditState()
         }
 
-        ContentLayout(
-            pagerState = pagerState,
-            items = viewModel.items,
-            editableState = editableState,
-            selectedNumberState = selectedNumberState,
-            onBack = {
-                if (editableState.value) {
-                    clearEditState()
-                } else {
-                    navigator.pop()
+        BottomSheetNavigator(
+            sheetShape = RoundedCornerShape(15.dp)
+        ) { bottomSheetNavigator ->
+            ContentLayout(
+                pagerState = pagerState,
+                items = viewModel.items,
+                editableState = editableState,
+                selectedNumberState = selectedNumberState,
+                onBack = {
+                    if (editableState.value) {
+                        clearEditState()
+                    } else {
+                        navigator.pop()
+                    }
+                },
+                onItemClick = {},
+                onItemCopy = {},
+                onSelected = {
+                    selectedNumberState.intValue += if (it.selected.value) 1 else -1
+                },
+                onDeleteClick = {
+                    scope.launch {
+                        viewModel.removePages()
+                    }
+                },
+                onAddClick = {
+                    bottomSheetNavigator.show(AddScreen())
                 }
-            },
-            onItemClick = {},
-            onItemCopy = {},
-            onSelected = {
-                selectedNumberState.intValue += if (it.selected.value) 1 else -1
-            },
-            onLoadTags = { emptyList() }
-        )
+            )
+        }
     }
 }
 
@@ -112,11 +135,31 @@ private fun ContentLayout(
     onItemClick: (KeyItem) -> Unit = {},
     onItemCopy: (KeyItem) -> Unit = {},
     onSelected: (ItemSelectedState<KeyItem>) -> Unit = {},
-    onLoadTags: (KeyItem) -> List<Tag> = { emptyList() }
+    onAddClick: () -> Unit = {},
+    onDeleteClick: () -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
     Scaffold(
         topBar = { TopBackBar(title = "密码本", onBack = onBack) },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = onAddClick,
+                shape = RoundedCornerShape(35),
+                elevation = FloatingActionButtonDefaults.elevation(
+                    defaultElevation = 5.dp,
+                    pressedElevation = 5.dp,
+                    focusedElevation = 5.dp,
+                    hoveredElevation = 5.dp
+                ),
+                modifier = Modifier.padding(end = 15.dp, bottom = 25.dp),
+                containerColor = MaterialTheme.colorScheme.secondaryContainer
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.Add,
+                    contentDescription = null
+                )
+            }
+        }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -137,15 +180,31 @@ private fun ContentLayout(
                     }
                 }
             } else {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
-                        .padding(vertical = 5.dp, horizontal = 10.dp)
-                ) {
-                    Text(
-                        text = "已选：${selectedNumberState.intValue}项，共${items[pagerState.settledPage].size}项"
+                Column {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp)
+                            .padding(vertical = 5.dp, horizontal = 10.dp)
+                    ) {
+                        Text(
+                            text = "已选：${selectedNumberState.intValue}项，共${items[pagerState.settledPage].size}项",
+                            modifier = Modifier.weight(1f)
+                        )
+                        IconButton(onClick = onDeleteClick) {
+                            Icon(
+                                imageVector = Icons.Rounded.Delete,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
+                    Box(
+                        modifier = Modifier
+                            .height(2.dp)
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.primary)
                     )
                 }
             }
@@ -159,12 +218,11 @@ private fun ContentLayout(
                 if (items[it].isNotEmpty()) {
                     ItemList(
                         items = items[it],
+                        modifier = Modifier.fillMaxSize(),
                         editableState = editableState,
                         onItemClick = onItemClick,
                         onItemCopy = onItemCopy,
-                        onSelected = onSelected,
-                        onLoadTags = onLoadTags,
-                        modifier = Modifier.fillMaxSize()
+                        onSelected = onSelected
                     )
                 } else {
                     Image(

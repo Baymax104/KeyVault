@@ -198,7 +198,7 @@ private fun ContentLayout(
 
             SearchField(
                 contentState = searchContentState,
-                placeholder = { Text(text = "搜索标签") },
+                placeholder = { Text("搜索标签") },
                 onSearch = onSearch,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -302,9 +302,9 @@ private fun InfoFields(
             contentState = nameState,
             placeholder = {
                 when (typeIndex.intValue) {
-                    0 -> Text(text = "网站名称")
-                    1 -> Text(text = "卡片名称")
-                    2 -> Text(text = "授权名称")
+                    0 -> Text("网站名称")
+                    1 -> Text("卡片名称")
+                    2 -> Text("授权名称")
                 }
             },
             leadingIcon = {
@@ -325,8 +325,8 @@ private fun InfoFields(
                 contentState = usernameState,
                 placeholder = {
                     when (typeIndex.intValue) {
-                        0 -> Text(text = "用户名")
-                        1 -> Text(text = "卡号")
+                        0 -> Text("用户名")
+                        1 -> Text("卡号")
                     }
                 },
                 leadingIcon = {
@@ -336,7 +336,7 @@ private fun InfoFields(
             )
             InfoField(
                 contentState = passwordState,
-                placeholder = { Text(text = "密码") },
+                placeholder = { Text("密码") },
                 leadingIcon = {
                     Icon(imageVector = Icons.Rounded.Key, contentDescription = null)
                 },
@@ -345,7 +345,7 @@ private fun InfoFields(
         }
         InfoField(
             contentState = commentState,
-            placeholder = { Text(text = "备注") },
+            placeholder = { Text("备注") },
             leadingIcon = {
                 Icon(imageVector = Icons.Rounded.Description, contentDescription = null)
             },

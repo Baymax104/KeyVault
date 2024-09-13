@@ -93,7 +93,7 @@ private fun ContentLayout(
 
         SearchField(
             contentState = searchContentState,
-            placeholder = { Text(text = "搜索条目") },
+            placeholder = { Text("搜索条目") },
             onSearch = onSearch,
             modifier = Modifier
                 .padding(horizontal = 20.dp, vertical = 5.dp)

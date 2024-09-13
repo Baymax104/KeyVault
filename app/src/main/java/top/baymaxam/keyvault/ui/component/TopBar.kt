@@ -31,7 +31,7 @@ fun TopBackBar(
     CenterAlignedTopAppBar(
         modifier = modifier,
         title = {
-            Text(text = title)
+            Text(title)
         },
         navigationIcon = {
             IconButton(onClick = onBack) {

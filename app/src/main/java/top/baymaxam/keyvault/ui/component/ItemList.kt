@@ -55,6 +55,7 @@ fun ItemList(
     onItemClick: (KeyItem) -> Unit = {},
     onItemCopy: (KeyItem) -> Unit = {},
     onSelected: (ItemSelectedState<KeyItem>) -> Unit = {},
+    tagsFactory: (KeyItem) -> List<Tag> = { emptyList() }
 ) {
     LazyColumn(
         modifier = modifier,
@@ -68,7 +69,7 @@ fun ItemList(
         ) {
             KeyItemLayout(
                 item = it,
-                tags = it.value.tags,
+                tags = tagsFactory(it.value),
                 editableState = editableState,
                 onClick = onItemClick,
                 onCopy = onItemCopy,

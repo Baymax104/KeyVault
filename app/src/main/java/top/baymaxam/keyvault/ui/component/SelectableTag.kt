@@ -30,6 +30,7 @@ fun SelectableTag(
     text: String,
     modifier: Modifier = Modifier,
     shape: Shape = RectangleShape,
+    color: Color = MaterialTheme.colorScheme.primary,
     fontSize: TextUnit = 14.sp,
     enabled: Boolean = true,
     selected: Boolean = false,
@@ -40,7 +41,7 @@ fun SelectableTag(
         modifier = modifier
             .clip(shape)
             .border(1.dp, MaterialTheme.colorScheme.primary, shape)
-            .background(if (selected) MaterialTheme.colorScheme.primary else Color.Transparent)
+            .background(if (selected) color else Color.Transparent)
             .clickable(enabled = enabled, onClick = onClick)
     ) {
         Text(

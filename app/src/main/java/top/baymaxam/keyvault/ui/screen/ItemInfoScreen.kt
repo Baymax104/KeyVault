@@ -205,9 +205,9 @@ private fun ItemInfo(
         if (isEdit) {
             InfoField(
                 contentState = contentState,
-                placeholder = { Text(text = hintText) },
+                placeholder = { Text(hintText) },
                 modifier = Modifier.weight(1f),
-                label = { Text(text = hintText) }
+                label = { Text(hintText) }
             )
         } else {
             Text(
@@ -245,8 +245,8 @@ private fun CommentInfo(
                     .fillMaxWidth(),
                 shape = RoundedCornerShape(15.dp),
                 colors = MaterialTheme.outlinedTextFieldColor,
-                label = { Text(text = "备注") },
-                placeholder = { Text(text = "备注") },
+                label = { Text("备注") },
+                placeholder = { Text("备注") },
             )
         } else {
             Text(

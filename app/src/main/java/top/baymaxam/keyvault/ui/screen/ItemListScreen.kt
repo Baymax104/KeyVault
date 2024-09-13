@@ -21,8 +21,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Delete
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -52,8 +50,10 @@ import cafe.adriel.voyager.navigator.bottomSheet.BottomSheetNavigator
 import kotlinx.coroutines.launch
 import top.baymaxam.keyvault.R
 import top.baymaxam.keyvault.model.domain.KeyItem
+import top.baymaxam.keyvault.model.domain.Tag
 import top.baymaxam.keyvault.state.ItemListScreenModel
 import top.baymaxam.keyvault.state.ItemSelectedState
+import top.baymaxam.keyvault.ui.component.FloatingButton
 import top.baymaxam.keyvault.ui.component.ItemList
 import top.baymaxam.keyvault.ui.component.TopBackBar
 import top.baymaxam.keyvault.ui.theme.AppTheme
@@ -119,6 +119,9 @@ class ItemListScreen : Screen {
                 },
                 onAddClick = {
                     bottomSheetNavigator.show(AddScreen())
+                },
+                tagsFactory = {
+                    emptyList()
                 }
             )
         }
@@ -137,28 +140,17 @@ private fun ContentLayout(
     onSelected: (ItemSelectedState<KeyItem>) -> Unit = {},
     onAddClick: () -> Unit = {},
     onDeleteClick: () -> Unit = {},
+    tagsFactory: (KeyItem) -> List<Tag> = { emptyList() }
 ) {
     val scope = rememberCoroutineScope()
     Scaffold(
         topBar = { TopBackBar(title = "密码本", onBack = onBack) },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = onAddClick,
-                shape = RoundedCornerShape(35),
-                elevation = FloatingActionButtonDefaults.elevation(
-                    defaultElevation = 5.dp,
-                    pressedElevation = 5.dp,
-                    focusedElevation = 5.dp,
-                    hoveredElevation = 5.dp
-                ),
+            FloatingButton(
+                icon = Icons.Rounded.Add,
                 modifier = Modifier.padding(end = 15.dp, bottom = 25.dp),
-                containerColor = MaterialTheme.colorScheme.secondaryContainer
-            ) {
-                Icon(
-                    imageVector = Icons.Rounded.Add,
-                    contentDescription = null
-                )
-            }
+                onClick = onAddClick
+            )
         }
     ) { paddingValues ->
         Column(
@@ -174,7 +166,7 @@ private fun ContentLayout(
                     listOf("网站", "卡片", "授权").forEachIndexed { index, text ->
                         Tab(
                             selected = pagerState.currentPage == index,
-                            text = { Text(text = text) },
+                            text = { Text(text) },
                             onClick = { scope.launch { pagerState.animateScrollToPage(index) } }
                         )
                     }
@@ -222,7 +214,8 @@ private fun ContentLayout(
                         editableState = editableState,
                         onItemClick = onItemClick,
                         onItemCopy = onItemCopy,
-                        onSelected = onSelected
+                        onSelected = onSelected,
+                        tagsFactory = tagsFactory
                     )
                 } else {
                     Image(

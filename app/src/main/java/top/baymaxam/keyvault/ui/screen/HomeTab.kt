@@ -69,7 +69,7 @@ object HomeTab : Tab {
             keyItems = viewModel.resentUsedItems,
             onSearch = {},
             onPasswordClick = { navigator += ItemListScreen() },
-            onTagClick = {},
+            onTagClick = { navigator += TagListScreen() },
             onItemClick = { navigator += ItemInfoScreen(it) }
         )
     }
@@ -137,7 +137,7 @@ private fun Header(
 
         SearchField(
             contentState = searchContentState,
-            placeholder = { Text(text = "搜索条目") },
+            placeholder = { Text("搜索条目") },
             onSearch = onSearch,
             modifier = Modifier.fillMaxWidth()
         )

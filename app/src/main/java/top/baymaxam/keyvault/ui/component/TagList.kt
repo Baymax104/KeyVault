@@ -43,6 +43,9 @@ fun TagList(
     items: List<ItemSelectedState<Tag>>,
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
+    editableState: MutableState<Boolean> = mutableStateOf(false),
+    onItemClick: (Tag) -> Unit = {},
+    onItemSelected: (ItemSelectedState<Tag>) -> Unit = {},
     keyItemsFactory: (Tag) -> List<KeyItem> = { emptyList() }
 ) {
     LazyColumn(
@@ -57,7 +60,10 @@ fun TagList(
         ) {
             TagListItem(
                 item = it,
-                keyItems = keyItemsFactory(it.value)
+                keyItems = keyItemsFactory(it.value),
+                editableState = editableState,
+                onClick = onItemClick,
+                onSelected = onItemSelected
             )
         }
     }

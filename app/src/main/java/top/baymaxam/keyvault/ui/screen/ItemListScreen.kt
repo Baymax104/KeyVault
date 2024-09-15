@@ -85,7 +85,7 @@ class ItemListScreen : Screen {
 
         LaunchedEffect(pagerState) {
             snapshotFlow { pagerState.settledPage }
-                .collect { viewModel.loadPage(it) }
+                .collect(viewModel::loadPage)
         }
 
         BackHandler(editableState.value) {
@@ -172,12 +172,16 @@ private fun ContentLayout(
                     }
                 }
             } else {
-                Column {
+                Column(
+                    modifier = Modifier
+                        .height(50.dp)
+                        .background(MaterialTheme.colorScheme.inverseOnSurface)
+                ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(50.dp)
+                            .height(48.dp)
                             .padding(vertical = 5.dp, horizontal = 10.dp)
                     ) {
                         Text(

@@ -10,6 +10,7 @@ import org.koin.dsl.module
 import top.baymaxam.keyvault.state.AddScreenModel
 import top.baymaxam.keyvault.state.HomeScreenModel
 import top.baymaxam.keyvault.state.ItemListScreenModel
+import top.baymaxam.keyvault.state.TagListScreenModel
 
 /**
  * Application
@@ -38,4 +39,5 @@ val appModule = module {
     factory { AddScreenModel() }
     factory { ItemListScreenModel() }
     factory { HomeScreenModel() }
+    factory { TagListScreenModel() }
 }

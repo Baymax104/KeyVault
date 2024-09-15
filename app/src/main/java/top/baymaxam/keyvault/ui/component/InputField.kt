@@ -112,7 +112,7 @@ fun InfoField(
 
 object InputFieldDefaults {
     val MinWidth = 280.dp
-    val MinHeight = 56.dp
+    val MinHeight = 55.dp
     val shape = RoundedCornerShape(50)
 }
 

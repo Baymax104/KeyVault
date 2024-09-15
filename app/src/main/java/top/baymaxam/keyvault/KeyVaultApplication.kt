@@ -38,7 +38,7 @@ class KeyVaultApplication : Application() {
 
 val appModule = module {
     single { PassRepository() }
-    factory { AddScreenModel() }
+    factory { AddScreenModel(get()) }
     factory { ItemListScreenModel() }
     factory { HomeScreenModel(get()) }
     factory { TagListScreenModel() }

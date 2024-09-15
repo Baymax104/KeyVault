@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CreditCard
@@ -43,12 +45,14 @@ import top.baymaxam.keyvault.ui.theme.IconColors
 
 @Composable
 fun ResentUsedList(
+    keyItems: List<KeyItem>,
     modifier: Modifier = Modifier,
-    keyItems: List<KeyItem> = mutableListOf(),
+    state: LazyListState = rememberLazyListState(),
     onItemClick: (KeyItem) -> Unit = {},
     onLoadTags: (KeyItem) -> List<Tag> = { emptyList() }
 ) {
     LazyColumn(
+        state = state,
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(10.dp),

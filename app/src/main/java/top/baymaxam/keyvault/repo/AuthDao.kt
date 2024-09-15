@@ -1,6 +1,7 @@
 package top.baymaxam.keyvault.repo
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import top.baymaxam.keyvault.model.entity.AuthEntity
@@ -18,4 +19,7 @@ interface AuthDao {
 
     @Query("select * from t_auth")
     suspend fun queryAll(): List<AuthEntity>
+
+    @Delete
+    suspend fun delete(entity: AuthEntity)
 }

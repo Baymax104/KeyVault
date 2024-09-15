@@ -6,6 +6,7 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.KeyType
 import top.baymaxam.keyvault.model.domain.Tag
+import top.baymaxam.keyvault.repo.PassRepository
 import top.baymaxam.keyvault.util.CachedStateList
 
 /**
@@ -14,7 +15,7 @@ import top.baymaxam.keyvault.util.CachedStateList
  * @since 01 8月 2024
  */
 @Stable
-class AddScreenModel : ScreenModel {
+class AddScreenModel(private val repo: PassRepository) : ScreenModel {
 
     val tags = CachedStateList<ItemSelectedState<Tag>>()
 
@@ -54,7 +55,9 @@ class AddScreenModel : ScreenModel {
             .let { passItems.refreshState(it) }
     }
 
-    suspend fun addItem(keyItem: KeyItem): Result<Unit> {
-        return Result.success(Unit)
+    suspend fun addItem(item: KeyItem): Result<Unit> {
+        return runCatching {
+            repo.addItem(item)
+        }
     }
 }

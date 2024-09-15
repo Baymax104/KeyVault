@@ -26,7 +26,7 @@ data class AuthEntity(
     var lastUsedDate: Date = Date(0),
 )
 
-fun AuthEntity.asItem(transform: (String) -> KeyItem): KeyItem {
+fun AuthEntity.asItem(transform: (String) -> KeyItem?): KeyItem {
     return KeyItem(
         id = id,
         name = name,

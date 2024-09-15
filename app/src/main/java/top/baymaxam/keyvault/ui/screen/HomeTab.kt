@@ -6,11 +6,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -38,6 +41,7 @@ import top.baymaxam.keyvault.ui.component.ResentUsedList
 import top.baymaxam.keyvault.ui.component.SearchField
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.ui.theme.robotoFont
+import top.baymaxam.keyvault.util.replaceAllBy
 
 /**
  * 首页
@@ -63,10 +67,17 @@ object HomeTab : Tab {
         val navigator = LocalNavigator.root
         val viewModel = koinScreenModel<HomeScreenModel>()
         val searchContentState = remember { mutableStateOf("") }
+        val resentUsedItems = remember { mutableStateListOf<KeyItem>() }
+        val resentUsedListState = rememberLazyListState()
+
+        LaunchedEffect(Unit) {
+            resentUsedItems.replaceAllBy(viewModel.getResentItems())
+            resentUsedListState.scrollToItem(0)
+        }
 
         ContentLayout(
             searchContentState = searchContentState,
-            keyItems = viewModel.resentUsedItems,
+            keyItems = resentUsedItems,
             onSearch = {},
             onPasswordClick = { navigator += ItemListScreen() },
             onTagClick = { navigator += TagListScreen() },
@@ -80,6 +91,7 @@ object HomeTab : Tab {
 private fun ContentLayout(
     searchContentState: MutableState<String> = mutableStateOf(""),
     keyItems: List<KeyItem> = mutableStateListOf(),
+    resentUsedListState: LazyListState = rememberLazyListState(),
     onSearch: () -> Unit = {},
     onPasswordClick: () -> Unit = {},
     onTagClick: () -> Unit = {},
@@ -97,6 +109,7 @@ private fun ContentLayout(
         )
 
         ResentUsed(
+            resentUsedListState = resentUsedListState,
             keyItems = keyItems,
             onItemClick = onItemClick
         )
@@ -154,6 +167,7 @@ private fun Header(
 
 @Composable
 private fun ResentUsed(
+    resentUsedListState: LazyListState = rememberLazyListState(),
     keyItems: List<KeyItem>,
     onItemClick: (KeyItem) -> Unit
 ) {
@@ -177,6 +191,7 @@ private fun ResentUsed(
             )
         )
         ResentUsedList(
+            state = resentUsedListState,
             keyItems = keyItems,
             onItemClick = onItemClick,
             modifier = Modifier.fillMaxWidth(),

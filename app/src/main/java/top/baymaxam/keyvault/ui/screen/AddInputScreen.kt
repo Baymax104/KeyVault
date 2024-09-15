@@ -68,6 +68,7 @@ import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.util.errorToast
 import top.baymaxam.keyvault.util.infoToast
 import top.baymaxam.keyvault.util.successToast
+import java.util.Date
 
 /**
  * 添加页填写页
@@ -125,7 +126,8 @@ class AddInputScreen : Screen {
                         username = usernameContentState.value,
                         password = passwordContentState.value,
                         comment = commentContentState.value,
-                        type = KeyType.Website
+                        type = KeyType.Website,
+                        createDate = Date(),
                     )
 
                     1 -> KeyItem(
@@ -133,13 +135,16 @@ class AddInputScreen : Screen {
                         username = usernameContentState.value,
                         password = passwordContentState.value,
                         comment = commentContentState.value,
-                        type = KeyType.Card
+                        type = KeyType.Card,
+                        createDate = Date(),
                     )
 
                     2 -> KeyItem(
                         name = nameContentState.value,
                         comment = commentContentState.value,
-                        authorization = viewModel.selectedPassItem.value!!
+                        authorization = viewModel.selectedPassItem.value!!,
+                        type = KeyType.Authorization,
+                        createDate = Date(),
                     )
 
                     else -> null

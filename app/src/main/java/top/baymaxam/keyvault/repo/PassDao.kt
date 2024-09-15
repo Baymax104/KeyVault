@@ -1,6 +1,7 @@
 package top.baymaxam.keyvault.repo
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import top.baymaxam.keyvault.model.entity.PasswordEntity
@@ -24,4 +25,7 @@ interface PassDao {
 
     @Query("select * from t_password where id in (:ids)")
     suspend fun query(ids: List<Long>): List<PasswordEntity>
+
+    @Delete
+    suspend fun delete(entity: PasswordEntity)
 }

@@ -142,8 +142,8 @@ private fun Preview() {
     AppTheme {
         val list = remember {
             mutableStateListOf(
-                KeyItem(id = 0, name = "测试", username = "username"),
-                KeyItem(id = 1, name = "TestCard", username = "code")
+                KeyItem(name = "测试", username = "username"),
+                KeyItem(name = "TestCard", username = "code")
             )
         }
         ContentLayout(

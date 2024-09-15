@@ -162,9 +162,9 @@ private fun Preview() {
     AppTheme {
         val list = remember {
             mutableStateListOf(
-                KeyItem(id = 0, name = "测试", username = "username", type = KeyType.Website),
-                KeyItem(id = 1, name = "TestCard", username = "code", type = KeyType.Card),
-                KeyItem(id = 2, name = "TestCard", username = "code", type = KeyType.Authorization),
+                KeyItem(name = "测试", username = "username", type = KeyType.Website),
+                KeyItem(name = "TestCard", username = "code", type = KeyType.Card),
+                KeyItem(name = "TestCard", username = "code", type = KeyType.Authorization),
             )
         }
         ResentUsedList(

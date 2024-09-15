@@ -7,6 +7,7 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
+import top.baymaxam.keyvault.repo.PassRepository
 import top.baymaxam.keyvault.state.AddScreenModel
 import top.baymaxam.keyvault.state.HomeScreenModel
 import top.baymaxam.keyvault.state.ItemListScreenModel
@@ -36,8 +37,9 @@ class KeyVaultApplication : Application() {
 }
 
 val appModule = module {
+    single { PassRepository() }
     factory { AddScreenModel() }
     factory { ItemListScreenModel() }
-    factory { HomeScreenModel() }
+    factory { HomeScreenModel(get()) }
     factory { TagListScreenModel() }
 }

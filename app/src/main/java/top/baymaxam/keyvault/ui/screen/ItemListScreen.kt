@@ -241,11 +241,11 @@ private fun Preview() {
         ContentLayout(
             items = listOf(
                 listOf(
-                    ItemSelectedState(KeyItem(id = 0, name = "hello1")),
-                    ItemSelectedState(KeyItem(id = 1, name = "hello1")),
-                    ItemSelectedState(KeyItem(id = 2, name = "hello1")),
-                    ItemSelectedState(KeyItem(id = 3, name = "hello1")),
-                    ItemSelectedState(KeyItem(id = 4, name = "hello1")),
+                    ItemSelectedState(KeyItem(name = "hello1")),
+                    ItemSelectedState(KeyItem(name = "hello1")),
+                    ItemSelectedState(KeyItem(name = "hello1")),
+                    ItemSelectedState(KeyItem(name = "hello1")),
+                    ItemSelectedState(KeyItem(name = "hello1")),
                 )
             )
         )

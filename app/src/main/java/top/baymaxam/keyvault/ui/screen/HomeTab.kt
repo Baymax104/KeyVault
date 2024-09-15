@@ -190,8 +190,8 @@ private fun ResentUsed(
 private fun Preview() {
     val list = remember {
         mutableStateListOf(
-            KeyItem(id = 0, name = "TestWeb", username = "username"),
-            KeyItem(id = 1, name = "TestCard", username = "code")
+            KeyItem(name = "TestWeb", username = "username"),
+            KeyItem(name = "TestCard", username = "code")
         )
     }
     AppTheme {

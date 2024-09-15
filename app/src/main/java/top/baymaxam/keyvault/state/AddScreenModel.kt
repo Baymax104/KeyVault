@@ -25,21 +25,21 @@ class AddScreenModel : ScreenModel {
     init {
         tags.replaceAll(
             listOf(
-                ItemSelectedState(Tag(id = 0, name = "Hello")),
-                ItemSelectedState(Tag(id = 1, name = "Hello1")),
-                ItemSelectedState(Tag(id = 2, name = "Hello2")),
-                ItemSelectedState(Tag(id = 3, name = "Hello3")),
-                ItemSelectedState(Tag(id = 4, name = "Hello4")),
+                ItemSelectedState(Tag(name = "Hello")),
+                ItemSelectedState(Tag(name = "Hello1")),
+                ItemSelectedState(Tag(name = "Hello2")),
+                ItemSelectedState(Tag(name = "Hello3")),
+                ItemSelectedState(Tag(name = "Hello4")),
             )
         )
 
         passItems.replaceAll(
             listOf(
-                KeyItem(id = 0, name = "test1", type = KeyType.Website, username = "Hello"),
-                KeyItem(id = 1, name = "test2", type = KeyType.Card, username = "Hello"),
-                KeyItem(id = 2, name = "test3", type = KeyType.Website, username = "Hello"),
-                KeyItem(id = 3, name = "test4", type = KeyType.Website, username = "Hello"),
-                KeyItem(id = 4, name = "test5", type = KeyType.Card, username = "Hello"),
+                KeyItem(name = "test1", type = KeyType.Website, username = "Hello"),
+                KeyItem(name = "test2", type = KeyType.Card, username = "Hello"),
+                KeyItem(name = "test3", type = KeyType.Website, username = "Hello"),
+                KeyItem(name = "test4", type = KeyType.Website, username = "Hello"),
+                KeyItem(name = "test5", type = KeyType.Card, username = "Hello"),
             )
         )
     }

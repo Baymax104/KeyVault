@@ -59,9 +59,3 @@ object KeyTypeConverter {
         }
     }
 }
-
-// ========================================== Object Map ===========================================
-
-fun interface ObjectMapper<S, T> {
-    fun map(source: S): T
-}

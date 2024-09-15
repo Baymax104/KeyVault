@@ -209,14 +209,14 @@ private fun KeyItemLayout(
 private fun Preview() {
     AppTheme {
         val list = listOf(
-            ItemSelectedState(KeyItem(id = 0, name = "Hello")),
-            ItemSelectedState(KeyItem(id = 1, name = "Hello")),
-            ItemSelectedState(KeyItem(id = 2, name = "Hello")),
-            ItemSelectedState(KeyItem(id = 3, name = "Hello")),
-            ItemSelectedState(KeyItem(id = 4, name = "Hello")),
-            ItemSelectedState(KeyItem(id = 5, name = "Hello")),
-            ItemSelectedState(KeyItem(id = 6, name = "Hello")),
-            ItemSelectedState(KeyItem(id = 7, name = "Hello")),
+            ItemSelectedState(KeyItem(name = "Hello")),
+            ItemSelectedState(KeyItem(name = "Hello")),
+            ItemSelectedState(KeyItem(name = "Hello")),
+            ItemSelectedState(KeyItem(name = "Hello")),
+            ItemSelectedState(KeyItem(name = "Hello")),
+            ItemSelectedState(KeyItem(name = "Hello")),
+            ItemSelectedState(KeyItem(name = "Hello")),
+            ItemSelectedState(KeyItem(name = "Hello")),
         )
         ItemList(items = list)
     }

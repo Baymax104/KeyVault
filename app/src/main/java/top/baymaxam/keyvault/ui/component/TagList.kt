@@ -140,11 +140,11 @@ private fun Preview() {
 //        )
         TagList(
             items = listOf(
-                ItemSelectedState(Tag(id = 0, name = "Hello")),
-                ItemSelectedState(Tag(id = 1, name = "Hello")),
-                ItemSelectedState(Tag(id = 2, name = "Hello")),
-                ItemSelectedState(Tag(id = 3, name = "Hello")),
-                ItemSelectedState(Tag(id = 4, name = "Hello")),
+                ItemSelectedState(Tag(name = "Hello")),
+                ItemSelectedState(Tag(name = "Hello")),
+                ItemSelectedState(Tag(name = "Hello")),
+                ItemSelectedState(Tag(name = "Hello")),
+                ItemSelectedState(Tag(name = "Hello")),
             ),
             keyItemsFactory = {
                 listOf(

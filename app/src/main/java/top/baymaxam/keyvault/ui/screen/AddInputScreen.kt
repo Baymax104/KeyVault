@@ -409,10 +409,10 @@ private fun LineHeader(modifier: Modifier = Modifier) {
 private fun Preview() {
     AppTheme {
         val tags = listOf(
-            ItemSelectedState(Tag(id = 0, name = "Hello0")),
-            ItemSelectedState(Tag(id = 1, name = "Hello1")),
-            ItemSelectedState(Tag(id = 2, name = "Hello2")),
-            ItemSelectedState(Tag(id = 3, name = "Hello3")),
+            ItemSelectedState(Tag(name = "Hello0")),
+            ItemSelectedState(Tag(name = "Hello1")),
+            ItemSelectedState(Tag(name = "Hello2")),
+            ItemSelectedState(Tag(name = "Hello3")),
         )
         ContentLayout(
             tags = tags

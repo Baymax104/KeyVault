@@ -14,8 +14,14 @@ import top.baymaxam.keyvault.model.entity.PasswordEntity
 interface PassDao {
 
     @Insert
-    suspend fun insertOne(entity: PasswordEntity): Long
+    suspend fun insert(entity: PasswordEntity)
 
     @Query("select * from t_password")
-    suspend fun queryAll(): MutableList<PasswordEntity>
+    suspend fun queryAll(): List<PasswordEntity>
+
+    @Query("select * from t_password where id=:id")
+    suspend fun query(id: Long): PasswordEntity
+
+    @Query("select * from t_password where id in (:ids)")
+    suspend fun query(ids: List<Long>): List<PasswordEntity>
 }

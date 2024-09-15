@@ -15,15 +15,15 @@ class TagListScreenModel : ScreenModel {
 
     val tags = mutableStateListOf<ItemSelectedState<Tag>>()
 
-    private val tagItemsMap = mutableMapOf<Long, StateList<KeyItem>>()
+    private val tagItemsMap = mutableMapOf<String, StateList<KeyItem>>()
 
     init {
         val list = listOf(
-            ItemSelectedState(Tag(id = 0, name = "Hello")),
-            ItemSelectedState(Tag(id = 1, name = "Hello")),
-            ItemSelectedState(Tag(id = 2, name = "Hello")),
-            ItemSelectedState(Tag(id = 3, name = "Hello")),
-            ItemSelectedState(Tag(id = 4, name = "Hello")),
+            ItemSelectedState(Tag(name = "Hello")),
+            ItemSelectedState(Tag(name = "Hello")),
+            ItemSelectedState(Tag(name = "Hello")),
+            ItemSelectedState(Tag(name = "Hello")),
+            ItemSelectedState(Tag(name = "Hello")),
         )
         tags.addAll(list)
         list.forEach {

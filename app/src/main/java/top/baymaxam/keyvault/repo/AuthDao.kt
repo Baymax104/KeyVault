@@ -14,8 +14,8 @@ import top.baymaxam.keyvault.model.entity.AuthEntity
 interface AuthDao {
 
     @Insert
-    suspend fun insert(entity: AuthEntity): Long
+    suspend fun insert(entity: AuthEntity)
 
     @Query("select * from t_auth")
-    suspend fun queryAll(): MutableList<AuthEntity>
+    suspend fun queryAll(): List<AuthEntity>
 }

@@ -3,6 +3,7 @@ package top.baymaxam.keyvault.repo
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.withTransaction
 import com.blankj.utilcode.util.Utils
 import top.baymaxam.keyvault.model.entity.AuthEntity
 import top.baymaxam.keyvault.model.entity.PasswordEntity
@@ -35,3 +36,5 @@ abstract class LocalDatabase : RoomDatabase() {
     abstract fun authDao(): AuthDao
 
 }
+
+suspend fun <R> transaction(block: suspend () -> R) = LocalDatabase.Instance.withTransaction(block)

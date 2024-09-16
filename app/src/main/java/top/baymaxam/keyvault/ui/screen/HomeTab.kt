@@ -16,6 +16,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -44,7 +46,6 @@ import top.baymaxam.keyvault.ui.component.ResentUsedList
 import top.baymaxam.keyvault.ui.component.SearchField
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.ui.theme.robotoFont
-import top.baymaxam.keyvault.util.replaceAllBy
 
 /**
  * 首页
@@ -70,23 +71,21 @@ object HomeTab : Tab {
         val navigator = LocalNavigator.root
         val viewModel = koinScreenModel<HomeScreenModel>()
         val searchContentState = remember { mutableStateOf("") }
-        val resentUsedItems = remember { mutableStateListOf<KeyItem>() }
+        val resentUsedItems = viewModel.getResentItems().collectAsState(emptyList())
         val resentUsedListState = rememberLazyListState()
-        val passwordCountState = remember { mutableIntStateOf(0) }
+        val passwordCountState = viewModel.getItemCount().collectAsState(0)
         val tagCountState = remember { mutableIntStateOf(0) }
         val bottomSheetNavigator = LocalBottomSheetNavigator.current
 
         if (!bottomSheetNavigator.isVisible) {
             LaunchedEffect(Unit) {
-                resentUsedItems.replaceAllBy(viewModel.getResentItems())
-                passwordCountState.intValue = viewModel.getItemCount()
                 resentUsedListState.scrollToItem(0)
             }
         }
 
         ContentLayout(
             searchContentState = searchContentState,
-            resentUsedItems = resentUsedItems,
+            resentUsedItems = resentUsedItems.value,
             resentUsedListState = resentUsedListState,
             passwordCountState = passwordCountState,
             tagCountState = tagCountState,
@@ -104,7 +103,7 @@ private fun ContentLayout(
     searchContentState: MutableState<String> = mutableStateOf(""),
     resentUsedItems: List<KeyItem> = mutableStateListOf(),
     resentUsedListState: LazyListState = rememberLazyListState(),
-    passwordCountState: MutableIntState = mutableIntStateOf(0),
+    passwordCountState: State<Int> = mutableIntStateOf(0),
     tagCountState: MutableIntState = mutableIntStateOf(0),
     onSearch: () -> Unit = {},
     onPasswordClick: () -> Unit = {},
@@ -120,7 +119,7 @@ private fun ContentLayout(
             onSearch = onSearch,
             onPasswordClick = onPasswordClick,
             onTagClick = onTagClick,
-            passwordCount = passwordCountState.intValue,
+            passwordCount = passwordCountState.value,
             tagCount = tagCountState.intValue
         )
 

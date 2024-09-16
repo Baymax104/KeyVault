@@ -3,10 +3,14 @@ package top.baymaxam.keyvault.state
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
 import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import top.baymaxam.keyvault.model.domain.KeyItem
-import top.baymaxam.keyvault.model.domain.KeyType
 import top.baymaxam.keyvault.model.domain.Tag
-import top.baymaxam.keyvault.repo.PassRepository
+import top.baymaxam.keyvault.model.domain.asEntity
+import top.baymaxam.keyvault.model.entity.asItem
+import top.baymaxam.keyvault.repo.KeyDao
 import top.baymaxam.keyvault.util.CachedStateList
 
 /**
@@ -15,49 +19,43 @@ import top.baymaxam.keyvault.util.CachedStateList
  * @since 01 8月 2024
  */
 @Stable
-class AddScreenModel(private val repo: PassRepository) : ScreenModel {
+class AddScreenModel(private val dao: KeyDao) : ScreenModel {
 
     val tags = CachedStateList<ItemSelectedState<Tag>>()
 
-    val passItems = CachedStateList<KeyItem>()
+    val items = CachedStateList<KeyItem>()
 
     val selectedPassItem = mutableStateOf<KeyItem?>(null)
 
     init {
-        tags.replaceAll(
-            listOf(
-                ItemSelectedState(Tag(name = "Hello")),
-                ItemSelectedState(Tag(name = "Hello1")),
-                ItemSelectedState(Tag(name = "Hello2")),
-                ItemSelectedState(Tag(name = "Hello3")),
-                ItemSelectedState(Tag(name = "Hello4")),
-            )
+        tags.cacheList = mutableListOf(
+            ItemSelectedState(Tag(name = "Hello")),
+            ItemSelectedState(Tag(name = "Hello1")),
+            ItemSelectedState(Tag(name = "Hello2")),
+            ItemSelectedState(Tag(name = "Hello3")),
+            ItemSelectedState(Tag(name = "Hello4")),
         )
 
-        passItems.replaceAll(
-            listOf(
-                KeyItem(name = "test1", type = KeyType.Website, username = "Hello"),
-                KeyItem(name = "test2", type = KeyType.Card, username = "Hello"),
-                KeyItem(name = "test3", type = KeyType.Website, username = "Hello"),
-                KeyItem(name = "test4", type = KeyType.Website, username = "Hello"),
-                KeyItem(name = "test5", type = KeyType.Card, username = "Hello"),
-            )
-        )
+        screenModelScope.launch {
+            dao.queryNonAuthItem()
+                .map { l -> l.map { it.asItem() } }
+                .collect { items.cacheList = it.toMutableList() }
+        }
     }
 
     fun searchTag(content: String) {
-        tags.originList.filter { it.value.name.contains(content, true) }
+        tags.cacheList.filter { it.value.name.contains(content, true) }
             .let { tags.refreshState(it) }
     }
 
     fun searchPassItem(content: String) {
-        passItems.originList.filter { it.name.contains(content, true) }
-            .let { passItems.refreshState(it) }
+        items.cacheList.filter { it.name.contains(content, true) }
+            .let { items.refreshState(it) }
     }
 
     suspend fun addItem(item: KeyItem): Result<Unit> {
         return runCatching {
-            repo.addItem(item)
+            dao.insert(item.asEntity())
         }
     }
 }

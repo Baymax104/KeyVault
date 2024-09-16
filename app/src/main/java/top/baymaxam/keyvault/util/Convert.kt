@@ -3,6 +3,7 @@ package top.baymaxam.keyvault.util
 import androidx.room.TypeConverter
 import kotlinx.serialization.json.Json
 import top.baymaxam.keyvault.model.domain.KeyType
+import top.baymaxam.keyvault.model.domain.toKeyType
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -36,26 +37,13 @@ object DateConverter {
 
     @TypeConverter
     fun date2Long(date: Date): Long = date.time
-
 }
 
 object KeyTypeConverter {
 
     @TypeConverter
-    fun type2String(type: KeyType): String {
-        return when (type) {
-            KeyType.Website -> "Website"
-            KeyType.Card -> "Card"
-            else -> "Website"
-        }
-    }
+    fun type2String(type: KeyType): String = type.name
 
     @TypeConverter
-    fun string2Type(string: String): KeyType {
-        return when (string) {
-            "Website" -> KeyType.Website
-            "Card" -> KeyType.Card
-            else -> KeyType.Website
-        }
-    }
+    fun string2Type(string: String): KeyType = string.toKeyType() ?: KeyType.Website
 }

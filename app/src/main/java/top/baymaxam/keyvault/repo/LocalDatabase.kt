@@ -5,8 +5,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.withTransaction
 import com.blankj.utilcode.util.Utils
-import top.baymaxam.keyvault.model.entity.AuthEntity
-import top.baymaxam.keyvault.model.entity.PasswordEntity
+import top.baymaxam.keyvault.model.entity.KeyEntity
 
 /**
  * Room数据库
@@ -14,10 +13,7 @@ import top.baymaxam.keyvault.model.entity.PasswordEntity
  * @since 30 6月 2024
  */
 @Database(
-    entities = [
-        PasswordEntity::class,
-        AuthEntity::class,
-    ],
+    entities = [KeyEntity::class],
     version = 1,
     exportSchema = false
 )
@@ -31,10 +27,7 @@ abstract class LocalDatabase : RoomDatabase() {
         ).build()
     }
 
-    abstract fun passDao(): PassDao
-
-    abstract fun authDao(): AuthDao
-
+    abstract fun keyDao(): KeyDao
 }
 
 suspend fun <R> transaction(block: suspend () -> R) = LocalDatabase.Instance.withTransaction(block)

@@ -142,7 +142,8 @@ class AddInputScreen : Screen {
                     2 -> KeyItem(
                         name = nameContentState.value,
                         comment = commentContentState.value,
-                        authorization = viewModel.selectedPassItem.value!!,
+                        authId = viewModel.selectedPassItem.value!!.id,
+                        authName = viewModel.selectedPassItem.value!!.name,
                         type = KeyType.Authorization,
                         createDate = Date(),
                     )

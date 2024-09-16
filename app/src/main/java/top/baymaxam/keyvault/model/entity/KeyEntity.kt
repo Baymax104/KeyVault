@@ -15,29 +15,33 @@ import java.util.Date
  * @author John
  * @since 04 7月 2024
  */
-@Entity(tableName = "t_password")
+@Entity(tableName = "t_key")
 @TypeConverters(DateConverter::class, KeyTypeConverter::class)
-data class PasswordEntity(
+data class KeyEntity(
     @PrimaryKey
     val id: String = uuid4().toString(),
     var name: String = "",
+    var type: KeyType = KeyType.Website,
     var username: String = "",
     var password: String = "",
-    var createDate: Date = Date(0),
     var comment: String = "",
-    var lastUsedDate: Date = Date(0),
-    var type: KeyType = KeyType.Website
+    var authId: String? = null,
+    var authName: String? = null,
+    var createDate: Date = Date(0),
+    var lastUsedDate: Date = Date(0)
 )
 
-fun PasswordEntity.asItem(): KeyItem {
-    return KeyItem(
+fun KeyEntity.asItem(): KeyItem =
+    KeyItem(
         id = id,
         name = name,
         type = type,
         username = username,
         password = password,
         comment = comment,
+        authId = authId,
+        authName = authName,
         createDate = createDate,
         lastUsedDate = lastUsedDate
     )
-}
+

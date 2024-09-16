@@ -124,7 +124,7 @@ private fun RecentUsedItem(
                     )
                     Text(
                         text = when (item.type) {
-                            KeyType.Authorization -> item.authorization?.name ?: ""
+                            KeyType.Authorization -> item.authName ?: ""
                             else -> item.username
                         },
                         style = TextStyle(

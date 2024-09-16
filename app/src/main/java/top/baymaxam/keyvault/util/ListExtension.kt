@@ -28,9 +28,9 @@ class CachedStateList<E> {
         }
     }
 
-    val originList: List<E> get() = cache
+    var cacheList: MutableList<E>
+        get() = cache
+        set(value) = cache.replaceAllBy(value)
 
     fun refreshState(elements: Collection<E>? = null) = state.replaceAllBy(elements ?: cache)
-
-    fun replaceAll(elements: Collection<E>) = cache.replaceAllBy(elements)
 }

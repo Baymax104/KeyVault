@@ -36,7 +36,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -83,9 +82,8 @@ class ItemListScreen : Screen {
             viewModel.items[pagerState.settledPage].forEach { it.selected.value = false }
         }
 
-        LaunchedEffect(pagerState) {
-            snapshotFlow { pagerState.settledPage }
-                .collect(viewModel::loadPage)
+        LaunchedEffect(pagerState.settledPage) {
+            viewModel.getPageItems(pagerState.settledPage)
         }
 
         BackHandler(editableState.value) {

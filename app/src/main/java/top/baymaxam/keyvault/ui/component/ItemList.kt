@@ -156,7 +156,7 @@ private fun KeyItemLayout(
                     Spacer(modifier = Modifier.height(5.dp))
                     Text(
                         text = when (keyItem.type) {
-                            KeyType.Authorization -> keyItem.authorization?.name ?: ""
+                            KeyType.Authorization -> keyItem.authName ?: ""
                             else -> keyItem.username
                         },
                         style = TextStyle(

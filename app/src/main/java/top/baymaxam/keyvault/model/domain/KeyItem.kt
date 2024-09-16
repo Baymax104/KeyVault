@@ -3,8 +3,7 @@ package top.baymaxam.keyvault.model.domain
 import android.os.Parcelable
 import com.benasher44.uuid.uuid4
 import kotlinx.parcelize.Parcelize
-import top.baymaxam.keyvault.model.entity.AuthEntity
-import top.baymaxam.keyvault.model.entity.PasswordEntity
+import top.baymaxam.keyvault.model.entity.KeyEntity
 import java.util.Date
 
 /**
@@ -22,47 +21,26 @@ data class KeyItem(
     var username: String = "",
     var password: String = "",
     var comment: String = "",
-    var authorization: KeyItem? = null,
+    var authId: String? = null,
+    var authName: String? = null
 ) : Parcelable {
     init {
-        when (type) {
-            KeyType.Authorization -> check(authorization?.type != KeyType.Authorization) {
-                "Authorization can not have authorization reference."
-            }
-
-            else -> check(authorization == null) {
-                "Non-authorization item can not have authorization reference."
-            }
+        if (type == KeyType.Authorization) {
+            check(authId != null && authName != null) { "Authorization's reference is null." }
         }
     }
 }
 
-fun KeyItem.asPasswordEntity(): PasswordEntity {
-    check(type != KeyType.Authorization) {
-        "Authorization item can not be converted to PasswordEntity."
-    }
-    return PasswordEntity(
+fun KeyItem.asEntity(): KeyEntity =
+    KeyEntity(
         id = id,
         name = name,
         type = type,
         username = username,
         password = password,
         comment = comment,
-        createDate = createDate,
-        lastUsedDate = lastUsedDate,
-    )
-}
-
-fun KeyItem.asAuthEntity(): AuthEntity {
-    check(type == KeyType.Authorization) {
-        "Non-authorization item can not be converted to AuthEntity."
-    }
-    return AuthEntity(
-        id = id,
-        name = name,
-        authorization = authorization!!.id,
-        comment = comment,
+        authId = authId,
+        authName = authName,
         createDate = createDate,
         lastUsedDate = lastUsedDate
     )
-}

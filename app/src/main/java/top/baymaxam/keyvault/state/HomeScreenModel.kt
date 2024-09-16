@@ -20,5 +20,7 @@ class HomeScreenModel(private val repo: PassRepository) : ScreenModel {
             .sortedByDescending { it.lastUsedDate.time }
     }
 
+    suspend fun getItemCount(): Int = repo.getAllItems().size
+
 
 }

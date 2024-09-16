@@ -14,7 +14,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import top.baymaxam.keyvault.R
@@ -69,15 +72,24 @@ object HomeTab : Tab {
         val searchContentState = remember { mutableStateOf("") }
         val resentUsedItems = remember { mutableStateListOf<KeyItem>() }
         val resentUsedListState = rememberLazyListState()
+        val passwordCountState = remember { mutableIntStateOf(0) }
+        val tagCountState = remember { mutableIntStateOf(0) }
+        val bottomSheetNavigator = LocalBottomSheetNavigator.current
 
-        LaunchedEffect(Unit) {
-            resentUsedItems.replaceAllBy(viewModel.getResentItems())
-            resentUsedListState.scrollToItem(0)
+        if (!bottomSheetNavigator.isVisible) {
+            LaunchedEffect(Unit) {
+                resentUsedItems.replaceAllBy(viewModel.getResentItems())
+                passwordCountState.intValue = viewModel.getItemCount()
+                resentUsedListState.scrollToItem(0)
+            }
         }
 
         ContentLayout(
             searchContentState = searchContentState,
-            keyItems = resentUsedItems,
+            resentUsedItems = resentUsedItems,
+            resentUsedListState = resentUsedListState,
+            passwordCountState = passwordCountState,
+            tagCountState = tagCountState,
             onSearch = {},
             onPasswordClick = { navigator += ItemListScreen() },
             onTagClick = { navigator += TagListScreen() },
@@ -90,8 +102,10 @@ object HomeTab : Tab {
 @Composable
 private fun ContentLayout(
     searchContentState: MutableState<String> = mutableStateOf(""),
-    keyItems: List<KeyItem> = mutableStateListOf(),
+    resentUsedItems: List<KeyItem> = mutableStateListOf(),
     resentUsedListState: LazyListState = rememberLazyListState(),
+    passwordCountState: MutableIntState = mutableIntStateOf(0),
+    tagCountState: MutableIntState = mutableIntStateOf(0),
     onSearch: () -> Unit = {},
     onPasswordClick: () -> Unit = {},
     onTagClick: () -> Unit = {},
@@ -105,12 +119,14 @@ private fun ContentLayout(
             searchContentState = searchContentState,
             onSearch = onSearch,
             onPasswordClick = onPasswordClick,
-            onTagClick = onTagClick
+            onTagClick = onTagClick,
+            passwordCount = passwordCountState.intValue,
+            tagCount = tagCountState.intValue
         )
 
         ResentUsed(
             resentUsedListState = resentUsedListState,
-            keyItems = keyItems,
+            keyItems = resentUsedItems,
             onItemClick = onItemClick
         )
     }
@@ -211,7 +227,7 @@ private fun Preview() {
     }
     AppTheme {
         ContentLayout(
-            keyItems = list
+            resentUsedItems = list
         )
     }
 }

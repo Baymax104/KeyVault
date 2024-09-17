@@ -34,7 +34,7 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.Tag
-import top.baymaxam.keyvault.state.ItemSelectedState
+import top.baymaxam.keyvault.state.SelectedState
 import top.baymaxam.keyvault.state.TagListScreenModel
 import top.baymaxam.keyvault.ui.component.FloatingButton
 import top.baymaxam.keyvault.ui.component.SearchField
@@ -63,7 +63,7 @@ class TagListScreen : Screen {
         fun clearEditState() {
             editableState.value = false
             selectedNumberState.intValue = 0
-            viewModel.tags.forEach { it.selected.value = false }
+            viewModel.tags.forEach { it.selected = false }
         }
 
         BackHandler(editableState.value) {
@@ -72,7 +72,7 @@ class TagListScreen : Screen {
 
         ContentLayout(
             items = viewModel.tags,
-            keyItemsFactory = viewModel::getTagItems,
+            keyItemsFactory = { viewModel.getTagItems(it) },
             editableState = editableState,
             searchContentState = searchContentState,
             selectedNumberState = selectedNumberState,
@@ -88,7 +88,7 @@ class TagListScreen : Screen {
             onDeleteClick = {},
             onItemClick = {},
             onItemSelected = {
-                selectedNumberState.intValue += if (it.selected.value) 1 else -1
+                selectedNumberState.intValue += if (it.selected) 1 else -1
             }
         )
     }
@@ -99,13 +99,13 @@ private fun ContentLayout(
     searchContentState: MutableState<String> = mutableStateOf(""),
     editableState: MutableState<Boolean> = mutableStateOf(false),
     selectedNumberState: MutableIntState = mutableIntStateOf(0),
-    items: List<ItemSelectedState<Tag>> = emptyList(),
+    items: List<SelectedState<Tag>> = emptyList(),
     onSearch: () -> Unit = {},
     onBack: () -> Unit = {},
     onAddClick: () -> Unit = {},
     onDeleteClick: () -> Unit = {},
     onItemClick: (Tag) -> Unit = {},
-    onItemSelected: (ItemSelectedState<Tag>) -> Unit = {},
+    onItemSelected: (SelectedState<Tag>) -> Unit = {},
     keyItemsFactory: (Tag) -> List<KeyItem> = { emptyList() }
 ) {
     Scaffold(
@@ -186,11 +186,11 @@ private fun Preview() {
     AppTheme {
         ContentLayout(
             items = listOf(
-                ItemSelectedState(Tag(name = "Hello")),
-                ItemSelectedState(Tag(name = "Hello")),
-                ItemSelectedState(Tag(name = "Hello")),
-                ItemSelectedState(Tag(name = "Hello")),
-                ItemSelectedState(Tag(name = "Hello")),
+                SelectedState(Tag(name = "Hello")),
+                SelectedState(Tag(name = "Hello")),
+                SelectedState(Tag(name = "Hello")),
+                SelectedState(Tag(name = "Hello")),
+                SelectedState(Tag(name = "Hello")),
             ),
             keyItemsFactory = {
                 listOf(

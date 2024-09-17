@@ -25,8 +25,6 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,7 +36,7 @@ import androidx.compose.ui.unit.sp
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.KeyType
 import top.baymaxam.keyvault.model.domain.Tag
-import top.baymaxam.keyvault.state.ItemSelectedState
+import top.baymaxam.keyvault.state.SelectedState
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.ui.theme.IconColors
 
@@ -49,12 +47,12 @@ import top.baymaxam.keyvault.ui.theme.IconColors
  */
 @Composable
 fun ItemList(
-    items: List<ItemSelectedState<KeyItem>>,
+    items: List<SelectedState<KeyItem>>,
     modifier: Modifier = Modifier,
-    editableState: MutableState<Boolean> = mutableStateOf(false),
+    isEditable: Boolean = false,
     onItemClick: (KeyItem) -> Unit = {},
     onItemCopy: (KeyItem) -> Unit = {},
-    onSelected: (ItemSelectedState<KeyItem>) -> Unit = {},
+    onSelected: (SelectedState<KeyItem>) -> Unit = {},
     tagsFactory: (KeyItem) -> List<Tag> = { emptyList() }
 ) {
     LazyColumn(
@@ -70,7 +68,7 @@ fun ItemList(
             KeyItemLayout(
                 item = it,
                 tags = tagsFactory(it.value),
-                editableState = editableState,
+                isEditable = isEditable,
                 onClick = onItemClick,
                 onCopy = onItemCopy,
                 onSelected = onSelected
@@ -83,14 +81,18 @@ fun ItemList(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun KeyItemLayout(
-    item: ItemSelectedState<KeyItem>,
+    item: SelectedState<KeyItem>,
     tags: List<Tag> = mutableListOf(),
-    editableState: MutableState<Boolean> = mutableStateOf(false),
+    isEditable: Boolean = false,
     onClick: (KeyItem) -> Unit = {},
     onCopy: (KeyItem) -> Unit = {},
-    onSelected: (ItemSelectedState<KeyItem>) -> Unit = {},
+    onSelected: (SelectedState<KeyItem>) -> Unit = {},
 ) {
-    val (keyItem, selectedState) = item
+    val (keyItem) = item
+    val select = {
+        item.selected = !item.selected
+        onSelected(item)
+    }
     Surface(
         shape = RoundedCornerShape(20.dp),
         shadowElevation = 1.dp,
@@ -101,21 +103,8 @@ private fun KeyItemLayout(
             modifier = Modifier
                 .fillMaxWidth()
                 .combinedClickable(
-                    onLongClick = {
-                        if (!editableState.value) {
-                            editableState.value = true
-                            selectedState.value = true
-                            onSelected(item)
-                        }
-                    },
-                    onClick = {
-                        if (editableState.value) {
-                            selectedState.value = !selectedState.value
-                            onSelected(item)
-                        } else {
-                            onClick(keyItem)
-                        }
-                    }
+                    onLongClick = { if (!isEditable) select() },
+                    onClick = { if (isEditable) select() else onClick(keyItem) }
                 )
                 .padding(10.dp)
         ) {
@@ -167,10 +156,10 @@ private fun KeyItemLayout(
                     )
                 }
 
-                if (editableState.value) {
+                if (isEditable) {
                     RadioButton(
-                        selected = selectedState.value,
-                        onClick = { selectedState.value = !selectedState.value }
+                        selected = item.selected,
+                        onClick = select
                     )
                 } else if (keyItem.type != KeyType.Authorization) {
                     IconButton(onClick = { onCopy(keyItem) }) {
@@ -209,14 +198,14 @@ private fun KeyItemLayout(
 private fun Preview() {
     AppTheme {
         val list = listOf(
-            ItemSelectedState(KeyItem(name = "Hello")),
-            ItemSelectedState(KeyItem(name = "Hello")),
-            ItemSelectedState(KeyItem(name = "Hello")),
-            ItemSelectedState(KeyItem(name = "Hello")),
-            ItemSelectedState(KeyItem(name = "Hello")),
-            ItemSelectedState(KeyItem(name = "Hello")),
-            ItemSelectedState(KeyItem(name = "Hello")),
-            ItemSelectedState(KeyItem(name = "Hello")),
+            SelectedState(KeyItem(name = "Hello")),
+            SelectedState(KeyItem(name = "Hello")),
+            SelectedState(KeyItem(name = "Hello")),
+            SelectedState(KeyItem(name = "Hello")),
+            SelectedState(KeyItem(name = "Hello")),
+            SelectedState(KeyItem(name = "Hello")),
+            SelectedState(KeyItem(name = "Hello")),
+            SelectedState(KeyItem(name = "Hello")),
         )
         ItemList(items = list)
     }

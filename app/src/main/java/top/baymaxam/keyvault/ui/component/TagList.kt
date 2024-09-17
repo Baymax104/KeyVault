@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastJoinToString
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.Tag
-import top.baymaxam.keyvault.state.ItemSelectedState
+import top.baymaxam.keyvault.state.SelectedState
 import top.baymaxam.keyvault.ui.theme.AppTheme
 
 /**
@@ -40,12 +40,12 @@ import top.baymaxam.keyvault.ui.theme.AppTheme
  */
 @Composable
 fun TagList(
-    items: List<ItemSelectedState<Tag>>,
+    items: List<SelectedState<Tag>>,
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
     editableState: MutableState<Boolean> = mutableStateOf(false),
     onItemClick: (Tag) -> Unit = {},
-    onItemSelected: (ItemSelectedState<Tag>) -> Unit = {},
+    onItemSelected: (SelectedState<Tag>) -> Unit = {},
     keyItemsFactory: (Tag) -> List<KeyItem> = { emptyList() }
 ) {
     LazyColumn(
@@ -71,35 +71,26 @@ fun TagList(
 
 @Composable
 private fun TagListItem(
-    item: ItemSelectedState<Tag>,
+    item: SelectedState<Tag>,
     keyItems: List<KeyItem>,
     editableState: MutableState<Boolean> = mutableStateOf(false),
     onClick: (Tag) -> Unit = {},
-    onSelected: (ItemSelectedState<Tag>) -> Unit = {}
+    onSelected: (SelectedState<Tag>) -> Unit = {}
 ) {
-    val (tag, selectedState) = item
+    val (tag) = item
     val itemName = keyItems.map { it.name }.fastJoinToString()
+    val select = {
+        item.selected = !item.selected
+        onSelected(item)
+    }
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
             .height(70.dp)
             .combinedClickable(
-                onLongClick = {
-                    if (!editableState.value) {
-                        editableState.value = true
-                        selectedState.value = true
-                        onSelected(item)
-                    }
-                },
-                onClick = {
-                    if (editableState.value) {
-                        selectedState.value = !selectedState.value
-                        onSelected(item)
-                    } else {
-                        onClick(tag)
-                    }
-                }
+                onLongClick = { if (!editableState.value) select() },
+                onClick = { if (editableState.value) select() else onClick(tag) }
             )
     ) {
         Column(
@@ -114,8 +105,8 @@ private fun TagListItem(
         }
         if (editableState.value) {
             RadioButton(
-                selected = selectedState.value,
-                onClick = { selectedState.value = !selectedState.value }
+                selected = item.selected,
+                onClick = select
             )
         }
     }
@@ -140,11 +131,11 @@ private fun Preview() {
 //        )
         TagList(
             items = listOf(
-                ItemSelectedState(Tag(name = "Hello")),
-                ItemSelectedState(Tag(name = "Hello")),
-                ItemSelectedState(Tag(name = "Hello")),
-                ItemSelectedState(Tag(name = "Hello")),
-                ItemSelectedState(Tag(name = "Hello")),
+                SelectedState(Tag(name = "Hello")),
+                SelectedState(Tag(name = "Hello")),
+                SelectedState(Tag(name = "Hello")),
+                SelectedState(Tag(name = "Hello")),
+                SelectedState(Tag(name = "Hello")),
             ),
             keyItemsFactory = {
                 listOf(

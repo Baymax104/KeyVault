@@ -2,6 +2,7 @@
 
 package top.baymaxam.keyvault.ui.component
 
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBackIosNew
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -26,7 +27,8 @@ import top.baymaxam.keyvault.ui.theme.AppTheme
 fun TopBackBar(
     title: String,
     onBack: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    actions: @Composable RowScope.() -> Unit = {}
 ) {
     CenterAlignedTopAppBar(
         modifier = modifier,
@@ -41,6 +43,7 @@ fun TopBackBar(
                 )
             }
         },
+        actions = actions,
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
             containerColor = MaterialTheme.colorScheme.inverseOnSurface
         )

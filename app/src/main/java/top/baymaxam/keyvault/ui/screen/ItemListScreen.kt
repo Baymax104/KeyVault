@@ -21,6 +21,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.Done
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,12 +32,11 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableIntState
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -50,12 +51,17 @@ import kotlinx.coroutines.launch
 import top.baymaxam.keyvault.R
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.Tag
+import top.baymaxam.keyvault.state.DialogState
 import top.baymaxam.keyvault.state.ItemListScreenModel
-import top.baymaxam.keyvault.state.ItemSelectedState
+import top.baymaxam.keyvault.state.SelectedState
+import top.baymaxam.keyvault.state.rememberDialogState
+import top.baymaxam.keyvault.ui.component.ConfirmDialog
 import top.baymaxam.keyvault.ui.component.FloatingButton
 import top.baymaxam.keyvault.ui.component.ItemList
 import top.baymaxam.keyvault.ui.component.TopBackBar
 import top.baymaxam.keyvault.ui.theme.AppTheme
+import top.baymaxam.keyvault.util.errorToast
+import top.baymaxam.keyvault.util.successToast
 
 /**
  * 条目列表页
@@ -70,23 +76,22 @@ class ItemListScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.root
-        val editableState = remember { mutableStateOf(false) }
+        var isEditable by remember { mutableStateOf(false) }
         val viewModel = koinScreenModel<ItemListScreenModel>()
         val pagerState = rememberPagerState { 3 }
-        val selectedNumberState = remember { mutableIntStateOf(0) }
         val scope = rememberCoroutineScope()
+        val dialogState = rememberDialogState()
 
         fun clearEditState() {
-            editableState.value = false
-            selectedNumberState.intValue = 0
-            viewModel.items[pagerState.settledPage].forEach { it.selected.value = false }
+            isEditable = false
+            viewModel.clearSelectedState(pagerState.settledPage)
         }
 
         LaunchedEffect(pagerState.settledPage) {
             viewModel.getPageItems(pagerState.settledPage)
         }
 
-        BackHandler(editableState.value) {
+        BackHandler(isEditable) {
             clearEditState()
         }
 
@@ -96,28 +101,30 @@ class ItemListScreen : Screen {
             ContentLayout(
                 pagerState = pagerState,
                 items = viewModel.items,
-                editableState = editableState,
-                selectedNumberState = selectedNumberState,
-                onBack = {
-                    if (editableState.value) {
-                        clearEditState()
-                    } else {
-                        navigator.pop()
+                editableState = isEditable,
+                selectedNumber = viewModel.selectedNumber,
+                dialogState = dialogState,
+                onBack = { if (isEditable) clearEditState() else navigator.pop() },
+                onEditClick = {
+                    isEditable = !isEditable
+                    if (!isEditable) {
+                        viewModel.clearSelectedState(pagerState.settledPage)
                     }
                 },
                 onItemClick = {},
                 onItemCopy = {},
                 onSelected = {
-                    selectedNumberState.intValue += if (it.selected.value) 1 else -1
+                    isEditable = true
+                    viewModel.selectedNumber += if (it.selected) 1 else -1
                 },
-                onDeleteClick = {
+                onDialogConfirm = {
                     scope.launch {
-                        viewModel.removePages()
+                        viewModel.removeSelectedItems(pagerState.settledPage)
+                            .onSuccess { successToast("删除成功") }
+                            .onFailure { errorToast(it.message) }
                     }
                 },
-                onAddClick = {
-                    bottomSheetNavigator.show(AddScreen())
-                },
+                onAddClick = { bottomSheetNavigator.show(AddScreen()) },
                 tagsFactory = {
                     emptyList()
                 }
@@ -129,26 +136,39 @@ class ItemListScreen : Screen {
 @Composable
 private fun ContentLayout(
     pagerState: PagerState = rememberPagerState { 3 },
-    items: List<List<ItemSelectedState<KeyItem>>> = emptyList(),
-    editableState: MutableState<Boolean> = mutableStateOf(true),
-    selectedNumberState: MutableIntState = mutableIntStateOf(0),
+    items: List<List<SelectedState<KeyItem>>> = emptyList(),
+    dialogState: DialogState = rememberDialogState(),
+    editableState: Boolean = false,
+    selectedNumber: Int = 0,
     onBack: () -> Unit = {},
     onItemClick: (KeyItem) -> Unit = {},
     onItemCopy: (KeyItem) -> Unit = {},
-    onSelected: (ItemSelectedState<KeyItem>) -> Unit = {},
+    onSelected: (SelectedState<KeyItem>) -> Unit = {},
+    onEditClick: () -> Unit = {},
     onAddClick: () -> Unit = {},
-    onDeleteClick: () -> Unit = {},
+    onDialogConfirm: () -> Unit = {},
     tagsFactory: (KeyItem) -> List<Tag> = { emptyList() }
 ) {
     val scope = rememberCoroutineScope()
     Scaffold(
-        topBar = { TopBackBar(title = "密码本", onBack = onBack) },
+        topBar = {
+            TopBackBar(title = "密码本", onBack = onBack) {
+                IconButton(onClick = onEditClick) {
+                    Icon(
+                        imageVector = if (!editableState) Icons.Rounded.Edit else Icons.Rounded.Done,
+                        contentDescription = null
+                    )
+                }
+            }
+        },
         floatingActionButton = {
-            FloatingButton(
-                icon = Icons.Rounded.Add,
-                modifier = Modifier.padding(end = 15.dp, bottom = 25.dp),
-                onClick = onAddClick
-            )
+            if (!editableState) {
+                FloatingButton(
+                    icon = Icons.Rounded.Add,
+                    modifier = Modifier.padding(end = 15.dp, bottom = 25.dp),
+                    onClick = onAddClick
+                )
+            }
         }
     ) { paddingValues ->
         Column(
@@ -156,7 +176,7 @@ private fun ContentLayout(
                 .padding(paddingValues)
                 .fillMaxSize(),
         ) {
-            if (!editableState.value) {
+            if (!editableState) {
                 TabRow(
                     selectedTabIndex = pagerState.currentPage,
                     modifier = Modifier.height(50.dp)
@@ -183,10 +203,16 @@ private fun ContentLayout(
                             .padding(vertical = 5.dp, horizontal = 10.dp)
                     ) {
                         Text(
-                            text = "已选：${selectedNumberState.intValue}项，共${items[pagerState.settledPage].size}项",
+                            text = "已选：${selectedNumber}项，共${items[pagerState.settledPage].size}项",
                             modifier = Modifier.weight(1f)
                         )
-                        IconButton(onClick = onDeleteClick) {
+                        IconButton(
+                            onClick = {
+                                if (selectedNumber > 0) {
+                                    dialogState.show()
+                                }
+                            }
+                        ) {
                             Icon(
                                 imageVector = Icons.Rounded.Delete,
                                 contentDescription = null,
@@ -205,7 +231,7 @@ private fun ContentLayout(
 
             HorizontalPager(
                 state = pagerState,
-                userScrollEnabled = !editableState.value,
+                userScrollEnabled = !editableState,
                 contentPadding = PaddingValues(horizontal = 10.dp),
                 pageSpacing = 10.dp
             ) {
@@ -213,7 +239,7 @@ private fun ContentLayout(
                     ItemList(
                         items = items[it],
                         modifier = Modifier.fillMaxSize(),
-                        editableState = editableState,
+                        isEditable = editableState,
                         onItemClick = onItemClick,
                         onItemCopy = onItemCopy,
                         onSelected = onSelected,
@@ -229,6 +255,16 @@ private fun ContentLayout(
             }
         }
     }
+    ConfirmDialog(
+        state = dialogState,
+        title = "确认删除",
+        text = "确认删除选中条目？",
+        onCancel = { dialogState.dismiss() },
+        onConfirm = {
+            dialogState.dismiss()
+            onDialogConfirm()
+        }
+    )
 }
 
 
@@ -239,11 +275,11 @@ private fun Preview() {
         ContentLayout(
             items = listOf(
                 listOf(
-                    ItemSelectedState(KeyItem(name = "hello1")),
-                    ItemSelectedState(KeyItem(name = "hello1")),
-                    ItemSelectedState(KeyItem(name = "hello1")),
-                    ItemSelectedState(KeyItem(name = "hello1")),
-                    ItemSelectedState(KeyItem(name = "hello1")),
+                    SelectedState(KeyItem(name = "hello1")),
+                    SelectedState(KeyItem(name = "hello1")),
+                    SelectedState(KeyItem(name = "hello1")),
+                    SelectedState(KeyItem(name = "hello1")),
+                    SelectedState(KeyItem(name = "hello1")),
                 )
             )
         )

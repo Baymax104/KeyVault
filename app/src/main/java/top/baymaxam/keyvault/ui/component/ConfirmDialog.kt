@@ -40,7 +40,6 @@ fun ConfirmDialog(
             text = text,
             onConfirm = onConfirm,
             onCancel = onCancel,
-            onDismissRequest = onCancel
         )
     }
 }

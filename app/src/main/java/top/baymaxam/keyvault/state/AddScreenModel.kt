@@ -21,7 +21,7 @@ import top.baymaxam.keyvault.util.CachedStateList
 @Stable
 class AddScreenModel(private val dao: KeyDao) : ScreenModel {
 
-    val tags = CachedStateList<ItemSelectedState<Tag>>()
+    val tags = CachedStateList<SelectedState<Tag>>()
 
     val items = CachedStateList<KeyItem>()
 
@@ -29,11 +29,11 @@ class AddScreenModel(private val dao: KeyDao) : ScreenModel {
 
     init {
         tags.cacheList = mutableListOf(
-            ItemSelectedState(Tag(name = "Hello")),
-            ItemSelectedState(Tag(name = "Hello1")),
-            ItemSelectedState(Tag(name = "Hello2")),
-            ItemSelectedState(Tag(name = "Hello3")),
-            ItemSelectedState(Tag(name = "Hello4")),
+            SelectedState(Tag(name = "Hello")),
+            SelectedState(Tag(name = "Hello1")),
+            SelectedState(Tag(name = "Hello2")),
+            SelectedState(Tag(name = "Hello3")),
+            SelectedState(Tag(name = "Hello4")),
         )
 
         screenModelScope.launch {

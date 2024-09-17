@@ -13,17 +13,17 @@ import top.baymaxam.keyvault.util.StateList
  */
 class TagListScreenModel : ScreenModel {
 
-    val tags = mutableStateListOf<ItemSelectedState<Tag>>()
+    val tags = mutableStateListOf<SelectedState<Tag>>()
 
     private val tagItemsMap = mutableMapOf<String, StateList<KeyItem>>()
 
     init {
         val list = listOf(
-            ItemSelectedState(Tag(name = "Hello")),
-            ItemSelectedState(Tag(name = "Hello")),
-            ItemSelectedState(Tag(name = "Hello")),
-            ItemSelectedState(Tag(name = "Hello")),
-            ItemSelectedState(Tag(name = "Hello")),
+            SelectedState(Tag(name = "Hello")),
+            SelectedState(Tag(name = "Hello")),
+            SelectedState(Tag(name = "Hello")),
+            SelectedState(Tag(name = "Hello")),
+            SelectedState(Tag(name = "Hello")),
         )
         tags.addAll(list)
         list.forEach {

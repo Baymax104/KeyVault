@@ -59,7 +59,7 @@ import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.KeyType
 import top.baymaxam.keyvault.model.domain.Tag
 import top.baymaxam.keyvault.state.AddScreenModel
-import top.baymaxam.keyvault.state.ItemSelectedState
+import top.baymaxam.keyvault.state.SelectedState
 import top.baymaxam.keyvault.ui.component.InfoField
 import top.baymaxam.keyvault.ui.component.SearchField
 import top.baymaxam.keyvault.ui.component.SelectableTag
@@ -169,7 +169,7 @@ class AddInputScreen : Screen {
 @Composable
 private fun ContentLayout(
     searchContentState: MutableState<String> = mutableStateOf(""),
-    tags: List<ItemSelectedState<Tag>> = mutableStateListOf(),
+    tags: List<SelectedState<Tag>> = mutableStateListOf(),
     typeSelectedState: MutableIntState = mutableIntStateOf(0),
     nameContentState: MutableState<String> = mutableStateOf(""),
     usernameContentState: MutableState<String> = mutableStateOf(""),
@@ -222,12 +222,12 @@ private fun ContentLayout(
                         items = tags,
                         key = { it.value.id }
                     ) {
-                        val (item, selectedState) = it
+                        val (item) = it
                         SelectableTag(
                             text = item.name,
-                            selected = selectedState.value,
+                            selected = it.selected,
                             shape = RoundedCornerShape(30),
-                            onClick = { selectedState.value = !selectedState.value },
+                            onClick = { it.selected = !it.selected },
                             modifier = Modifier
                                 .height(40.dp)
                                 .width(80.dp)
@@ -415,10 +415,10 @@ private fun LineHeader(modifier: Modifier = Modifier) {
 private fun Preview() {
     AppTheme {
         val tags = listOf(
-            ItemSelectedState(Tag(name = "Hello0")),
-            ItemSelectedState(Tag(name = "Hello1")),
-            ItemSelectedState(Tag(name = "Hello2")),
-            ItemSelectedState(Tag(name = "Hello3")),
+            SelectedState(Tag(name = "Hello0")),
+            SelectedState(Tag(name = "Hello1")),
+            SelectedState(Tag(name = "Hello2")),
+            SelectedState(Tag(name = "Hello3")),
         )
         ContentLayout(
             tags = tags

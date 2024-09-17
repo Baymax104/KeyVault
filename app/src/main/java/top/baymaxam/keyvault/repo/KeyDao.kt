@@ -22,6 +22,9 @@ interface KeyDao {
     @Delete
     suspend fun delete(entity: KeyEntity)
 
+    @Delete
+    suspend fun delete(entities: List<KeyEntity>)
+
     @Query("select * from t_key")
     fun queryAll(): Flow<List<KeyEntity>>
 

@@ -72,7 +72,10 @@ val MaterialTheme.outlinedTextFieldColor: TextFieldColors
         unfocusedContainerColor = colorScheme.background,
         focusedContainerColor = colorScheme.background,
         unfocusedLeadingIconColor = colorScheme.onBackground,
-        focusedLeadingIconColor = colorScheme.primary
+        focusedLeadingIconColor = colorScheme.primary,
+        disabledTrailingIconColor = colorScheme.onBackground,
+        disabledContainerColor = colorScheme.background,
+        disabledBorderColor = colorScheme.onBackground,
     )
 
 object IconColors {

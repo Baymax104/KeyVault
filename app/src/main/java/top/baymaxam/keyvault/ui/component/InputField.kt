@@ -81,14 +81,17 @@ fun SearchField(
 fun InfoField(
     contentState: MutableState<String>,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     shape: Shape = InputFieldDefaults.shape,
     label: (@Composable () -> Unit)? = null,
     placeholder: (@Composable () -> Unit)? = null,
     leadingIcon: (@Composable () -> Unit)? = null,
+    trailingIcon: (@Composable () -> Unit)? = null
 ) {
     OutlinedTextField(
         value = contentState.value,
         onValueChange = { contentState.value = it },
+        enabled = enabled,
         modifier = modifier.defaultMinSize(
             minWidth = InputFieldDefaults.MinWidth,
             minHeight = InputFieldDefaults.MinHeight
@@ -100,7 +103,9 @@ fun InfoField(
         placeholder = placeholder,
         leadingIcon = leadingIcon,
         trailingIcon = {
-            if (contentState.value.isNotEmpty()) {
+            if (trailingIcon != null) {
+                trailingIcon()
+            } else if (enabled && contentState.value.isNotEmpty()) {
                 IconButton(onClick = { contentState.value = "" }) {
                     Icon(imageVector = Icons.Rounded.Close, contentDescription = null)
                 }

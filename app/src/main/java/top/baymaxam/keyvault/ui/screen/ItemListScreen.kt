@@ -32,6 +32,7 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -79,16 +80,17 @@ class ItemListScreen : Screen {
         var isEditable by remember { mutableStateOf(false) }
         val viewModel = koinScreenModel<ItemListScreenModel>()
         val pagerState = rememberPagerState { 3 }
+        val settledPage by remember { derivedStateOf { pagerState.settledPage } }
         val scope = rememberCoroutineScope()
         val dialogState = rememberDialogState()
 
         fun clearEditState() {
             isEditable = false
-            viewModel.clearSelectedState(pagerState.settledPage)
+            viewModel.clearSelectedState(settledPage)
         }
 
-        LaunchedEffect(pagerState.settledPage) {
-            viewModel.getPageItems(pagerState.settledPage)
+        LaunchedEffect(settledPage) {
+            viewModel.getPageItems(settledPage)
         }
 
         BackHandler(isEditable) {
@@ -101,17 +103,17 @@ class ItemListScreen : Screen {
             ContentLayout(
                 pagerState = pagerState,
                 items = viewModel.items,
-                editableState = isEditable,
+                isEditable = isEditable,
                 selectedNumber = viewModel.selectedNumber,
                 dialogState = dialogState,
                 onBack = { if (isEditable) clearEditState() else navigator.pop() },
                 onEditClick = {
                     isEditable = !isEditable
                     if (!isEditable) {
-                        viewModel.clearSelectedState(pagerState.settledPage)
+                        viewModel.clearSelectedState(settledPage)
                     }
                 },
-                onItemClick = {},
+                onItemClick = { navigator += ItemInfoScreen(it) },
                 onItemCopy = {},
                 onSelected = {
                     isEditable = true
@@ -119,7 +121,7 @@ class ItemListScreen : Screen {
                 },
                 onDialogConfirm = {
                     scope.launch {
-                        viewModel.removeSelectedItems(pagerState.settledPage)
+                        viewModel.removeSelectedItems(settledPage)
                             .onSuccess { successToast("删除成功") }
                             .onFailure { errorToast(it.message) }
                     }
@@ -138,7 +140,7 @@ private fun ContentLayout(
     pagerState: PagerState = rememberPagerState { 3 },
     items: List<List<SelectedState<KeyItem>>> = emptyList(),
     dialogState: DialogState = rememberDialogState(),
-    editableState: Boolean = false,
+    isEditable: Boolean = false,
     selectedNumber: Int = 0,
     onBack: () -> Unit = {},
     onItemClick: (KeyItem) -> Unit = {},
@@ -150,19 +152,20 @@ private fun ContentLayout(
     tagsFactory: (KeyItem) -> List<Tag> = { emptyList() }
 ) {
     val scope = rememberCoroutineScope()
+    val currentPage by remember { derivedStateOf { pagerState.currentPage } }
     Scaffold(
         topBar = {
             TopBackBar(title = "密码本", onBack = onBack) {
                 IconButton(onClick = onEditClick) {
                     Icon(
-                        imageVector = if (!editableState) Icons.Rounded.Edit else Icons.Rounded.Done,
+                        imageVector = if (!isEditable) Icons.Rounded.Edit else Icons.Rounded.Done,
                         contentDescription = null
                     )
                 }
             }
         },
         floatingActionButton = {
-            if (!editableState) {
+            if (!isEditable) {
                 FloatingButton(
                     icon = Icons.Rounded.Add,
                     modifier = Modifier.padding(end = 15.dp, bottom = 25.dp),
@@ -176,14 +179,14 @@ private fun ContentLayout(
                 .padding(paddingValues)
                 .fillMaxSize(),
         ) {
-            if (!editableState) {
+            if (!isEditable) {
                 TabRow(
-                    selectedTabIndex = pagerState.currentPage,
+                    selectedTabIndex = currentPage,
                     modifier = Modifier.height(50.dp)
                 ) {
                     listOf("网站", "卡片", "授权").forEachIndexed { index, text ->
                         Tab(
-                            selected = pagerState.currentPage == index,
+                            selected = currentPage == index,
                             text = { Text(text) },
                             onClick = { scope.launch { pagerState.animateScrollToPage(index) } }
                         )
@@ -231,7 +234,7 @@ private fun ContentLayout(
 
             HorizontalPager(
                 state = pagerState,
-                userScrollEnabled = !editableState,
+                userScrollEnabled = !isEditable,
                 contentPadding = PaddingValues(horizontal = 10.dp),
                 pageSpacing = 10.dp
             ) {
@@ -239,7 +242,7 @@ private fun ContentLayout(
                     ItemList(
                         items = items[it],
                         modifier = Modifier.fillMaxSize(),
-                        isEditable = editableState,
+                        isEditable = isEditable,
                         onItemClick = onItemClick,
                         onItemCopy = onItemCopy,
                         onSelected = onSelected,

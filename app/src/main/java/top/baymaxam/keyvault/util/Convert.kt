@@ -11,14 +11,10 @@ import java.util.Locale
 // ================================= Date String Convertor =========================================
 
 fun Date?.toDateString(pattern: String) =
-    this?.let {
-        SimpleDateFormat(pattern, Locale.CHINA).format(this)
-    } ?: ""
+    this?.takeIf { it.time > 0 }?.let { SimpleDateFormat(pattern, Locale.CHINA).format(it) } ?: ""
 
 fun String?.toDate(pattern: String): Date? =
-    this?.runCatching {
-        SimpleDateFormat(pattern, Locale.CHINA).parse(this)
-    }?.getOrNull()
+    this?.runCatching { SimpleDateFormat(pattern, Locale.CHINA).parse(this) }?.getOrNull()
 
 
 // =========================================== Json ================================================

@@ -100,4 +100,5 @@ dependencies {
     implementation(libs.voyager.tabNavigator)
     implementation(libs.voyager.koin)
     implementation(libs.koin)
+    implementation(libs.splashscreen)
 }

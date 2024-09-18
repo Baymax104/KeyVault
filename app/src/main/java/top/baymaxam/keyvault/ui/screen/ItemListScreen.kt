@@ -21,8 +21,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Delete
-import androidx.compose.material.icons.rounded.Done
-import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +28,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -40,7 +39,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
@@ -83,6 +84,7 @@ class ItemListScreen : Screen {
         val settledPage by remember { derivedStateOf { pagerState.settledPage } }
         val scope = rememberCoroutineScope()
         val dialogState = rememberDialogState()
+        val clipboardManager = LocalClipboardManager.current
 
         fun clearEditState() {
             isEditable = false
@@ -114,7 +116,10 @@ class ItemListScreen : Screen {
                     }
                 },
                 onItemClick = { navigator += ItemInfoScreen(it) },
-                onItemCopy = {},
+                onItemCopy = {
+                    clipboardManager.setText(AnnotatedString(it.password))
+                    successToast("复制密码成功")
+                },
                 onSelected = {
                     isEditable = true
                     viewModel.selectedNumber += if (it.selected) 1 else -1
@@ -156,11 +161,8 @@ private fun ContentLayout(
     Scaffold(
         topBar = {
             TopBackBar(title = "密码本", onBack = onBack) {
-                IconButton(onClick = onEditClick) {
-                    Icon(
-                        imageVector = if (!isEditable) Icons.Rounded.Edit else Icons.Rounded.Done,
-                        contentDescription = null
-                    )
+                TextButton(onClick = onEditClick) {
+                    Text(if (!isEditable) "管理" else "完成")
                 }
             }
         },

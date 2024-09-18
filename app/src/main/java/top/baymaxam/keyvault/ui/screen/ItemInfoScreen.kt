@@ -31,6 +31,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -76,21 +78,21 @@ data class ItemInfoScreen(val item: KeyItem) : Screen {
         val commentState = remember { mutableStateOf(item.comment) }
         val dialogState = rememberDialogState()
         val scope = rememberCoroutineScope()
+        val clipboardManager = LocalClipboardManager.current
 
         fun checkEquals(): Boolean = with(item) {
             name == nameState.value && username == usernameState.value &&
                     password == passwordState.value && comment == commentState.value
         }
 
-        suspend fun updateItem(): Result<Unit> = runCatching {
-            item.apply {
-                name = nameState.value
-                username = usernameState.value
-                password = passwordState.value
-                comment = commentState.value
-            }.let { dao.update(it.asEntity()) }
-        }.onSuccess { successToast("修改成功") }
-            .onFailure { errorToast(it.message) }
+        suspend fun updateItem() = item.apply {
+            name = nameState.value
+            username = usernameState.value
+            password = passwordState.value
+            comment = commentState.value
+        }.runCatching {
+            dao.update(asEntity())
+        }
 
         ContentLayout(
             item = item,
@@ -100,12 +102,27 @@ data class ItemInfoScreen(val item: KeyItem) : Screen {
             commentState = commentState,
             dialogState = dialogState,
             onBack = { if (!checkEquals()) dialogState.show() else navigator.pop() },
-            onCopy = { },
-            onSaveClick = { if (!checkEquals()) scope.launch { updateItem() } },
+            onCopy = {
+                clipboardManager.setText(AnnotatedString(it))
+                successToast("复制成功")
+            },
+            onSaveClick = {
+                if (!checkEquals()) {
+                    scope.launch {
+                        updateItem()
+                            .onSuccess { successToast("修改成功") }
+                            .onFailure { errorToast(it.message) }
+                    }
+                }
+            },
             onDialogConfirm = {
                 scope.launch {
                     updateItem()
-                    navigator.pop()
+                        .onFailure { errorToast(it.message) }
+                        .onSuccess {
+                            successToast("修改成功")
+                            navigator.pop()
+                        }
                 }
             },
             onDialogCancel = {

@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 import top.baymaxam.keyvault.model.domain.KeyType
 import top.baymaxam.keyvault.model.entity.KeyEntity
@@ -24,6 +25,9 @@ interface KeyDao {
 
     @Delete
     suspend fun delete(entities: List<KeyEntity>)
+
+    @Update
+    suspend fun update(entity: KeyEntity)
 
     @Query("select * from t_key")
     fun queryAll(): Flow<List<KeyEntity>>

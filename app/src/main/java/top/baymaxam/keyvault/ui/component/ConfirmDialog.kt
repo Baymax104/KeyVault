@@ -29,17 +29,28 @@ import top.baymaxam.keyvault.ui.theme.AppTheme
 @Composable
 fun ConfirmDialog(
     state: DialogState,
-    title: String,
-    text: String,
+    title: String = "",
+    text: String = "",
+    confirmText: String = "确认",
+    cancelText: String = "取消",
+    autoClose: Boolean = true,
     onConfirm: () -> Unit = {},
-    onCancel: () -> Unit = {},
+    onCancel: () -> Unit = { state.dismiss() },
 ) {
-    if (state.isShow.value) {
+    if (state.isShow) {
         DialogContent(
             title = title,
             text = text,
-            onConfirm = onConfirm,
+            confirmText = confirmText,
+            cancelText = cancelText,
             onCancel = onCancel,
+            onDismissRequest = { state.isShow = false },
+            onConfirm = {
+                if (autoClose) {
+                    state.dismiss()
+                }
+                onConfirm()
+            },
         )
     }
 }
@@ -48,6 +59,8 @@ fun ConfirmDialog(
 private fun DialogContent(
     title: String = "",
     text: String = "",
+    confirmText: String = "",
+    cancelText: String = "",
     onConfirm: () -> Unit = {},
     onCancel: () -> Unit = {},
     onDismissRequest: () -> Unit = {}
@@ -79,7 +92,7 @@ private fun DialogContent(
                         shape = RoundedCornerShape(15.dp),
                         modifier = Modifier.width(100.dp)
                     ) {
-                        Text(text = "取消", style = MaterialTheme.typography.bodyMedium)
+                        Text(text = cancelText, style = MaterialTheme.typography.bodyMedium)
                     }
 
                     TextButton(
@@ -87,7 +100,7 @@ private fun DialogContent(
                         shape = RoundedCornerShape(15.dp),
                         modifier = Modifier.width(100.dp)
                     ) {
-                        Text(text = "确认", style = MaterialTheme.typography.bodyMedium)
+                        Text(text = confirmText, style = MaterialTheme.typography.bodyMedium)
                     }
                 }
             }

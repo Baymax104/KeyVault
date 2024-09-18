@@ -33,14 +33,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.ScreenKey
-import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import kotlinx.coroutines.flow.map
+import org.koin.compose.koinInject
 import top.baymaxam.keyvault.R
 import top.baymaxam.keyvault.model.domain.KeyItem
-import top.baymaxam.keyvault.state.HomeScreenModel
+import top.baymaxam.keyvault.model.entity.asItem
+import top.baymaxam.keyvault.repo.KeyDao
 import top.baymaxam.keyvault.ui.component.CatalogBlock
 import top.baymaxam.keyvault.ui.component.ResentUsedList
 import top.baymaxam.keyvault.ui.component.SearchField
@@ -69,13 +71,15 @@ object HomeTab : Tab {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.root
-        val viewModel = koinScreenModel<HomeScreenModel>()
+        val dao = koinInject<KeyDao>()
         val searchContentState = remember { mutableStateOf("") }
-        val resentUsedItems = viewModel.getResentItems().collectAsState(emptyList())
         val resentUsedListState = rememberLazyListState()
-        val passwordCountState = viewModel.getItemCount().collectAsState(0)
         val tagCountState = remember { mutableIntStateOf(0) }
         val bottomSheetNavigator = LocalBottomSheetNavigator.current
+        val passwordCountState = dao.queryItemCounts().collectAsState(0)
+        val resentUsedItems = dao.queryOrderedByLastUsedTime()
+            .map { l -> l.map { it.asItem() } }
+            .collectAsState(emptyList())
 
         if (!bottomSheetNavigator.isVisible) {
             LaunchedEffect(Unit) {

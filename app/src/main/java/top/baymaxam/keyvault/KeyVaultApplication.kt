@@ -9,7 +9,6 @@ import org.koin.core.context.startKoin
 import org.koin.dsl.module
 import top.baymaxam.keyvault.repo.LocalDatabase
 import top.baymaxam.keyvault.state.AddScreenModel
-import top.baymaxam.keyvault.state.HomeScreenModel
 import top.baymaxam.keyvault.state.ItemListScreenModel
 import top.baymaxam.keyvault.state.TagListScreenModel
 
@@ -37,8 +36,8 @@ class KeyVaultApplication : Application() {
 }
 
 val appModule = module {
-    factory { AddScreenModel(LocalDatabase.Instance.keyDao()) }
-    factory { ItemListScreenModel(LocalDatabase.Instance.keyDao()) }
-    factory { HomeScreenModel(LocalDatabase.Instance.keyDao()) }
+    single { LocalDatabase.Instance.keyDao() }
+    factory { AddScreenModel(get()) }
+    factory { ItemListScreenModel(get()) }
     factory { TagListScreenModel() }
 }

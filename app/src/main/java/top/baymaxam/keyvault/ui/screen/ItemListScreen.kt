@@ -210,11 +210,7 @@ private fun ContentLayout(
                             modifier = Modifier.weight(1f)
                         )
                         IconButton(
-                            onClick = {
-                                if (selectedNumber > 0) {
-                                    dialogState.show()
-                                }
-                            }
+                            onClick = { if (selectedNumber > 0) dialogState.show() }
                         ) {
                             Icon(
                                 imageVector = Icons.Rounded.Delete,
@@ -262,11 +258,7 @@ private fun ContentLayout(
         state = dialogState,
         title = "确认删除",
         text = "确认删除选中条目？",
-        onCancel = { dialogState.dismiss() },
-        onConfirm = {
-            dialogState.dismiss()
-            onDialogConfirm()
-        }
+        onConfirm = onDialogConfirm
     )
 }
 

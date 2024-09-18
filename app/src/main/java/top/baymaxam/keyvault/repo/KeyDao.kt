@@ -32,8 +32,8 @@ interface KeyDao {
     @Query("select * from t_key")
     fun queryAll(): Flow<List<KeyEntity>>
 
-    @Query("select * from t_key where lastUsedDate != 0 order by lastUsedDate DESC limit 10")
-    fun queryOrderedByLastUsedTime(): Flow<List<KeyEntity>>
+    @Query("select * from t_key where resentDate != 0 order by resentDate DESC limit 10")
+    fun queryOrderedByResentDate(): Flow<List<KeyEntity>>
 
     @Query("select count(*) from t_key")
     fun queryItemCounts(): Flow<Int>

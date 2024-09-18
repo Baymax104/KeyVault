@@ -6,11 +6,14 @@ import es.dmoral.toasty.Toasty
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
+import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
+import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.repo.LocalDatabase
 import top.baymaxam.keyvault.state.AddScreenModel
-import top.baymaxam.keyvault.state.ItemListScreenModel
-import top.baymaxam.keyvault.state.TagListScreenModel
+import top.baymaxam.keyvault.state.ItemListViewModel
+import top.baymaxam.keyvault.state.ItemViewModel
+import top.baymaxam.keyvault.state.TagListViewModel
 
 /**
  * Application
@@ -38,6 +41,7 @@ class KeyVaultApplication : Application() {
 val appModule = module {
     single { LocalDatabase.Instance.keyDao() }
     factory { AddScreenModel(get()) }
-    factory { ItemListScreenModel(get()) }
-    factory { TagListScreenModel() }
+    viewModel { ItemListViewModel(get()) }
+    viewModel { TagListViewModel() }
+    viewModel { (item: KeyItem) -> ItemViewModel(get(), item) }
 }

@@ -58,6 +58,7 @@ import kotlinx.coroutines.launch
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.KeyType
 import top.baymaxam.keyvault.model.domain.Tag
+import top.baymaxam.keyvault.model.domain.toKeyType
 import top.baymaxam.keyvault.state.AddScreenModel
 import top.baymaxam.keyvault.state.SelectedState
 import top.baymaxam.keyvault.ui.component.InfoField
@@ -84,7 +85,7 @@ class AddInputScreen : Screen {
     override fun Content() {
         val bottomSheetNavigator = LocalBottomSheetNavigator.current
         val navigator = LocalNavigator.currentOrThrow
-        val viewModel = navigator.koinNavigatorScreenModel<AddScreenModel>()
+        val vm = navigator.koinNavigatorScreenModel<AddScreenModel>()
         val tagListState = rememberLazyListState()
         val scope = rememberCoroutineScope()
 
@@ -97,31 +98,32 @@ class AddInputScreen : Screen {
 
         if (searchState.value.isEmpty()) {
             LaunchedEffect(Unit) {
-                viewModel.tags.refreshState()
+                vm.tags.refreshState()
                 tagListState.scrollToItem(0)
             }
         }
 
         ContentLayout(
             searchContentState = searchState,
-            tags = viewModel.tags.state,
+            tags = vm.tags.state,
             typeSelectedState = typeSelectedState,
             nameContentState = nameContentState,
             usernameContentState = usernameContentState,
             passwordContentState = passwordContentState,
             commentContentState = commentContentState,
-            selectedItemState = viewModel.selectedPassItem,
+            selectedItemState = vm.selectedPassItem,
             tagListState = tagListState,
-            onSearch = { viewModel.searchTag(searchState.value) },
+            onSearch = { vm.searchTag(searchState.value) },
             onCancel = { bottomSheetNavigator.hide() },
             onSelectAuth = { navigator += AddAuthScreen() },
             onConfirm = onConfirm@{
-                if (typeSelectedState.intValue == 2 && viewModel.selectedPassItem.value == null) {
+                if (typeSelectedState.intValue == 2 && vm.selectedPassItem.value == null) {
                     infoToast("授权条目未设置")
                     return@onConfirm
                 }
-                val item: KeyItem? = when (typeSelectedState.intValue) {
-                    0 -> KeyItem(
+                val type = typeSelectedState.intValue.toKeyType() ?: error("Invalid type.")
+                val item: KeyItem = when (type) {
+                    KeyType.Website -> KeyItem(
                         name = nameContentState.value,
                         username = usernameContentState.value,
                         password = passwordContentState.value,
@@ -130,7 +132,7 @@ class AddInputScreen : Screen {
                         createDate = Date(),
                     )
 
-                    1 -> KeyItem(
+                    KeyType.Card -> KeyItem(
                         name = nameContentState.value,
                         username = usernameContentState.value,
                         password = passwordContentState.value,
@@ -139,27 +141,22 @@ class AddInputScreen : Screen {
                         createDate = Date(),
                     )
 
-                    2 -> KeyItem(
+                    KeyType.Authorization -> KeyItem(
                         name = nameContentState.value,
                         comment = commentContentState.value,
-                        authId = viewModel.selectedPassItem.value!!.id,
-                        authName = viewModel.selectedPassItem.value!!.name,
+                        authId = vm.selectedPassItem.value!!.id,
+                        authName = vm.selectedPassItem.value!!.name,
                         type = KeyType.Authorization,
                         createDate = Date(),
                     )
-
-                    else -> null
-                }
-                if (item == null) {
-                    throw NullPointerException("Item is null.")
                 }
                 scope.launch {
-                    viewModel.addItem(item)
+                    vm.addItem(item)
+                        .onFailure { errorToast(it.message) }
                         .onSuccess {
                             successToast("添加条目成功")
                             bottomSheetNavigator.hide()
                         }
-                        .onFailure { errorToast(it.message) }
                 }
             }
         )

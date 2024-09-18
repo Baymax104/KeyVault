@@ -1,7 +1,7 @@
 package top.baymaxam.keyvault.state
 
 import androidx.compose.runtime.mutableStateListOf
-import cafe.adriel.voyager.core.model.ScreenModel
+import androidx.lifecycle.ViewModel
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.Tag
 import top.baymaxam.keyvault.util.StateList
@@ -11,7 +11,7 @@ import top.baymaxam.keyvault.util.StateList
  * @author John
  * @since 15 9月 2024
  */
-class TagListScreenModel : ScreenModel {
+class TagListViewModel : ViewModel() {
 
     val tags = mutableStateListOf<SelectedState<Tag>>()
 

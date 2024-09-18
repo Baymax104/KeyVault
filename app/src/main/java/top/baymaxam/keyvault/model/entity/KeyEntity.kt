@@ -28,7 +28,7 @@ data class KeyEntity(
     var authId: String? = null,
     var authName: String? = null,
     var createDate: Date = Date(0),
-    var lastUsedDate: Date = Date(0)
+    var resentDate: Date = Date(0)
 )
 
 fun KeyEntity.asItem(): KeyItem =
@@ -42,6 +42,6 @@ fun KeyEntity.asItem(): KeyItem =
         authId = authId,
         authName = authName,
         createDate = createDate,
-        lastUsedDate = lastUsedDate
+        resentDate = resentDate
     )
 

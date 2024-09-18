@@ -30,12 +30,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
-import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
+import org.koin.androidx.compose.koinViewModel
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.Tag
 import top.baymaxam.keyvault.state.SelectedState
-import top.baymaxam.keyvault.state.TagListScreenModel
+import top.baymaxam.keyvault.state.TagListViewModel
 import top.baymaxam.keyvault.ui.component.FloatingButton
 import top.baymaxam.keyvault.ui.component.SearchField
 import top.baymaxam.keyvault.ui.component.TagList
@@ -55,7 +55,7 @@ class TagListScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.root
-        val viewModel = koinScreenModel<TagListScreenModel>()
+        val vm = koinViewModel<TagListViewModel>()
         val editableState = remember { mutableStateOf(false) }
         val searchContentState = remember { mutableStateOf("") }
         val selectedNumberState = remember { mutableIntStateOf(0) }
@@ -63,7 +63,7 @@ class TagListScreen : Screen {
         fun clearEditState() {
             editableState.value = false
             selectedNumberState.intValue = 0
-            viewModel.tags.forEach { it.selected = false }
+            vm.tags.forEach { it.selected = false }
         }
 
         BackHandler(editableState.value) {
@@ -71,8 +71,8 @@ class TagListScreen : Screen {
         }
 
         ContentLayout(
-            items = viewModel.tags,
-            keyItemsFactory = { viewModel.getTagItems(it) },
+            items = vm.tags,
+            keyItemsFactory = { vm.getTagItems(it) },
             editableState = editableState,
             searchContentState = searchContentState,
             selectedNumberState = selectedNumberState,

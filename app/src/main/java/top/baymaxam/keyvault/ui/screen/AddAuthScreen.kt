@@ -50,24 +50,24 @@ class AddAuthScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val viewModel = navigator.koinNavigatorScreenModel<AddScreenModel>()
+        val vm = navigator.koinNavigatorScreenModel<AddScreenModel>()
         val searchContentState = remember { mutableStateOf("") }
         val passItemListState = rememberLazyListState()
 
         if (searchContentState.value.isEmpty()) {
             LaunchedEffect(Unit) {
-                viewModel.items.refreshState()
+                vm.items.refreshState()
                 passItemListState.scrollToItem(0)
             }
         }
 
         ContentLayout(
             searchContentState = searchContentState,
-            items = viewModel.items.state,
-            onSearch = { viewModel.searchPassItem(searchContentState.value) },
+            items = vm.items.state,
+            onSearch = { vm.searchPassItem(searchContentState.value) },
             onBack = { navigator.pop() },
             onPassItemClick = {
-                viewModel.selectedPassItem.value = it
+                vm.selectedPassItem.value = it
                 navigator.pop()
             }
         )

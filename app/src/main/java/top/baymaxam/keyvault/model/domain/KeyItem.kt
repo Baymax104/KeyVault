@@ -17,7 +17,7 @@ data class KeyItem(
     var name: String = "",
     val type: KeyType = KeyType.Website,
     val createDate: Date = Date(0),
-    var lastUsedDate: Date = Date(0),
+    var resentDate: Date = Date(0),
     var username: String = "",
     var password: String = "",
     var comment: String = "",
@@ -42,5 +42,5 @@ fun KeyItem.asEntity(): KeyEntity =
         authId = authId,
         authName = authName,
         createDate = createDate,
-        lastUsedDate = lastUsedDate
+        resentDate = resentDate
     )

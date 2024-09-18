@@ -26,7 +26,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,12 +39,12 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.navigator.LocalNavigator
 import kotlinx.coroutines.launch
-import org.koin.compose.koinInject
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.KeyType
-import top.baymaxam.keyvault.model.domain.asEntity
-import top.baymaxam.keyvault.repo.KeyDao
 import top.baymaxam.keyvault.state.DialogState
+import top.baymaxam.keyvault.state.ItemViewModel
 import top.baymaxam.keyvault.state.rememberDialogState
 import top.baymaxam.keyvault.ui.component.ConfirmDialog
 import top.baymaxam.keyvault.ui.component.FillIcon
@@ -71,45 +70,27 @@ data class ItemInfoScreen(val item: KeyItem) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.root
-        val dao = koinInject<KeyDao>()
-        val nameState = remember { mutableStateOf(item.name) }
-        val usernameState = remember { mutableStateOf(item.username) }
-        val passwordState = remember { mutableStateOf(item.password) }
-        val commentState = remember { mutableStateOf(item.comment) }
+        val vm = koinViewModel<ItemViewModel> { parametersOf(item) }
         val dialogState = rememberDialogState()
         val scope = rememberCoroutineScope()
         val clipboardManager = LocalClipboardManager.current
 
-        fun checkEquals(): Boolean = with(item) {
-            name == nameState.value && username == usernameState.value &&
-                    password == passwordState.value && comment == commentState.value
-        }
-
-        suspend fun updateItem() = item.apply {
-            name = nameState.value
-            username = usernameState.value
-            password = passwordState.value
-            comment = commentState.value
-        }.runCatching {
-            dao.update(asEntity())
-        }
-
         ContentLayout(
-            item = item,
-            nameState = nameState,
-            usernameState = usernameState,
-            passwordState = passwordState,
-            commentState = commentState,
+            item = vm.item,
+            nameState = vm.nameState,
+            usernameState = vm.usernameState,
+            passwordState = vm.passwordState,
+            commentState = vm.commentState,
             dialogState = dialogState,
-            onBack = { if (!checkEquals()) dialogState.show() else navigator.pop() },
-            onCopy = {
-                clipboardManager.setText(AnnotatedString(it))
+            onBack = { if (!vm.checkEquals()) dialogState.show() else navigator.pop() },
+            onCopy = { text ->
+                clipboardManager.setText(AnnotatedString(text))
                 successToast("复制成功")
             },
             onSaveClick = {
-                if (!checkEquals()) {
+                if (!vm.checkEquals()) {
                     scope.launch {
-                        updateItem()
+                        vm.updateItem()
                             .onSuccess { successToast("修改成功") }
                             .onFailure { errorToast(it.message) }
                     }
@@ -117,7 +98,7 @@ data class ItemInfoScreen(val item: KeyItem) : Screen {
             },
             onDialogConfirm = {
                 scope.launch {
-                    updateItem()
+                    vm.updateItem()
                         .onFailure { errorToast(it.message) }
                         .onSuccess {
                             successToast("修改成功")
@@ -195,7 +176,7 @@ private fun ContentLayout(
                         fontSize = 15.sp
                     )
                     Text(
-                        text = "最近使用时间：${item.lastUsedDate.toDateString("yyyy/MM/dd")}",
+                        text = "最近使用时间：${item.resentDate.toDateString("yyyy/MM/dd HH:mm:ss")}",
                         color = Color.Gray,
                         fontSize = 15.sp
                     )

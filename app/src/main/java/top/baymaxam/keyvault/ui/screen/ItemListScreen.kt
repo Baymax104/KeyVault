@@ -46,15 +46,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
-import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.bottomSheet.BottomSheetNavigator
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 import top.baymaxam.keyvault.R
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.Tag
 import top.baymaxam.keyvault.state.DialogState
-import top.baymaxam.keyvault.state.ItemListScreenModel
+import top.baymaxam.keyvault.state.ItemListViewModel
 import top.baymaxam.keyvault.state.SelectedState
 import top.baymaxam.keyvault.state.rememberDialogState
 import top.baymaxam.keyvault.ui.component.ConfirmDialog
@@ -79,7 +79,7 @@ class ItemListScreen : Screen {
     override fun Content() {
         val navigator = LocalNavigator.root
         var isEditable by remember { mutableStateOf(false) }
-        val viewModel = koinScreenModel<ItemListScreenModel>()
+        val vm = koinViewModel<ItemListViewModel>()
         val pagerState = rememberPagerState { 3 }
         val settledPage by remember { derivedStateOf { pagerState.settledPage } }
         val scope = rememberCoroutineScope()
@@ -88,11 +88,11 @@ class ItemListScreen : Screen {
 
         fun clearEditState() {
             isEditable = false
-            viewModel.clearSelectedState(settledPage)
+            vm.clearSelectedState(settledPage)
         }
 
         LaunchedEffect(settledPage) {
-            viewModel.getPageItems(settledPage)
+            vm.getPageItems(settledPage)
         }
 
         BackHandler(isEditable) {
@@ -104,29 +104,29 @@ class ItemListScreen : Screen {
         ) { bottomSheetNavigator ->
             ContentLayout(
                 pagerState = pagerState,
-                items = viewModel.items,
+                items = vm.items,
                 isEditable = isEditable,
-                selectedNumber = viewModel.selectedNumber,
+                selectedNumber = vm.selectedNumber,
                 dialogState = dialogState,
                 onBack = { if (isEditable) clearEditState() else navigator.pop() },
                 onEditClick = {
                     isEditable = !isEditable
                     if (!isEditable) {
-                        viewModel.clearSelectedState(settledPage)
+                        vm.clearSelectedState(settledPage)
                     }
                 },
                 onItemClick = { navigator += ItemInfoScreen(it) },
-                onItemCopy = {
-                    clipboardManager.setText(AnnotatedString(it.password))
+                onItemCopy = { item ->
+                    clipboardManager.setText(AnnotatedString(item.password))
                     successToast("复制密码成功")
                 },
                 onSelected = {
                     isEditable = true
-                    viewModel.selectedNumber += if (it.selected) 1 else -1
+                    vm.selectedNumber += if (it.selected) 1 else -1
                 },
                 onDialogConfirm = {
                     scope.launch {
-                        viewModel.removeSelectedItems(settledPage)
+                        vm.removeSelectedItems(settledPage)
                             .onSuccess { successToast("删除成功") }
                             .onFailure { errorToast(it.message) }
                     }

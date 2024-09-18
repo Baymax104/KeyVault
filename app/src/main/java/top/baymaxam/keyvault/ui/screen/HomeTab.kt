@@ -13,7 +13,6 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
@@ -34,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import kotlinx.coroutines.flow.map
@@ -44,7 +42,7 @@ import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.entity.asItem
 import top.baymaxam.keyvault.repo.KeyDao
 import top.baymaxam.keyvault.ui.component.CatalogBlock
-import top.baymaxam.keyvault.ui.component.ResentUsedList
+import top.baymaxam.keyvault.ui.component.ResentList
 import top.baymaxam.keyvault.ui.component.SearchField
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.ui.theme.robotoFont
@@ -73,24 +71,15 @@ object HomeTab : Tab {
         val navigator = LocalNavigator.root
         val dao = koinInject<KeyDao>()
         val searchContentState = remember { mutableStateOf("") }
-        val resentUsedListState = rememberLazyListState()
         val tagCountState = remember { mutableIntStateOf(0) }
-        val bottomSheetNavigator = LocalBottomSheetNavigator.current
         val passwordCountState = dao.queryItemCounts().collectAsState(0)
-        val resentUsedItems = dao.queryOrderedByLastUsedTime()
+        val resentUsedItems = dao.queryOrderedByResentDate()
             .map { l -> l.map { it.asItem() } }
             .collectAsState(emptyList())
-
-        if (!bottomSheetNavigator.isVisible) {
-            LaunchedEffect(Unit) {
-                resentUsedListState.scrollToItem(0)
-            }
-        }
 
         ContentLayout(
             searchContentState = searchContentState,
             resentUsedItems = resentUsedItems.value,
-            resentUsedListState = resentUsedListState,
             passwordCountState = passwordCountState,
             tagCountState = tagCountState,
             onSearch = {},
@@ -106,7 +95,6 @@ object HomeTab : Tab {
 private fun ContentLayout(
     searchContentState: MutableState<String> = mutableStateOf(""),
     resentUsedItems: List<KeyItem> = mutableStateListOf(),
-    resentUsedListState: LazyListState = rememberLazyListState(),
     passwordCountState: State<Int> = mutableIntStateOf(0),
     tagCountState: MutableIntState = mutableIntStateOf(0),
     onSearch: () -> Unit = {},
@@ -127,8 +115,7 @@ private fun ContentLayout(
             tagCount = tagCountState.intValue
         )
 
-        ResentUsed(
-            resentUsedListState = resentUsedListState,
+        ResentItemList(
             keyItems = resentUsedItems,
             onItemClick = onItemClick
         )
@@ -185,7 +172,7 @@ private fun Header(
 
 
 @Composable
-private fun ResentUsed(
+private fun ResentItemList(
     resentUsedListState: LazyListState = rememberLazyListState(),
     keyItems: List<KeyItem>,
     onItemClick: (KeyItem) -> Unit
@@ -197,7 +184,7 @@ private fun ResentUsed(
             .padding(15.dp)
     ) {
         Text(
-            text = "最近使用",
+            text = "最近查看",
             modifier = Modifier
                 .padding(bottom = 5.dp)
                 .fillMaxWidth(),
@@ -209,7 +196,7 @@ private fun ResentUsed(
                 color = MaterialTheme.colorScheme.onBackground
             )
         )
-        ResentUsedList(
+        ResentList(
             state = resentUsedListState,
             keyItems = keyItems,
             onItemClick = onItemClick,

@@ -5,7 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.setValue
-import cafe.adriel.voyager.core.model.ScreenModel
+import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.map
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.asEntity
@@ -21,7 +21,7 @@ import top.baymaxam.keyvault.util.replaceAllBy
  * @since 07 8月 2024
  */
 @Stable
-class ItemListScreenModel(private val dao: KeyDao) : ScreenModel {
+class ItemListViewModel(private val dao: KeyDao) : ViewModel() {
 
     var selectedNumber by mutableIntStateOf(0)
 

@@ -38,13 +38,13 @@ import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.ui.theme.IconColors
 
 /**
- * 最近使用条目列表
+ * 最近条目列表
  * @author John
  * @since 27 6月 2024
  */
 
 @Composable
-fun ResentUsedList(
+fun ResentList(
     keyItems: List<KeyItem>,
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
@@ -62,7 +62,7 @@ fun ResentUsedList(
             items = keyItems,
             key = { it.id }
         ) {
-            RecentUsedItem(
+            RecentItem(
                 item = it,
                 tags = onLoadTags(it),
                 onClick = onItemClick
@@ -73,7 +73,7 @@ fun ResentUsedList(
 
 
 @Composable
-private fun RecentUsedItem(
+private fun RecentItem(
     item: KeyItem = KeyItem(),
     tags: List<Tag> = mutableListOf(),
     onClick: (KeyItem) -> Unit,
@@ -171,7 +171,7 @@ private fun Preview() {
                 KeyItem(name = "TestCard", username = "code", type = KeyType.Authorization),
             )
         }
-        ResentUsedList(
+        ResentList(
             keyItems = list,
             onLoadTags = { emptyList() },
         )

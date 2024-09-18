@@ -2,9 +2,12 @@ package top.baymaxam.keyvault.state
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.asEntity
 import top.baymaxam.keyvault.repo.KeyDao
+import java.util.Date
 
 /**
  * ItemViewModel
@@ -32,6 +35,12 @@ class ItemViewModel(private val dao: KeyDao, val item: KeyItem) : ViewModel() {
             }.let {
                 dao.update(it.asEntity())
             }
+        }
+    }
+
+    fun updateItemResentDate() {
+        viewModelScope.launch {
+            item.apply { resentDate = Date() }.let { dao.update(it.asEntity()) }
         }
     }
 }

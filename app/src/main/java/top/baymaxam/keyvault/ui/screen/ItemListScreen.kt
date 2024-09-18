@@ -63,6 +63,7 @@ import top.baymaxam.keyvault.ui.component.ItemList
 import top.baymaxam.keyvault.ui.component.TopBackBar
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.util.errorToast
+import top.baymaxam.keyvault.util.root
 import top.baymaxam.keyvault.util.successToast
 
 /**

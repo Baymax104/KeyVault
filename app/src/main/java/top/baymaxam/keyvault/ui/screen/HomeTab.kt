@@ -46,6 +46,7 @@ import top.baymaxam.keyvault.ui.component.ResentList
 import top.baymaxam.keyvault.ui.component.SearchField
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.ui.theme.robotoFont
+import top.baymaxam.keyvault.util.root
 
 /**
  * 首页

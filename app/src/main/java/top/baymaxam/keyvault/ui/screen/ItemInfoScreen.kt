@@ -24,6 +24,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -54,6 +55,7 @@ import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.ui.theme.IconColors
 import top.baymaxam.keyvault.ui.theme.outlinedTextFieldColor
 import top.baymaxam.keyvault.util.errorToast
+import top.baymaxam.keyvault.util.root
 import top.baymaxam.keyvault.util.successToast
 import top.baymaxam.keyvault.util.toDateString
 
@@ -74,6 +76,10 @@ data class ItemInfoScreen(val item: KeyItem) : Screen {
         val dialogState = rememberDialogState()
         val scope = rememberCoroutineScope()
         val clipboardManager = LocalClipboardManager.current
+
+        DisposableEffect(vm) {
+            onDispose { vm.updateItemResentDate() }
+        }
 
         ContentLayout(
             item = vm.item,
@@ -176,7 +182,7 @@ private fun ContentLayout(
                         fontSize = 15.sp
                     )
                     Text(
-                        text = "最近使用时间：${item.resentDate.toDateString("yyyy/MM/dd HH:mm:ss")}",
+                        text = "最近查看时间：${item.resentDate.toDateString("yyyy/MM/dd HH:mm:ss")}",
                         color = Color.Gray,
                         fontSize = 15.sp
                     )

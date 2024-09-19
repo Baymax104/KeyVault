@@ -3,6 +3,7 @@
     <style name="Theme.AppTheme" parent="android:Theme.Material.Light.NoActionBar"/>
     <style name="Theme.KeyVault" parent="Theme.SplashScreen" >
         <item name="postSplashScreenTheme">@style/Theme.AppTheme</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/img_logo</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/img_logo_large</item>
+        <item name="windowSplashScreenBackground">@color/white</item>
     </style>
 </resources>

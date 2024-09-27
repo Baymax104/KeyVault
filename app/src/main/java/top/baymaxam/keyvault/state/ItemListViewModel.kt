@@ -4,6 +4,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.map
@@ -25,6 +26,12 @@ class ItemListViewModel(private val dao: KeyDao) : ViewModel() {
 
     var selectedNumber by mutableIntStateOf(0)
 
+    val isItemsLoading = listOf(
+        mutableStateOf(true),
+        mutableStateOf(true),
+        mutableStateOf(true)
+    )
+
     val items = listOf<StateList<SelectedState<KeyItem>>>(
         mutableStateListOf(),
         mutableStateListOf(),
@@ -37,10 +44,14 @@ class ItemListViewModel(private val dao: KeyDao) : ViewModel() {
     }
 
     suspend fun getPageItems(page: Int) {
+        if (items[page].isNotEmpty()) return
         val type = page.toKeyType() ?: error("Invalid page: $page")
         dao.queryByType(type)
             .map { l -> l.map { SelectedState(it.asItem()) } }
-            .collect { items[page].replaceAllBy(it) }
+            .collect {
+                items[page].replaceAllBy(it)
+                isItemsLoading[page].value = false
+            }
     }
 
     suspend fun removeSelectedItems(page: Int): Result<Unit> {

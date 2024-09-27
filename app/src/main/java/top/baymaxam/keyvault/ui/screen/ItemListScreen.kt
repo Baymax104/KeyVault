@@ -1,9 +1,8 @@
-@file:OptIn(ExperimentalFoundationApi::class)
+@file:OptIn(ExperimentalMaterial3Api::class)
 
 package top.baymaxam.keyvault.ui.screen
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -14,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -21,6 +21,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -31,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -101,11 +104,13 @@ class ItemListScreen : Screen {
         }
 
         BottomSheetNavigator(
-            sheetShape = RoundedCornerShape(15.dp)
+            sheetShape = RoundedCornerShape(15.dp),
+            sheetContent = { AddScreen().Content() }
         ) { bottomSheetNavigator ->
             ContentLayout(
                 pagerState = pagerState,
                 items = vm.items,
+                isItemsLoading = vm.isItemsLoading,
                 isEditable = isEditable,
                 selectedNumber = vm.selectedNumber,
                 dialogState = dialogState,
@@ -145,6 +150,7 @@ class ItemListScreen : Screen {
 private fun ContentLayout(
     pagerState: PagerState = rememberPagerState { 3 },
     items: List<List<SelectedState<KeyItem>>> = emptyList(),
+    isItemsLoading: List<MutableState<Boolean>> = emptyList(),
     dialogState: DialogState = rememberDialogState(),
     isEditable: Boolean = false,
     selectedNumber: Int = 0,
@@ -231,28 +237,38 @@ private fun ContentLayout(
                 }
             }
 
+
             HorizontalPager(
                 state = pagerState,
                 userScrollEnabled = !isEditable,
                 contentPadding = PaddingValues(horizontal = 10.dp),
                 pageSpacing = 10.dp
             ) {
-                if (items[it].isNotEmpty()) {
-                    ItemList(
-                        items = items[it],
-                        modifier = Modifier.fillMaxSize(),
-                        isEditable = isEditable,
-                        onItemClick = onItemClick,
-                        onItemCopy = onItemCopy,
-                        onSelected = onSelected,
-                        tagsFactory = tagsFactory
-                    )
-                } else {
-                    Image(
-                        painter = painterResource(id = R.drawable.img_no_data),
-                        contentDescription = null,
+                if (isItemsLoading[it].value) {
+                    Box(
+                        contentAlignment = Alignment.Center,
                         modifier = Modifier.fillMaxSize()
-                    )
+                    ) {
+                        CircularProgressIndicator(modifier = Modifier.size(60.dp))
+                    }
+                } else {
+                    if (items[it].isNotEmpty()) {
+                        ItemList(
+                            items = items[it],
+                            modifier = Modifier.fillMaxSize(),
+                            isEditable = isEditable,
+                            onItemClick = onItemClick,
+                            onItemCopy = onItemCopy,
+                            onSelected = onSelected,
+                            tagsFactory = tagsFactory
+                        )
+                    } else {
+                        Image(
+                            painter = painterResource(id = R.drawable.img_no_data),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
                 }
             }
         }

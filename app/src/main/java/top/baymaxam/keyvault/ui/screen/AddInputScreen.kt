@@ -237,7 +237,7 @@ private fun ContentLayout(
                     modifier = Modifier
                         .padding(vertical = 10.dp)
                         .fillMaxWidth()
-                        .height(50.dp)
+                        .height(40.dp)
                 ) {
                     Text(text = "未找到标签", color = MaterialTheme.colorScheme.onBackground)
                 }

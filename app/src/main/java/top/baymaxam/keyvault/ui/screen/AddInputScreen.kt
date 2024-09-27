@@ -252,17 +252,34 @@ private fun ContentLayout(
                 TypeSelection(
                     text = "网站",
                     selected = typeSelectedState.intValue == 0,
-                    onClick = { typeSelectedState.intValue = 0 }
+                    onClick = {
+                        typeSelectedState.intValue = 0
+                        nameContentState.value = ""
+                        usernameContentState.value = ""
+                        passwordContentState.value = ""
+                        commentContentState.value = ""
+                    }
                 )
                 TypeSelection(
                     text = "卡片",
                     selected = typeSelectedState.intValue == 1,
-                    onClick = { typeSelectedState.intValue = 1 }
+                    onClick = {
+                        typeSelectedState.intValue = 1
+                        nameContentState.value = ""
+                        usernameContentState.value = ""
+                        passwordContentState.value = ""
+                        commentContentState.value = ""
+                    }
                 )
                 TypeSelection(
                     text = "授权",
                     selected = typeSelectedState.intValue == 2,
-                    onClick = { typeSelectedState.intValue = 2 }
+                    onClick = {
+                        typeSelectedState.intValue = 2
+                        nameContentState.value = ""
+                        commentContentState.value = ""
+                        selectedItemState.value = null
+                    }
                 )
             }
             InfoFields(

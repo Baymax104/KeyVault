@@ -27,6 +27,7 @@ val backgroundLight = Color(0xfffbfbfb)
 val onBackgroundLight = Color(0xFF181C22)
 val surfaceLight = Color(0xFFFFFFFF)
 val onSurfaceLight = Color(0xFF181C22)
+val surfaceContainerLight = Color(0xffe7f0ff)
 val surfaceVariantLight = Color(0xffe7f0ff)
 val onSurfaceVariantLight = Color(0xFF404753)
 val outlineLight = Color(0xFF707785)
@@ -56,6 +57,7 @@ val backgroundDark = Color(0xFF10141A)
 val onBackgroundDark = Color(0xFFE0E2EC)
 val surfaceDark = Color(0xff1c232e)
 val onSurfaceDark = Color(0xFFE0E2EC)
+val surfaceContainerDark = Color(0xFF404753)
 val surfaceVariantDark = Color(0xFF404753)
 val onSurfaceVariantDark = Color(0xFFC0C7D6)
 val outlineDark = Color(0xFF8A919F)
@@ -73,9 +75,6 @@ val MaterialTheme.outlinedTextFieldColor: TextFieldColors
         focusedContainerColor = colorScheme.background,
         unfocusedLeadingIconColor = colorScheme.onBackground,
         focusedLeadingIconColor = colorScheme.primary,
-        disabledTrailingIconColor = colorScheme.onBackground,
-        disabledContainerColor = colorScheme.background,
-        disabledBorderColor = colorScheme.onBackground,
     )
 
 object IconColors {

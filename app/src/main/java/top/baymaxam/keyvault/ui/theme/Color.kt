@@ -93,18 +93,11 @@ object IconColors {
             backgroundColor = Color(0xffffe8d3)
         )
 
-    val WebItem
+    val UserItem
         @Composable
         get() = FillIconDefaults.colors(
             iconColor = Color(0xff1e90ff),
             backgroundColor = Color(0xffd9ecff)
-        )
-
-    val CardItem
-        @Composable
-        get() = FillIconDefaults.colors(
-            iconColor = Color(0xFF673AB7),
-            backgroundColor = Color(0xffede3ff)
         )
 
     val AuthItem

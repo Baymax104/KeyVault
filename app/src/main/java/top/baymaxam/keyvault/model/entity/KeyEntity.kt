@@ -4,8 +4,10 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.benasher44.uuid.uuid4
+import top.baymaxam.keyvault.model.domain.AuthItem
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.KeyType
+import top.baymaxam.keyvault.model.domain.UserItem
 import top.baymaxam.keyvault.util.DateConverter
 import top.baymaxam.keyvault.util.KeyTypeConverter
 import java.util.Date
@@ -21,7 +23,7 @@ data class KeyEntity(
     @PrimaryKey
     val id: String = uuid4().toString(),
     var name: String = "",
-    var type: KeyType = KeyType.Website,
+    var type: KeyType = KeyType.User,
     var username: String = "",
     var password: String = "",
     var comment: String = "",
@@ -31,17 +33,27 @@ data class KeyEntity(
     var resentDate: Date = Date(0)
 )
 
-fun KeyEntity.asItem(): KeyItem =
-    KeyItem(
-        id = id,
-        name = name,
-        type = type,
-        username = username,
-        password = password,
-        comment = comment,
-        authId = authId,
-        authName = authName,
-        createDate = createDate,
-        resentDate = resentDate
-    )
+fun KeyEntity.asItem(): KeyItem {
+    return when (type) {
+        KeyType.User -> UserItem(
+            id,
+            name,
+            createDate,
+            resentDate,
+            comment,
+            username,
+            password
+        )
+
+        KeyType.Authorization -> AuthItem(
+            id,
+            name,
+            createDate,
+            resentDate,
+            comment,
+            authId ?: "",
+            authName ?: ""
+        )
+    }
+}
 

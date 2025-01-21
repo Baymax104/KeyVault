@@ -51,6 +51,7 @@ import kotlinx.coroutines.flow.map
 import org.koin.compose.koinInject
 import top.baymaxam.keyvault.R
 import top.baymaxam.keyvault.model.domain.KeyItem
+import top.baymaxam.keyvault.model.domain.UserItem
 import top.baymaxam.keyvault.model.entity.asItem
 import top.baymaxam.keyvault.repo.KeyDao
 import top.baymaxam.keyvault.ui.component.FillIcon
@@ -309,8 +310,8 @@ private fun IndexCard(
 private fun Preview() {
     val list = remember {
         mutableStateListOf(
-            KeyItem(name = "TestWeb", username = "username"),
-            KeyItem(name = "TestCard", username = "code")
+            UserItem(name = "TestWeb", username = "username"),
+            UserItem(name = "TestCard", username = "code")
         )
     }
     AppTheme {

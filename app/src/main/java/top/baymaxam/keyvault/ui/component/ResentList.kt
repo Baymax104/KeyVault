@@ -15,7 +15,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CreditCard
-import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -30,8 +29,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import top.baymaxam.keyvault.model.domain.AuthItem
 import top.baymaxam.keyvault.model.domain.KeyItem
-import top.baymaxam.keyvault.model.domain.KeyType
+import top.baymaxam.keyvault.model.domain.UserItem
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.ui.theme.IconColors
 
@@ -70,7 +70,7 @@ fun ResentList(
 
 @Composable
 private fun RecentItem(
-    item: KeyItem = KeyItem(),
+    item: KeyItem = UserItem(),
     onClick: (KeyItem) -> Unit,
 ) {
     Surface(
@@ -90,17 +90,15 @@ private fun RecentItem(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 FillIcon(
-                    icon = when (item.type) {
-                        KeyType.Website -> Icons.Rounded.Language
-                        KeyType.Card -> Icons.Rounded.CreditCard
-                        KeyType.Authorization -> Icons.Rounded.Person
+                    icon = when (item) {
+                        is UserItem -> Icons.Rounded.CreditCard
+                        is AuthItem -> Icons.Rounded.Person
                     },
                     shape = RoundedCornerShape(20),
                     modifier = Modifier.size(45.dp),
-                    colors = when (item.type) {
-                        KeyType.Website -> IconColors.WebItem
-                        KeyType.Card -> IconColors.CardItem
-                        KeyType.Authorization -> IconColors.AuthItem
+                    colors = when (item) {
+                        is UserItem -> IconColors.UserItem
+                        is AuthItem -> IconColors.AuthItem
                     }
                 )
 
@@ -118,9 +116,9 @@ private fun RecentItem(
                         )
                     )
                     Text(
-                        text = when (item.type) {
-                            KeyType.Authorization -> item.authName ?: ""
-                            else -> item.username
+                        text = when (item) {
+                            is UserItem -> item.username
+                            is AuthItem -> item.authName
                         },
                         style = TextStyle(
                             fontSize = 15.sp,
@@ -140,9 +138,9 @@ private fun Preview() {
     AppTheme {
         val list = remember {
             mutableStateListOf(
-                KeyItem(name = "测试", username = "username", type = KeyType.Website),
-                KeyItem(name = "TestCard", username = "code", type = KeyType.Card),
-                KeyItem(name = "TestCard", username = "code", type = KeyType.Authorization),
+                UserItem(name = "测试", username = "username"),
+                UserItem(name = "TestCard", username = "code"),
+                UserItem(name = "TestCard", username = "code"),
             )
         }
         ResentList(

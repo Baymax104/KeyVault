@@ -16,7 +16,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CreditCard
-import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,7 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import top.baymaxam.keyvault.model.domain.KeyItem
-import top.baymaxam.keyvault.model.domain.KeyType
+import top.baymaxam.keyvault.model.domain.UserItem
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.ui.theme.IconColors
 
@@ -44,7 +43,7 @@ fun AddAuthList(
     items: List<KeyItem>,
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
-    onItemClick: (KeyItem) -> Unit = {}
+    onItemClick: (UserItem) -> Unit = {}
 ) {
     LazyColumn(
         state = state,
@@ -56,7 +55,7 @@ fun AddAuthList(
             key = { it.id }
         ) {
             AddAuthItem(
-                item = it,
+                item = it as UserItem,
                 onClick = onItemClick
             )
         }
@@ -65,8 +64,8 @@ fun AddAuthList(
 
 @Composable
 private fun AddAuthItem(
-    item: KeyItem,
-    onClick: (KeyItem) -> Unit
+    item: UserItem,
+    onClick: (UserItem) -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -78,18 +77,10 @@ private fun AddAuthItem(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         FillIcon(
-            icon = when (item.type) {
-                KeyType.Website -> Icons.Rounded.Language
-                KeyType.Card -> Icons.Rounded.CreditCard
-                else -> throw IllegalArgumentException("Item is authorization type.")
-            },
+            icon = Icons.Rounded.CreditCard,
             shape = RoundedCornerShape(20),
             modifier = Modifier.size(40.dp),
-            colors = when (item.type) {
-                KeyType.Website -> IconColors.WebItem
-                KeyType.Card -> IconColors.CardItem
-                else -> throw IllegalArgumentException("Item is authorization type.")
-            }
+            colors = IconColors.UserItem
         )
 
         Column(
@@ -120,8 +111,8 @@ private fun Preview() {
     AppTheme {
         val list = remember {
             mutableStateListOf(
-                KeyItem(name = "测试", username = "username"),
-                KeyItem(name = "TestCard", username = "code")
+                UserItem(name = "测试", username = "username"),
+                UserItem(name = "TestCard", username = "code")
             )
         }
         AddAuthList(items = list)

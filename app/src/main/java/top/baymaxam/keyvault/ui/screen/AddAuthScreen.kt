@@ -32,6 +32,7 @@ import cafe.adriel.voyager.koin.koinNavigatorScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import top.baymaxam.keyvault.model.domain.KeyItem
+import top.baymaxam.keyvault.model.domain.UserItem
 import top.baymaxam.keyvault.state.AddScreenModel
 import top.baymaxam.keyvault.ui.component.AddAuthList
 import top.baymaxam.keyvault.ui.component.SearchField
@@ -56,18 +57,18 @@ class AddAuthScreen : Screen {
 
         if (searchContentState.value.isEmpty()) {
             LaunchedEffect(Unit) {
-                vm.items.refreshState()
+                vm.candidateUserItems.refreshState()
                 passItemListState.scrollToItem(0)
             }
         }
 
         ContentLayout(
             searchContentState = searchContentState,
-            items = vm.items.state,
+            items = vm.candidateUserItems.state,
             onSearch = { vm.searchPassItem(searchContentState.value) },
             onBack = { navigator.pop() },
             onPassItemClick = {
-                vm.selectedPassItem.value = it
+                vm.selectedUserItem.value = it
                 navigator.pop()
             }
         )
@@ -81,7 +82,7 @@ private fun ContentLayout(
     itemListState: LazyListState = rememberLazyListState(),
     onBack: () -> Unit = {},
     onSearch: () -> Unit = {},
-    onPassItemClick: (KeyItem) -> Unit = {}
+    onPassItemClick: (UserItem) -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -142,8 +143,8 @@ private fun Preview() {
     AppTheme {
         val list = remember {
             mutableStateListOf(
-                KeyItem(name = "测试", username = "username"),
-                KeyItem(name = "TestCard", username = "code")
+                UserItem(name = "测试", username = "username"),
+                UserItem(name = "TestCard", username = "code")
             )
         }
         ContentLayout(

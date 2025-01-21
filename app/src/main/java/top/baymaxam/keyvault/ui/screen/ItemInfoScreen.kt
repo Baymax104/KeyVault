@@ -14,7 +14,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.CreditCard
-import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -42,8 +41,9 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
+import top.baymaxam.keyvault.model.domain.AuthItem
 import top.baymaxam.keyvault.model.domain.KeyItem
-import top.baymaxam.keyvault.model.domain.KeyType
+import top.baymaxam.keyvault.model.domain.UserItem
 import top.baymaxam.keyvault.state.DialogState
 import top.baymaxam.keyvault.state.ItemViewModel
 import top.baymaxam.keyvault.state.rememberDialogState
@@ -124,7 +124,7 @@ data class ItemInfoScreen(val item: KeyItem) : Screen {
 
 @Composable
 private fun ContentLayout(
-    item: KeyItem = KeyItem(),
+    item: KeyItem = UserItem(),
     nameState: MutableState<String> = mutableStateOf(""),
     usernameState: MutableState<String> = mutableStateOf(""),
     passwordState: MutableState<String> = mutableStateOf(""),
@@ -162,15 +162,13 @@ private fun ContentLayout(
                 FillIcon(
                     shape = RoundedCornerShape(20),
                     modifier = Modifier.size(70.dp),
-                    icon = when (item.type) {
-                        KeyType.Website -> Icons.Rounded.Language
-                        KeyType.Card -> Icons.Rounded.CreditCard
-                        KeyType.Authorization -> Icons.Rounded.Person
+                    icon = when (item) {
+                        is UserItem -> Icons.Rounded.CreditCard
+                        is AuthItem -> Icons.Rounded.Person
                     },
-                    colors = when (item.type) {
-                        KeyType.Website -> IconColors.WebItem
-                        KeyType.Card -> IconColors.CardItem
-                        KeyType.Authorization -> IconColors.AuthItem
+                    colors = when (item) {
+                        is UserItem -> IconColors.UserItem
+                        is AuthItem -> IconColors.AuthItem
                     }
                 )
 
@@ -195,8 +193,8 @@ private fun ContentLayout(
 
             Spacer(modifier = Modifier.height(25.dp))
 
-            when (item.type) {
-                KeyType.Website -> WebItemInfo(
+            when (item) {
+                is UserItem -> UserItemInfo(
                     nameState = nameState,
                     usernameState = usernameState,
                     passwordState = passwordState,
@@ -204,15 +202,7 @@ private fun ContentLayout(
                     onCopy = onCopy
                 )
 
-                KeyType.Card -> CardItemInfo(
-                    nameState = nameState,
-                    usernameState = usernameState,
-                    passwordState = passwordState,
-                    commentState = commentState,
-                    onCopy = onCopy
-                )
-
-                KeyType.Authorization -> {}
+                is AuthItem -> {}
             }
         }
     }
@@ -277,7 +267,7 @@ private fun CommentInfo(
 }
 
 @Composable
-private fun WebItemInfo(
+private fun UserItemInfo(
     nameState: MutableState<String> = mutableStateOf(""),
     usernameState: MutableState<String> = mutableStateOf(""),
     passwordState: MutableState<String> = mutableStateOf(""),
@@ -294,38 +284,6 @@ private fun WebItemInfo(
         ItemInfo(
             contentState = usernameState,
             label = "用户名",
-            onCopy = onCopy
-        )
-        ItemInfo(
-            contentState = passwordState,
-            label = "密码",
-            onCopy = onCopy
-        )
-        CommentInfo(
-            contentState = commentState,
-        )
-    }
-}
-
-
-@Composable
-private fun CardItemInfo(
-    nameState: MutableState<String> = mutableStateOf(""),
-    usernameState: MutableState<String> = mutableStateOf(""),
-    passwordState: MutableState<String> = mutableStateOf(""),
-    commentState: MutableState<String> = mutableStateOf(""),
-    onCopy: (String) -> Unit = {},
-) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(15.dp),
-    ) {
-        ItemInfo(
-            contentState = nameState,
-            label = "卡片名称",
-        )
-        ItemInfo(
-            contentState = usernameState,
-            label = "卡号",
             onCopy = onCopy
         )
         ItemInfo(

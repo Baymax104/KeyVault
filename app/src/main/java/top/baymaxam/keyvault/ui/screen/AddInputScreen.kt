@@ -55,10 +55,11 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
+import top.baymaxam.keyvault.model.domain.AuthItem
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.KeyType
 import top.baymaxam.keyvault.model.domain.Tag
-import top.baymaxam.keyvault.model.domain.toKeyType
+import top.baymaxam.keyvault.model.domain.UserItem
 import top.baymaxam.keyvault.state.AddScreenModel
 import top.baymaxam.keyvault.state.SelectedState
 import top.baymaxam.keyvault.ui.component.InfoField
@@ -111,42 +112,32 @@ class AddInputScreen : Screen {
             usernameContentState = usernameContentState,
             passwordContentState = passwordContentState,
             commentContentState = commentContentState,
-            selectedItemState = vm.selectedPassItem,
+            selectedItemState = vm.selectedUserItem,
             tagListState = tagListState,
             onSearch = { vm.searchTag(searchState.value) },
             onCancel = { bottomSheetNavigator.hide() },
             onSelectAuth = { navigator += AddAuthScreen() },
             onConfirm = onConfirm@{
-                if (typeSelectedState.intValue == 2 && vm.selectedPassItem.value == null) {
+                if (typeSelectedState.intValue == 1 && vm.selectedUserItem.value == null) {
                     infoToast("授权条目未设置")
                     return@onConfirm
                 }
-                val type = typeSelectedState.intValue.toKeyType() ?: error("Invalid type.")
+                val type =
+                    if (typeSelectedState.intValue == 0) KeyType.User else KeyType.Authorization
                 val item: KeyItem = when (type) {
-                    KeyType.Website -> KeyItem(
+                    KeyType.User -> UserItem(
                         name = nameContentState.value,
                         username = usernameContentState.value,
                         password = passwordContentState.value,
                         comment = commentContentState.value,
-                        type = KeyType.Website,
                         createDate = Date(),
                     )
 
-                    KeyType.Card -> KeyItem(
-                        name = nameContentState.value,
-                        username = usernameContentState.value,
-                        password = passwordContentState.value,
-                        comment = commentContentState.value,
-                        type = KeyType.Card,
-                        createDate = Date(),
-                    )
-
-                    KeyType.Authorization -> KeyItem(
+                    KeyType.Authorization -> AuthItem(
                         name = nameContentState.value,
                         comment = commentContentState.value,
-                        authId = vm.selectedPassItem.value!!.id,
-                        authName = vm.selectedPassItem.value!!.name,
-                        type = KeyType.Authorization,
+                        authId = vm.selectedUserItem.value!!.id,
+                        authName = vm.selectedUserItem.value!!.name,
                         createDate = Date(),
                     )
                 }
@@ -172,7 +163,7 @@ private fun ContentLayout(
     usernameContentState: MutableState<String> = mutableStateOf(""),
     passwordContentState: MutableState<String> = mutableStateOf(""),
     commentContentState: MutableState<String> = mutableStateOf(""),
-    selectedItemState: MutableState<KeyItem?> = mutableStateOf(null),
+    selectedItemState: MutableState<UserItem?> = mutableStateOf(null),
     tagListState: LazyListState = rememberLazyListState(),
     onSearch: () -> Unit = {},
     onConfirm: () -> Unit = {},
@@ -249,38 +240,33 @@ private fun ContentLayout(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(text = "条目类型：", color = MaterialTheme.colorScheme.onBackground)
-                TypeSelection(
-                    text = "网站",
-                    selected = typeSelectedState.intValue == 0,
-                    onClick = {
-                        typeSelectedState.intValue = 0
-                        nameContentState.value = ""
-                        usernameContentState.value = ""
-                        passwordContentState.value = ""
-                        commentContentState.value = ""
-                    }
-                )
-                TypeSelection(
-                    text = "卡片",
-                    selected = typeSelectedState.intValue == 1,
-                    onClick = {
-                        typeSelectedState.intValue = 1
-                        nameContentState.value = ""
-                        usernameContentState.value = ""
-                        passwordContentState.value = ""
-                        commentContentState.value = ""
-                    }
-                )
-                TypeSelection(
-                    text = "授权",
-                    selected = typeSelectedState.intValue == 2,
-                    onClick = {
-                        typeSelectedState.intValue = 2
-                        nameContentState.value = ""
-                        commentContentState.value = ""
-                        selectedItemState.value = null
-                    }
-                )
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    TypeSelection(
+                        text = "用户",
+                        selected = typeSelectedState.intValue == 0,
+                        onClick = {
+                            typeSelectedState.intValue = 0
+                            nameContentState.value = ""
+                            usernameContentState.value = ""
+                            passwordContentState.value = ""
+                            commentContentState.value = ""
+                        }
+                    )
+
+                    TypeSelection(
+                        text = "授权",
+                        selected = typeSelectedState.intValue == 1,
+                        onClick = {
+                            typeSelectedState.intValue = 1
+                            nameContentState.value = ""
+                            commentContentState.value = ""
+                            selectedItemState.value = null
+                        }
+                    )
+                }
             }
             InfoFields(
                 typeIndex = typeSelectedState,
@@ -306,12 +292,12 @@ private fun ContentLayout(
 
 @Composable
 private fun InfoFields(
-    typeIndex: MutableIntState = mutableIntStateOf(2),
+    typeIndex: MutableIntState = mutableIntStateOf(0),
     nameState: MutableState<String> = mutableStateOf(""),
     usernameState: MutableState<String> = mutableStateOf(""),
     passwordState: MutableState<String> = mutableStateOf(""),
     commentState: MutableState<String> = mutableStateOf(""),
-    selectedItemState: MutableState<KeyItem?> = mutableStateOf(null),
+    selectedItemState: MutableState<UserItem?> = mutableStateOf(null),
     onSelectAuth: () -> Unit = {},
 ) {
     Column(
@@ -322,16 +308,14 @@ private fun InfoFields(
             contentState = nameState,
             placeholder = {
                 when (typeIndex.intValue) {
-                    0 -> Text("网站名称")
-                    1 -> Text("卡片名称")
-                    2 -> Text("授权名称")
+                    0 -> Text("条目名称")
+                    1 -> Text("授权名称")
                 }
             },
             leadingIcon = {
                 val icon = when (typeIndex.intValue) {
-                    0 -> Icons.Rounded.Language
-                    1 -> Icons.Rounded.CreditCard
-                    2 -> Icons.Rounded.Person
+                    0 -> Icons.Rounded.CreditCard
+                    1 -> Icons.Rounded.Person
                     else -> null
                 }
                 if (icon != null) {
@@ -340,14 +324,11 @@ private fun InfoFields(
             },
             modifier = Modifier.fillMaxWidth()
         )
-        if (typeIndex.intValue != 2) {
+        if (typeIndex.intValue == 0) {
             InfoField(
                 contentState = usernameState,
                 placeholder = {
-                    when (typeIndex.intValue) {
-                        0 -> Text("用户名")
-                        1 -> Text("卡号")
-                    }
+                    Text("用户名")
                 },
                 leadingIcon = {
                     Icon(imageVector = Icons.Rounded.Person, contentDescription = null)
@@ -371,7 +352,7 @@ private fun InfoFields(
             },
             modifier = Modifier.fillMaxWidth()
         )
-        if (typeIndex.intValue == 2) {
+        if (typeIndex.intValue == 1) {
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(50))

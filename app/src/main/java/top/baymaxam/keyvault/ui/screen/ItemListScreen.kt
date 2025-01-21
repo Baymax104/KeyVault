@@ -43,6 +43,7 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import top.baymaxam.keyvault.R
 import top.baymaxam.keyvault.model.domain.KeyItem
+import top.baymaxam.keyvault.model.domain.UserItem
 import top.baymaxam.keyvault.state.DialogState
 import top.baymaxam.keyvault.state.ItemListViewModel
 import top.baymaxam.keyvault.state.SelectedState
@@ -125,7 +126,7 @@ private fun ContentLayout(
     isEditable: Boolean = false,
     onBack: () -> Unit = {},
     onItemClick: (KeyItem) -> Unit = {},
-    onItemCopy: (KeyItem) -> Unit = {},
+    onItemCopy: (UserItem) -> Unit = {},
     onSelected: (SelectedState<KeyItem>) -> Unit = {},
     onEditClick: () -> Unit = {},
     onAddClick: () -> Unit = {},
@@ -215,7 +216,7 @@ private fun ColumnScope.ItemListView(
     items: List<SelectedState<KeyItem>> = emptyList(),
     isInitialized: Boolean = true,
     isEditable: Boolean = false,
-    onItemCopy: (KeyItem) -> Unit = {},
+    onItemCopy: (UserItem) -> Unit = {},
     onItemClick: (KeyItem) -> Unit = {},
     onSelected: (SelectedState<KeyItem>) -> Unit = {}
 ) {
@@ -253,11 +254,11 @@ private fun Preview() {
     AppTheme {
         ContentLayout(
             items = listOf(
-                SelectedState(KeyItem(name = "hello1")),
-                SelectedState(KeyItem(name = "hello1")),
-                SelectedState(KeyItem(name = "hello1")),
-                SelectedState(KeyItem(name = "hello1")),
-                SelectedState(KeyItem(name = "hello1")),
+                SelectedState(UserItem(name = "hello1")),
+                SelectedState(UserItem(name = "hello1")),
+                SelectedState(UserItem(name = "hello1")),
+                SelectedState(UserItem(name = "hello1")),
+                SelectedState(UserItem(name = "hello1")),
             ),
             isEditable = true
         )

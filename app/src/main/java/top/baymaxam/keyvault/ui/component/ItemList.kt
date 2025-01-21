@@ -17,7 +17,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.CreditCard
-import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,8 +32,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import top.baymaxam.keyvault.model.domain.AuthItem
 import top.baymaxam.keyvault.model.domain.KeyItem
-import top.baymaxam.keyvault.model.domain.KeyType
+import top.baymaxam.keyvault.model.domain.UserItem
 import top.baymaxam.keyvault.state.SelectedState
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.ui.theme.IconColors
@@ -50,14 +50,14 @@ fun ItemList(
     modifier: Modifier = Modifier,
     isEditable: Boolean = false,
     onItemClick: (KeyItem) -> Unit = {},
-    onItemCopy: (KeyItem) -> Unit = {},
+    onItemCopy: (UserItem) -> Unit = {},
     onSelected: (SelectedState<KeyItem>) -> Unit = {},
 ) {
     LazyColumn(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(10.dp),
-        contentPadding = PaddingValues(vertical = 10.dp)
+        contentPadding = PaddingValues(vertical = 10.dp, horizontal = 5.dp)
     ) {
         items(
             items = items,
@@ -81,7 +81,7 @@ private fun KeyItemLayout(
     item: SelectedState<KeyItem>,
     isEditable: Boolean = false,
     onClick: (KeyItem) -> Unit = {},
-    onCopy: (KeyItem) -> Unit = {},
+    onCopy: (UserItem) -> Unit = {},
     onSelected: (SelectedState<KeyItem>) -> Unit = {},
 ) {
     val (keyItem) = item
@@ -112,17 +112,15 @@ private fun KeyItemLayout(
                     .height(50.dp)
             ) {
                 FillIcon(
-                    icon = when (keyItem.type) {
-                        KeyType.Website -> Icons.Rounded.Language
-                        KeyType.Card -> Icons.Rounded.CreditCard
-                        KeyType.Authorization -> Icons.Rounded.Person
+                    icon = when (keyItem) {
+                        is UserItem -> Icons.Rounded.CreditCard
+                        is AuthItem -> Icons.Rounded.Person
                     },
                     shape = RoundedCornerShape(20),
                     modifier = Modifier.size(45.dp),
-                    colors = when (keyItem.type) {
-                        KeyType.Website -> IconColors.WebItem
-                        KeyType.Card -> IconColors.CardItem
-                        KeyType.Authorization -> IconColors.AuthItem
+                    colors = when (keyItem) {
+                        is UserItem -> IconColors.UserItem
+                        is AuthItem -> IconColors.AuthItem
                     }
                 )
 
@@ -140,9 +138,9 @@ private fun KeyItemLayout(
                     )
                     Spacer(modifier = Modifier.height(5.dp))
                     Text(
-                        text = when (keyItem.type) {
-                            KeyType.Authorization -> keyItem.authName ?: ""
-                            else -> keyItem.username
+                        text = when (keyItem) {
+                            is UserItem -> keyItem.username
+                            is AuthItem -> keyItem.authName
                         },
                         style = TextStyle(
                             fontSize = 14.sp,
@@ -157,7 +155,7 @@ private fun KeyItemLayout(
                         selected = item.selected,
                         onClick = select
                     )
-                } else if (keyItem.type != KeyType.Authorization) {
+                } else if (keyItem is UserItem) {
                     IconButton(onClick = { onCopy(keyItem) }) {
                         Icon(imageVector = Icons.Rounded.ContentCopy, contentDescription = null)
                     }
@@ -173,14 +171,12 @@ private fun KeyItemLayout(
 private fun Preview() {
     AppTheme {
         val list = listOf(
-            SelectedState(KeyItem(name = "Hello")),
-            SelectedState(KeyItem(name = "Hello")),
-            SelectedState(KeyItem(name = "Hello")),
-            SelectedState(KeyItem(name = "Hello")),
-            SelectedState(KeyItem(name = "Hello")),
-            SelectedState(KeyItem(name = "Hello")),
-            SelectedState(KeyItem(name = "Hello")),
-            SelectedState(KeyItem(name = "Hello")),
+            SelectedState(UserItem(name = "Hello")),
+            SelectedState(UserItem(name = "Hello")),
+            SelectedState(AuthItem(name = "Hello")),
+            SelectedState(AuthItem(name = "Hello")),
+            SelectedState(UserItem(name = "Hello")),
+            SelectedState(AuthItem(name = "Hello")),
         )
         ItemList(items = list)
     }

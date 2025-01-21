@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.Tag
+import top.baymaxam.keyvault.model.domain.UserItem
 import top.baymaxam.keyvault.model.domain.asEntity
 import top.baymaxam.keyvault.model.entity.asItem
 import top.baymaxam.keyvault.repo.KeyDao
@@ -23,9 +24,9 @@ class AddScreenModel(private val dao: KeyDao) : ScreenModel {
 
     val tags = CachedStateList<SelectedState<Tag>>()
 
-    val items = CachedStateList<KeyItem>()
+    val candidateUserItems = CachedStateList<KeyItem>()
 
-    val selectedPassItem = mutableStateOf<KeyItem?>(null)
+    val selectedUserItem = mutableStateOf<UserItem?>(null)
 
     init {
         tags.cacheList = mutableListOf(
@@ -37,9 +38,9 @@ class AddScreenModel(private val dao: KeyDao) : ScreenModel {
         )
 
         screenModelScope.launch {
-            dao.queryNonAuthItem()
+            dao.queryUserItems()
                 .map { l -> l.map { it.asItem() } }
-                .collect { items.cacheList = it.toMutableList() }
+                .collect { candidateUserItems.cacheList = it.toMutableList() }
         }
     }
 
@@ -49,8 +50,8 @@ class AddScreenModel(private val dao: KeyDao) : ScreenModel {
     }
 
     fun searchPassItem(content: String) {
-        items.cacheList.filter { it.name.contains(content, true) }
-            .let { items.refreshState(it) }
+        candidateUserItems.cacheList.filter { it.name.contains(content, true) }
+            .let { candidateUserItems.refreshState(it) }
     }
 
     suspend fun addItem(item: KeyItem): Result<Unit> {

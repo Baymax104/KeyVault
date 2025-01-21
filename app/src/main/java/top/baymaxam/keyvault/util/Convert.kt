@@ -41,5 +41,5 @@ object KeyTypeConverter {
     fun type2String(type: KeyType): String = type.name
 
     @TypeConverter
-    fun string2Type(string: String): KeyType = string.toKeyType() ?: KeyType.Website
+    fun string2Type(string: String): KeyType = string.toKeyType() ?: KeyType.User
 }

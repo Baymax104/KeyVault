@@ -39,7 +39,7 @@ interface KeyDao {
     fun queryItemCounts(): Flow<Int>
 
     @Query("select * from t_key where type != 'Authorization'")
-    fun queryNonAuthItem(): Flow<List<KeyEntity>>
+    fun queryUserItems(): Flow<List<KeyEntity>>
 
     @Query("select * from t_key where id = :id")
     suspend fun queryById(id: Long): KeyEntity

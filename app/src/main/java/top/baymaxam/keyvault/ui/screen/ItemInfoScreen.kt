@@ -138,11 +138,15 @@ private fun ContentLayout(
 ) {
     Scaffold(
         topBar = {
-            TopBackBar(title = "条目详情", onBack = onBack) {
-                TextButton(onClick = onSaveClick) {
-                    Text("保存")
+            TopBackBar(
+                content = { Text("条目详情") },
+                onBack = onBack,
+                actions = {
+                    TextButton(onClick = onSaveClick) {
+                        Text("保存")
+                    }
                 }
-            }
+            )
         }
     ) { paddingValues ->
         Column(

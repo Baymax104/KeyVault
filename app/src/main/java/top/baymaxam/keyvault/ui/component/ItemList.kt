@@ -35,7 +35,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.KeyType
-import top.baymaxam.keyvault.model.domain.Tag
 import top.baymaxam.keyvault.state.SelectedState
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.ui.theme.IconColors
@@ -53,7 +52,6 @@ fun ItemList(
     onItemClick: (KeyItem) -> Unit = {},
     onItemCopy: (KeyItem) -> Unit = {},
     onSelected: (SelectedState<KeyItem>) -> Unit = {},
-    tagsFactory: (KeyItem) -> List<Tag> = { emptyList() }
 ) {
     LazyColumn(
         modifier = modifier,
@@ -67,7 +65,6 @@ fun ItemList(
         ) {
             KeyItemLayout(
                 item = it,
-                tags = tagsFactory(it.value),
                 isEditable = isEditable,
                 onClick = onItemClick,
                 onCopy = onItemCopy,
@@ -82,7 +79,6 @@ fun ItemList(
 @Composable
 private fun KeyItemLayout(
     item: SelectedState<KeyItem>,
-    tags: List<Tag> = mutableListOf(),
     isEditable: Boolean = false,
     onClick: (KeyItem) -> Unit = {},
     onCopy: (KeyItem) -> Unit = {},
@@ -113,7 +109,7 @@ private fun KeyItemLayout(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(40.dp)
+                    .height(50.dp)
             ) {
                 FillIcon(
                     icon = when (keyItem.type) {
@@ -122,7 +118,7 @@ private fun KeyItemLayout(
                         KeyType.Authorization -> Icons.Rounded.Person
                     },
                     shape = RoundedCornerShape(20),
-                    modifier = Modifier.size(40.dp),
+                    modifier = Modifier.size(45.dp),
                     colors = when (keyItem.type) {
                         KeyType.Website -> IconColors.WebItem
                         KeyType.Card -> IconColors.CardItem
@@ -167,33 +163,12 @@ private fun KeyItemLayout(
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(10.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                if (tags.isNotEmpty()) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        tags.take(3).forEach {
-                            SelectableTag(
-                                text = it.name,
-                                enabled = false,
-                                shape = RoundedCornerShape(50),
-                            )
-                        }
-                    }
-                } else {
-                    Text(text = "暂无标签", color = Color.Gray, fontSize = 14.sp)
-                }
-            }
         }
     }
 }
 
 
-@Preview(showBackground = true, showSystemUi = true)
+@Preview(showBackground = true)
 @Composable
 private fun Preview() {
     AppTheme {

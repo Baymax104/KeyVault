@@ -25,16 +25,14 @@ import top.baymaxam.keyvault.ui.theme.AppTheme
 
 @Composable
 fun TopBackBar(
-    title: String,
-    onBack: () -> Unit,
+    onBack: () -> Unit = {},
     modifier: Modifier = Modifier,
-    actions: @Composable RowScope.() -> Unit = {}
+    actions: @Composable RowScope.() -> Unit = {},
+    content: @Composable () -> Unit = {}
 ) {
     CenterAlignedTopAppBar(
         modifier = modifier,
-        title = {
-            Text(title)
-        },
+        title = content,
         navigationIcon = {
             IconButton(onClick = onBack) {
                 Icon(
@@ -54,6 +52,6 @@ fun TopBackBar(
 @Composable
 private fun Preview() {
     AppTheme {
-        TopBackBar(title = "Hello", onBack = {})
+        TopBackBar(onBack = {}) { Text("Hello") }
     }
 }

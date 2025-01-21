@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package top.baymaxam.keyvault.ui.screen
 
 import androidx.activity.compose.BackHandler
@@ -7,33 +5,23 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerState
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,7 +43,6 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import top.baymaxam.keyvault.R
 import top.baymaxam.keyvault.model.domain.KeyItem
-import top.baymaxam.keyvault.model.domain.Tag
 import top.baymaxam.keyvault.state.DialogState
 import top.baymaxam.keyvault.state.ItemListViewModel
 import top.baymaxam.keyvault.state.SelectedState
@@ -84,23 +71,20 @@ class ItemListScreen : Screen {
         val navigator = LocalNavigator.root
         var isEditable by remember { mutableStateOf(false) }
         val vm = koinViewModel<ItemListViewModel>()
-        val pagerState = rememberPagerState { 3 }
-        val settledPage by remember { derivedStateOf { pagerState.settledPage } }
         val scope = rememberCoroutineScope()
         val dialogState = rememberDialogState()
         val clipboardManager = LocalClipboardManager.current
 
-        fun clearEditState() {
-            isEditable = false
-            vm.clearSelectedState(settledPage)
+        if (!isEditable) {
+            vm.items.forEach { it.selected = false }
         }
 
-        LaunchedEffect(settledPage) {
-            vm.getPageItems(settledPage)
+        LaunchedEffect(Unit) {
+            vm.getItems()
         }
 
         BackHandler(isEditable) {
-            clearEditState()
+            isEditable = false
         }
 
         BottomSheetNavigator(
@@ -108,39 +92,26 @@ class ItemListScreen : Screen {
             sheetContent = { AddScreen().Content() }
         ) { bottomSheetNavigator ->
             ContentLayout(
-                pagerState = pagerState,
                 items = vm.items,
-                isItemsLoading = vm.isItemsLoading,
+                isInitialized = vm.isInitialized,
                 isEditable = isEditable,
-                selectedNumber = vm.selectedNumber,
                 dialogState = dialogState,
-                onBack = { if (isEditable) clearEditState() else navigator.pop() },
-                onEditClick = {
-                    isEditable = !isEditable
-                    if (!isEditable) {
-                        vm.clearSelectedState(settledPage)
-                    }
-                },
+                onBack = { if (isEditable) isEditable = false else navigator.pop() },
+                onEditClick = { isEditable = !isEditable },
                 onItemClick = { navigator += ItemInfoScreen(it) },
                 onItemCopy = { item ->
                     clipboardManager.setText(AnnotatedString(item.password))
                     successToast("复制密码成功")
                 },
-                onSelected = {
-                    isEditable = true
-                    vm.selectedNumber += if (it.selected) 1 else -1
-                },
+                onSelected = { isEditable = true },
                 onDialogConfirm = {
                     scope.launch {
-                        vm.removeSelectedItems(settledPage)
+                        vm.removeSelectedItems()
                             .onSuccess { successToast("删除成功") }
                             .onFailure { errorToast(it.message) }
                     }
                 },
                 onAddClick = { bottomSheetNavigator.show(AddScreen()) },
-                tagsFactory = {
-                    emptyList()
-                }
             )
         }
     }
@@ -148,12 +119,10 @@ class ItemListScreen : Screen {
 
 @Composable
 private fun ContentLayout(
-    pagerState: PagerState = rememberPagerState { 3 },
-    items: List<List<SelectedState<KeyItem>>> = emptyList(),
-    isItemsLoading: List<MutableState<Boolean>> = emptyList(),
+    items: List<SelectedState<KeyItem>> = emptyList(),
+    isInitialized: Boolean = true,
     dialogState: DialogState = rememberDialogState(),
     isEditable: Boolean = false,
-    selectedNumber: Int = 0,
     onBack: () -> Unit = {},
     onItemClick: (KeyItem) -> Unit = {},
     onItemCopy: (KeyItem) -> Unit = {},
@@ -161,16 +130,19 @@ private fun ContentLayout(
     onEditClick: () -> Unit = {},
     onAddClick: () -> Unit = {},
     onDialogConfirm: () -> Unit = {},
-    tagsFactory: (KeyItem) -> List<Tag> = { emptyList() }
 ) {
-    val scope = rememberCoroutineScope()
-    val currentPage by remember { derivedStateOf { pagerState.currentPage } }
+
     Scaffold(
         topBar = {
-            TopBackBar(title = "密码本", onBack = onBack) {
-                TextButton(onClick = onEditClick) {
-                    Text(if (!isEditable) "管理" else "完成")
+            TopBackBar(
+                onBack = onBack,
+                actions = {
+                    TextButton(onClick = onEditClick) {
+                        Text(if (!isEditable) "管理" else "完成")
+                    }
                 }
+            ) {
+                Text("密码本")
             }
         },
         floatingActionButton = {
@@ -188,88 +160,19 @@ private fun ContentLayout(
                 .padding(paddingValues)
                 .fillMaxSize(),
         ) {
-            if (!isEditable) {
-                TabRow(
-                    selectedTabIndex = currentPage,
-                    modifier = Modifier.height(50.dp)
-                ) {
-                    listOf("网站", "卡片", "授权").forEachIndexed { index, text ->
-                        Tab(
-                            selected = currentPage == index,
-                            text = { Text(text) },
-                            onClick = { scope.launch { pagerState.animateScrollToPage(index) } }
-                        )
-                    }
-                }
-            } else {
-                Column(
-                    modifier = Modifier
-                        .height(50.dp)
-                        .background(MaterialTheme.colorScheme.inverseOnSurface)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(48.dp)
-                            .padding(vertical = 5.dp, horizontal = 10.dp)
-                    ) {
-                        Text(
-                            text = "已选：${selectedNumber}项，共${items[pagerState.settledPage].size}项",
-                            modifier = Modifier.weight(1f)
-                        )
-                        IconButton(
-                            onClick = { if (selectedNumber > 0) dialogState.show() }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Rounded.Delete,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.error
-                            )
-                        }
-                    }
-                    Box(
-                        modifier = Modifier
-                            .height(2.dp)
-                            .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.primary)
-                    )
-                }
-            }
-
-
-            HorizontalPager(
-                state = pagerState,
-                userScrollEnabled = !isEditable,
-                contentPadding = PaddingValues(horizontal = 10.dp),
-                pageSpacing = 10.dp
-            ) {
-                if (isItemsLoading[it].value) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        CircularProgressIndicator(modifier = Modifier.size(60.dp))
-                    }
-                } else {
-                    if (items[it].isNotEmpty()) {
-                        ItemList(
-                            items = items[it],
-                            modifier = Modifier.fillMaxSize(),
-                            isEditable = isEditable,
-                            onItemClick = onItemClick,
-                            onItemCopy = onItemCopy,
-                            onSelected = onSelected,
-                            tagsFactory = tagsFactory
-                        )
-                    } else {
-                        Image(
-                            painter = painterResource(id = R.drawable.img_no_data),
-                            contentDescription = null,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    }
-                }
+            ItemListView(
+                items = items,
+                isInitialized = isInitialized,
+                isEditable = isEditable,
+                onItemCopy = onItemCopy,
+                onItemClick = onItemClick,
+                onSelected = onSelected
+            )
+            if (isEditable) {
+                EditBar(
+                    items = items,
+                    onDeleteClick = { dialogState.show() }
+                )
             }
         }
     }
@@ -281,6 +184,68 @@ private fun ContentLayout(
     )
 }
 
+@Composable
+private fun EditBar(
+    items: List<SelectedState<KeyItem>> = emptyList(),
+    onDeleteClick: () -> Unit = {},
+) {
+    val selectedNumber by remember { derivedStateOf { items.count { it.selected } } }
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(60.dp)
+            .background(MaterialTheme.colorScheme.inverseOnSurface)
+            .padding(vertical = 5.dp, horizontal = 15.dp)
+    ) {
+        Text(
+            text = "已选：${selectedNumber}项，共${items.size}项",
+            modifier = Modifier.weight(1f)
+        )
+        TextButton(
+            onClick = { if (selectedNumber > 0) onDeleteClick() }
+        ) {
+            Text("删除", color = MaterialTheme.colorScheme.error)
+        }
+    }
+}
+
+@Composable
+private fun ColumnScope.ItemListView(
+    items: List<SelectedState<KeyItem>> = emptyList(),
+    isInitialized: Boolean = true,
+    isEditable: Boolean = false,
+    onItemCopy: (KeyItem) -> Unit = {},
+    onItemClick: (KeyItem) -> Unit = {},
+    onSelected: (SelectedState<KeyItem>) -> Unit = {}
+) {
+    if (!isInitialized) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            CircularProgressIndicator(modifier = Modifier.size(60.dp))
+        }
+    } else {
+        if (items.isNotEmpty()) {
+            ItemList(
+                items = items,
+                modifier = Modifier.weight(1f),
+                isEditable = isEditable,
+                onItemClick = onItemClick,
+                onItemCopy = onItemCopy,
+                onSelected = onSelected,
+            )
+        } else {
+            Image(
+                painter = painterResource(id = R.drawable.img_no_data),
+                contentDescription = null,
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
+}
+
 
 @Preview(showSystemUi = true, showBackground = true)
 @Composable
@@ -288,14 +253,13 @@ private fun Preview() {
     AppTheme {
         ContentLayout(
             items = listOf(
-                listOf(
-                    SelectedState(KeyItem(name = "hello1")),
-                    SelectedState(KeyItem(name = "hello1")),
-                    SelectedState(KeyItem(name = "hello1")),
-                    SelectedState(KeyItem(name = "hello1")),
-                    SelectedState(KeyItem(name = "hello1")),
-                )
-            )
+                SelectedState(KeyItem(name = "hello1")),
+                SelectedState(KeyItem(name = "hello1")),
+                SelectedState(KeyItem(name = "hello1")),
+                SelectedState(KeyItem(name = "hello1")),
+                SelectedState(KeyItem(name = "hello1")),
+            ),
+            isEditable = true
         )
     }
 }

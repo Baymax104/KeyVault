@@ -26,18 +26,6 @@ class TagListViewModel : ViewModel() {
             SelectedState(Tag(name = "Hello")),
         )
         tags.addAll(list)
-        list.forEach {
-            tagItemsMap[it.value.id] = mutableStateListOf(
-                KeyItem(name = "Hello1"),
-                KeyItem(name = "Hello2"),
-                KeyItem(name = "Hello3"),
-                KeyItem(name = "Hello4"),
-                KeyItem(name = "Hello5"),
-                KeyItem(name = "Hello5"),
-                KeyItem(name = "Hello5"),
-                KeyItem(name = "Hello5"),
-            )
-        }
     }
 
     fun getTagItems(tag: Tag): List<KeyItem> {

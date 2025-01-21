@@ -1,29 +1,41 @@
 package top.baymaxam.keyvault.ui.screen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableIntState
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -41,10 +53,11 @@ import top.baymaxam.keyvault.R
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.entity.asItem
 import top.baymaxam.keyvault.repo.KeyDao
-import top.baymaxam.keyvault.ui.component.CatalogBlock
+import top.baymaxam.keyvault.ui.component.FillIcon
+import top.baymaxam.keyvault.ui.component.FillIconColors
 import top.baymaxam.keyvault.ui.component.ResentList
-import top.baymaxam.keyvault.ui.component.SearchField
 import top.baymaxam.keyvault.ui.theme.AppTheme
+import top.baymaxam.keyvault.ui.theme.IconColors
 import top.baymaxam.keyvault.ui.theme.robotoFont
 import top.baymaxam.keyvault.util.root
 
@@ -71,7 +84,6 @@ object HomeTab : Tab {
     override fun Content() {
         val navigator = LocalNavigator.root
         val dao = koinInject<KeyDao>()
-        val searchContentState = remember { mutableStateOf("") }
         val tagCountState = remember { mutableIntStateOf(0) }
         val passwordCountState = dao.queryItemCounts().collectAsState(0)
         val resentUsedItems = dao.queryOrderedByResentDate()
@@ -79,7 +91,6 @@ object HomeTab : Tab {
             .collectAsState(emptyList())
 
         ContentLayout(
-            searchContentState = searchContentState,
             resentUsedItems = resentUsedItems.value,
             passwordCountState = passwordCountState,
             tagCountState = tagCountState,
@@ -94,7 +105,6 @@ object HomeTab : Tab {
 
 @Composable
 private fun ContentLayout(
-    searchContentState: MutableState<String> = mutableStateOf(""),
     resentUsedItems: List<KeyItem> = mutableStateListOf(),
     passwordCountState: State<Int> = mutableIntStateOf(0),
     tagCountState: MutableIntState = mutableIntStateOf(0),
@@ -108,7 +118,6 @@ private fun ContentLayout(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Header(
-            searchContentState = searchContentState,
             onSearch = onSearch,
             onPasswordClick = onPasswordClick,
             onTagClick = onTagClick,
@@ -125,7 +134,6 @@ private fun ContentLayout(
 
 @Composable
 private fun Header(
-    searchContentState: MutableState<String> = mutableStateOf(""),
     onSearch: () -> Unit = {},
     passwordCount: Int = 0,
     tagCount: Int = 0,
@@ -141,28 +149,32 @@ private fun Header(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Text(
-            text = stringResource(id = R.string.app_name),
-            style = TextStyle(
-                fontFamily = robotoFont,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Black,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onBackground
-            ),
-            modifier = Modifier
-                .padding(vertical = 10.dp)
-                .fillMaxWidth()
-        )
-
-        SearchField(
-            contentState = searchContentState,
-            placeholder = { Text("搜索条目") },
-            onSearch = onSearch,
+        Box(
             modifier = Modifier.fillMaxWidth()
-        )
+        ) {
+            Text(
+                text = stringResource(id = R.string.app_name),
+                style = TextStyle(
+                    fontFamily = robotoFont,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Black,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onBackground
+                ),
+                modifier = Modifier.align(Alignment.Center)
+            )
+            IconButton(
+                onClick = onSearch,
+                modifier = Modifier.align(Alignment.CenterEnd)
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.Search,
+                    contentDescription = null
+                )
+            }
+        }
 
-        CatalogBlock(
+        IndexView(
             passwordCount = passwordCount,
             tagCount = tagCount,
             onPasswordClick = onPasswordClick,
@@ -198,14 +210,99 @@ private fun ResentItemList(
             )
         )
         ResentList(
-            state = resentUsedListState,
             keyItems = keyItems,
-            onItemClick = onItemClick,
             modifier = Modifier.fillMaxWidth(),
+            state = resentUsedListState,
+            onItemClick = onItemClick,
         )
     }
 }
 
+@Composable
+fun IndexView(
+    passwordCount: Int = 0,
+    tagCount: Int = 0,
+    onPasswordClick: () -> Unit = {},
+    onTagClick: () -> Unit = {}
+) {
+    Row(
+        modifier = Modifier
+            .padding(vertical = 15.dp)
+            .fillMaxWidth(),
+    ) {
+        IndexCard(
+            modifier = Modifier
+                .height(110.dp)
+                .weight(1f),
+            icon = R.drawable.ic_key,
+            iconColors = IconColors.CatalogKey,
+            text = "${passwordCount}条密码",
+            onClick = onPasswordClick
+        )
+
+        Spacer(modifier = Modifier.width(10.dp))
+
+        IndexCard(
+            modifier = Modifier
+                .height(110.dp)
+                .weight(1f),
+            icon = R.drawable.ic_tag,
+            iconColors = IconColors.CatalogTag,
+            text = "${tagCount}个标签",
+            onClick = onTagClick
+        )
+    }
+}
+
+@Composable
+private fun IndexCard(
+    modifier: Modifier = Modifier,
+    icon: Int,
+    iconColors: FillIconColors,
+    text: String,
+    onClick: () -> Unit
+) {
+    Surface(
+        shape = RoundedCornerShape(20.dp),
+        onClick = onClick,
+        tonalElevation = 0.dp,
+        modifier = modifier
+    ) {
+        Column(
+            verticalArrangement = Arrangement.SpaceEvenly,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 12.dp)
+        ) {
+
+            FillIcon(
+                icon = painterResource(id = icon),
+                shape = RoundedCornerShape(50),
+                modifier = Modifier.size(40.dp),
+                colors = iconColors
+            )
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = text,
+                    style = TextStyle(
+                        fontFamily = robotoFont,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
+                )
+                Icon(
+                    imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
+                    contentDescription = null
+                )
+            }
+        }
+    }
+}
 
 @Preview(showBackground = true)
 @Composable

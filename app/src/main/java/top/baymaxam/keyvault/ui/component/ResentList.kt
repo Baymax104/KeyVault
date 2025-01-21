@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -33,7 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.KeyType
-import top.baymaxam.keyvault.model.domain.Tag
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.ui.theme.IconColors
 
@@ -49,7 +47,6 @@ fun ResentList(
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
     onItemClick: (KeyItem) -> Unit = {},
-    onLoadTags: (KeyItem) -> List<Tag> = { emptyList() }
 ) {
     LazyColumn(
         state = state,
@@ -64,7 +61,6 @@ fun ResentList(
         ) {
             RecentItem(
                 item = it,
-                tags = onLoadTags(it),
                 onClick = onItemClick
             )
         }
@@ -75,7 +71,6 @@ fun ResentList(
 @Composable
 private fun RecentItem(
     item: KeyItem = KeyItem(),
-    tags: List<Tag> = mutableListOf(),
     onClick: (KeyItem) -> Unit,
 ) {
     Surface(
@@ -112,7 +107,7 @@ private fun RecentItem(
                 Column(
                     verticalArrangement = Arrangement.SpaceEvenly,
                     modifier = Modifier
-                        .height(45.dp)
+                        .height(50.dp)
                         .padding(horizontal = 10.dp)
                 ) {
                     Text(
@@ -135,27 +130,6 @@ private fun RecentItem(
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(10.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                if (tags.isNotEmpty()) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        tags.take(3).forEach {
-                            SelectableTag(
-                                text = it.name,
-                                enabled = false,
-                                shape = RoundedCornerShape(50),
-                            )
-                        }
-                    }
-                } else {
-                    Text(text = "暂无标签", color = Color.Gray, fontSize = 14.sp)
-                }
-            }
         }
     }
 }
@@ -173,7 +147,6 @@ private fun Preview() {
         }
         ResentList(
             keyItems = list,
-            onLoadTags = { emptyList() },
         )
     }
 }

@@ -33,9 +33,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -95,7 +93,7 @@ class AddInputScreen : Screen {
         val usernameContentState = rememberSaveable { mutableStateOf("") }
         val passwordContentState = rememberSaveable { mutableStateOf("") }
         val commentContentState = rememberSaveable { mutableStateOf("") }
-        val typeSelectedState = rememberSaveable { mutableIntStateOf(0) }
+        val typeSelectedState = rememberSaveable { mutableStateOf(KeyType.User) }
 
         if (searchState.value.isEmpty()) {
             LaunchedEffect(Unit) {
@@ -118,13 +116,11 @@ class AddInputScreen : Screen {
             onCancel = { bottomSheetNavigator.hide() },
             onSelectAuth = { navigator += AddAuthScreen() },
             onConfirm = onConfirm@{
-                if (typeSelectedState.intValue == 1 && vm.selectedUserItem.value == null) {
+                if (typeSelectedState.value == KeyType.Authorization && vm.selectedUserItem.value == null) {
                     infoToast("授权条目未设置")
                     return@onConfirm
                 }
-                val type =
-                    if (typeSelectedState.intValue == 0) KeyType.User else KeyType.Authorization
-                val item: KeyItem = when (type) {
+                val item: KeyItem = when (typeSelectedState.value) {
                     KeyType.User -> UserItem(
                         name = nameContentState.value,
                         username = usernameContentState.value,
@@ -158,7 +154,7 @@ class AddInputScreen : Screen {
 private fun ContentLayout(
     searchContentState: MutableState<String> = mutableStateOf(""),
     tags: List<SelectedState<Tag>> = mutableStateListOf(),
-    typeSelectedState: MutableIntState = mutableIntStateOf(0),
+    typeSelectedState: MutableState<KeyType> = mutableStateOf(KeyType.User),
     nameContentState: MutableState<String> = mutableStateOf(""),
     usernameContentState: MutableState<String> = mutableStateOf(""),
     passwordContentState: MutableState<String> = mutableStateOf(""),
@@ -246,9 +242,9 @@ private fun ContentLayout(
                 ) {
                     TypeSelection(
                         text = "用户",
-                        selected = typeSelectedState.intValue == 0,
+                        selected = typeSelectedState.value == KeyType.User,
                         onClick = {
-                            typeSelectedState.intValue = 0
+                            typeSelectedState.value = KeyType.User
                             nameContentState.value = ""
                             usernameContentState.value = ""
                             passwordContentState.value = ""
@@ -258,9 +254,9 @@ private fun ContentLayout(
 
                     TypeSelection(
                         text = "授权",
-                        selected = typeSelectedState.intValue == 1,
+                        selected = typeSelectedState.value == KeyType.Authorization,
                         onClick = {
-                            typeSelectedState.intValue = 1
+                            typeSelectedState.value = KeyType.Authorization
                             nameContentState.value = ""
                             commentContentState.value = ""
                             selectedItemState.value = null
@@ -269,7 +265,7 @@ private fun ContentLayout(
                 }
             }
             InfoFields(
-                typeIndex = typeSelectedState,
+                selectedType = typeSelectedState.value,
                 nameState = nameContentState,
                 usernameState = usernameContentState,
                 passwordState = passwordContentState,
@@ -292,7 +288,7 @@ private fun ContentLayout(
 
 @Composable
 private fun InfoFields(
-    typeIndex: MutableIntState = mutableIntStateOf(0),
+    selectedType: KeyType = KeyType.User,
     nameState: MutableState<String> = mutableStateOf(""),
     usernameState: MutableState<String> = mutableStateOf(""),
     passwordState: MutableState<String> = mutableStateOf(""),
@@ -307,24 +303,23 @@ private fun InfoFields(
         InfoField(
             contentState = nameState,
             placeholder = {
-                when (typeIndex.intValue) {
-                    0 -> Text("条目名称")
-                    1 -> Text("授权名称")
+                when (selectedType) {
+                    KeyType.User -> Text("条目名称")
+                    KeyType.Authorization -> Text("授权名称")
                 }
             },
             leadingIcon = {
-                val icon = when (typeIndex.intValue) {
-                    0 -> Icons.Rounded.CreditCard
-                    1 -> Icons.Rounded.Person
-                    else -> null
-                }
-                if (icon != null) {
-                    Icon(imageVector = icon, contentDescription = null)
-                }
+                Icon(
+                    imageVector = when (selectedType) {
+                        KeyType.User -> Icons.Rounded.CreditCard
+                        KeyType.Authorization -> Icons.Rounded.Person
+                    },
+                    contentDescription = null
+                )
             },
             modifier = Modifier.fillMaxWidth()
         )
-        if (typeIndex.intValue == 0) {
+        if (selectedType == KeyType.User) {
             InfoField(
                 contentState = usernameState,
                 placeholder = {
@@ -352,7 +347,7 @@ private fun InfoFields(
             },
             modifier = Modifier.fillMaxWidth()
         )
-        if (typeIndex.intValue == 1) {
+        if (selectedType == KeyType.Authorization) {
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(50))

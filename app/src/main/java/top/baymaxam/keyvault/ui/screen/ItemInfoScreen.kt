@@ -88,13 +88,13 @@ data class ItemInfoScreen(val item: KeyItem) : Screen {
             passwordState = vm.passwordState,
             commentState = vm.commentState,
             dialogState = dialogState,
-            onBack = { if (!vm.checkEquals()) dialogState.show() else navigator.pop() },
+            onBack = { if (!vm.isUserItemEquals()) dialogState.show() else navigator.pop() },
             onCopy = { text ->
                 clipboardManager.setText(AnnotatedString(text))
                 successToast("复制成功")
             },
             onSaveClick = {
-                if (!vm.checkEquals()) {
+                if (!vm.isUserItemEquals()) {
                     scope.launch {
                         vm.updateItem()
                             .onSuccess { successToast("修改成功") }

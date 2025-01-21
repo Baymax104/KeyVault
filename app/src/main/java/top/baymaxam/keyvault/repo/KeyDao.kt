@@ -42,8 +42,11 @@ interface KeyDao {
     fun queryUserItems(): Flow<List<KeyEntity>>
 
     @Query("select * from t_key where id = :id")
-    suspend fun queryById(id: Long): KeyEntity
+    suspend fun queryById(id: String): KeyEntity
 
     @Query("select * from t_key where type = :type")
     fun queryByType(type: KeyType): Flow<List<KeyEntity>>
+
+    @Query("update t_key set authName = :authName where authId = :authId")
+    suspend fun updateAuthName(authId: String, authName: String)
 }

@@ -1,6 +1,5 @@
 package top.baymaxam.keyvault.state
 
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,6 +9,7 @@ import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.UserItem
 import top.baymaxam.keyvault.model.domain.asEntity
 import top.baymaxam.keyvault.repo.KeyDao
+import top.baymaxam.keyvault.repo.transaction
 import java.util.Date
 
 /**
@@ -21,37 +21,43 @@ class ItemViewModel(private val dao: KeyDao, val item: KeyItem) : ViewModel() {
 
     val nameState = mutableStateOf(item.name)
     val commentState = mutableStateOf(item.comment)
-    val usernameState: MutableState<String>
-    val passwordState: MutableState<String>
+    val usernameState = mutableStateOf("")
+    val passwordState = mutableStateOf("")
 
     init {
         when (item) {
             is UserItem -> {
-                usernameState = mutableStateOf(item.username)
-                passwordState = mutableStateOf(item.password)
+                usernameState.value = item.username
+                passwordState.value = item.password
             }
 
             is AuthItem -> {
-                usernameState = mutableStateOf("")
-                passwordState = mutableStateOf("")
             }
-        }
-    }
-
-    fun checkEquals(): Boolean {
-        return if (item is UserItem) {
-            with(item) {
-                name == nameState.value && username == usernameState.value && password == passwordState.value && comment == commentState.value
-            }
-        } else {
-            false
         }
     }
 
     suspend fun updateItem(): Result<Unit> {
         return runCatching {
-            if (item !is UserItem) {
-                throw IllegalArgumentException("item is not UserItem")
+            when (item) {
+                is UserItem -> updateUserItem()
+                is AuthItem -> updateAuthItem()
+            }
+        }
+    }
+
+    fun isUserItemEquals(): Boolean {
+        item as UserItem
+        return item.name == nameState.value &&
+                item.username == usernameState.value &&
+                item.password == passwordState.value &&
+                item.comment == commentState.value
+    }
+
+    private suspend fun updateUserItem() {
+        item as UserItem
+        transaction {
+            if (item.name != nameState.value) {
+                dao.updateAuthName(item.id, nameState.value)
             }
             item.apply {
                 name = nameState.value
@@ -63,6 +69,12 @@ class ItemViewModel(private val dao: KeyDao, val item: KeyItem) : ViewModel() {
             }
         }
     }
+
+    private suspend fun updateAuthItem() {
+        item as AuthItem
+
+    }
+
 
     fun updateItemResentDate() {
         viewModelScope.launch {

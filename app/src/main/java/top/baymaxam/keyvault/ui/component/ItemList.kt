@@ -85,10 +85,6 @@ private fun KeyItemLayout(
     onSelected: (SelectedState<KeyItem>) -> Unit = {},
 ) {
     val (keyItem) = item
-    val select = {
-        item.selected = !item.selected
-        onSelected(item)
-    }
     Surface(
         shape = RoundedCornerShape(20.dp),
         shadowElevation = 1.dp,
@@ -99,8 +95,8 @@ private fun KeyItemLayout(
             modifier = Modifier
                 .fillMaxWidth()
                 .combinedClickable(
-                    onLongClick = { if (!isEditable) select() },
-                    onClick = { if (isEditable) select() else onClick(keyItem) }
+                    onLongClick = { if (!isEditable) onSelected(item) },
+                    onClick = { if (isEditable) onSelected(item) else onClick(keyItem) }
                 )
                 .padding(10.dp)
         ) {
@@ -153,7 +149,7 @@ private fun KeyItemLayout(
                 if (isEditable) {
                     RadioButton(
                         selected = item.selected,
-                        onClick = select
+                        onClick = { onSelected(item) }
                     )
                 } else if (keyItem is UserItem) {
                     IconButton(onClick = { onCopy(keyItem) }) {

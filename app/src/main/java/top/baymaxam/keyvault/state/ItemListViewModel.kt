@@ -27,7 +27,6 @@ class ItemListViewModel(private val dao: KeyDao) : ViewModel() {
 
 
     suspend fun getItems() {
-        if (items.isNotEmpty()) return
         dao.queryAll()
             .map { l -> l.map { SelectedState(it.asItem()) } }
             .collect {

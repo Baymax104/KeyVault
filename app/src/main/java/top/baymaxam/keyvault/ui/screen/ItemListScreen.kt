@@ -104,7 +104,10 @@ class ItemListScreen : Screen {
                     clipboardManager.setText(AnnotatedString(item.password))
                     successToast("复制密码成功")
                 },
-                onSelected = { isEditable = true },
+                onSelected = {
+                    isEditable = true
+                    it.selected = !it.selected
+                },
                 onDialogConfirm = {
                     scope.launch {
                         vm.removeSelectedItems()

@@ -1,6 +1,5 @@
 package top.baymaxam.keyvault.model.domain
 
-import android.os.Parcelable
 import com.benasher44.uuid.uuid4
 import kotlinx.parcelize.Parcelize
 import top.baymaxam.keyvault.model.entity.KeyEntity
@@ -20,7 +19,7 @@ data class UserItem(
     override var comment: String = "",
     var username: String = "",
     var password: String = "",
-) : KeyItem, Parcelable
+) : KeyItem
 
 fun UserItem.asEntity(): KeyEntity {
     return KeyEntity(

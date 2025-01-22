@@ -1,5 +1,6 @@
 package top.baymaxam.keyvault.model.domain
 
+import android.os.Parcelable
 import top.baymaxam.keyvault.model.entity.KeyEntity
 import java.util.Date
 
@@ -8,7 +9,7 @@ import java.util.Date
  * @author John
  * @since 21 1月 2025
  */
-sealed interface KeyItem {
+sealed interface KeyItem : Parcelable {
     val id: String
     var name: String
     val createDate: Date

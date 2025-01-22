@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.CircularProgressIndicator
@@ -35,10 +34,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.core.screen.ScreenKey
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.bottomSheet.BottomSheetNavigator
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootGraph
+import com.ramcosta.composedestinations.generated.destinations.AddScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.ItemInfoScreenDestination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import top.baymaxam.keyvault.R
@@ -54,7 +54,6 @@ import top.baymaxam.keyvault.ui.component.ItemList
 import top.baymaxam.keyvault.ui.component.TopBackBar
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.util.errorToast
-import top.baymaxam.keyvault.util.root
 import top.baymaxam.keyvault.util.successToast
 
 /**
@@ -62,63 +61,54 @@ import top.baymaxam.keyvault.util.successToast
  * @author John
  * @since 06 8月 2024
  */
-class ItemListScreen : Screen {
+@Destination<RootGraph>()
+@Composable
+fun ItemListScreen(
+    navigator: DestinationsNavigator
+) {
+    var isEditable by remember { mutableStateOf(false) }
+    val vm = koinViewModel<ItemListViewModel>()
+    val scope = rememberCoroutineScope()
+    val dialogState = rememberDialogState()
+    val clipboardManager = LocalClipboardManager.current
 
-    override val key: ScreenKey
-        get() = "Item-List-Screen"
-
-    @Composable
-    override fun Content() {
-        val navigator = LocalNavigator.root
-        var isEditable by remember { mutableStateOf(false) }
-        val vm = koinViewModel<ItemListViewModel>()
-        val scope = rememberCoroutineScope()
-        val dialogState = rememberDialogState()
-        val clipboardManager = LocalClipboardManager.current
-
-        if (!isEditable) {
-            vm.items.forEach { it.selected = false }
-        }
-
-        LaunchedEffect(Unit) {
-            vm.getItems()
-        }
-
-        BackHandler(isEditable) {
-            isEditable = false
-        }
-
-        BottomSheetNavigator(
-            sheetShape = RoundedCornerShape(15.dp),
-            sheetContent = { AddScreen().Content() }
-        ) { bottomSheetNavigator ->
-            ContentLayout(
-                items = vm.items,
-                isInitialized = vm.isInitialized,
-                isEditable = isEditable,
-                dialogState = dialogState,
-                onBack = { if (isEditable) isEditable = false else navigator.pop() },
-                onEditClick = { isEditable = !isEditable },
-                onItemClick = { navigator += ItemInfoScreen(it) },
-                onItemCopy = { item ->
-                    clipboardManager.setText(AnnotatedString(item.password))
-                    successToast("复制密码成功")
-                },
-                onSelected = {
-                    isEditable = true
-                    it.selected = !it.selected
-                },
-                onDialogConfirm = {
-                    scope.launch {
-                        vm.removeSelectedItems()
-                            .onSuccess { successToast("删除成功") }
-                            .onFailure { errorToast(it.message) }
-                    }
-                },
-                onAddClick = { bottomSheetNavigator.show(AddScreen()) },
-            )
-        }
+    if (!isEditable) {
+        vm.items.forEach { it.selected = false }
     }
+
+    LaunchedEffect(Unit) {
+        vm.getItems()
+    }
+
+    BackHandler(isEditable) {
+        isEditable = false
+    }
+
+    ContentLayout(
+        items = vm.items,
+        isInitialized = vm.isInitialized,
+        isEditable = isEditable,
+        dialogState = dialogState,
+        onBack = { if (isEditable) isEditable = false else navigator.navigateUp() },
+        onEditClick = { isEditable = !isEditable },
+        onItemClick = { navigator.navigate(ItemInfoScreenDestination(it)) },
+        onAddClick = { navigator.navigate(AddScreenDestination) },
+        onItemCopy = { item ->
+            clipboardManager.setText(AnnotatedString(item.password))
+            successToast("复制密码成功")
+        },
+        onSelected = {
+            isEditable = true
+            it.selected = !it.selected
+        },
+        onDialogConfirm = {
+            scope.launch {
+                vm.removeSelectedItems()
+                    .onSuccess { successToast("删除成功") }
+                    .onFailure { errorToast(it.message) }
+            }
+        },
+    )
 }
 
 @Composable

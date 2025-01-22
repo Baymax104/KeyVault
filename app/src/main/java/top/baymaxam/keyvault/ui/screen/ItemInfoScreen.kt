@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -14,11 +13,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.CreditCard
+import androidx.compose.material.icons.rounded.Key
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -35,9 +33,12 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.core.screen.ScreenKey
-import cafe.adriel.voyager.navigator.LocalNavigator
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootGraph
+import com.ramcosta.composedestinations.generated.destinations.RootSelectAuthScreenDestination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.result.ResultRecipient
+import com.ramcosta.composedestinations.result.onResult
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -47,15 +48,15 @@ import top.baymaxam.keyvault.model.domain.UserItem
 import top.baymaxam.keyvault.state.DialogState
 import top.baymaxam.keyvault.state.ItemViewModel
 import top.baymaxam.keyvault.state.rememberDialogState
+import top.baymaxam.keyvault.ui.component.CommentField
 import top.baymaxam.keyvault.ui.component.ConfirmDialog
 import top.baymaxam.keyvault.ui.component.FillIcon
 import top.baymaxam.keyvault.ui.component.InfoField
+import top.baymaxam.keyvault.ui.component.SelectAuthButton
 import top.baymaxam.keyvault.ui.component.TopBackBar
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.ui.theme.IconColors
-import top.baymaxam.keyvault.ui.theme.outlinedTextFieldColor
 import top.baymaxam.keyvault.util.errorToast
-import top.baymaxam.keyvault.util.root
 import top.baymaxam.keyvault.util.successToast
 import top.baymaxam.keyvault.util.toDateString
 
@@ -64,61 +65,64 @@ import top.baymaxam.keyvault.util.toDateString
  * @author John
  * @since 08 8月 2024
  */
-data class ItemInfoScreen(val item: KeyItem) : Screen {
+@Destination<RootGraph>
+@Composable
+fun ItemInfoScreen(
+    navigator: DestinationsNavigator,
+    item: KeyItem,
+    authRecipient: ResultRecipient<RootSelectAuthScreenDestination, UserItem>
+) {
+    val vm = koinViewModel<ItemViewModel> { parametersOf(item) }
+    val dialogState = rememberDialogState()
+    val scope = rememberCoroutineScope()
+    val clipboardManager = LocalClipboardManager.current
 
-    override val key: ScreenKey
-        get() = "Item-Info-Screen-${item.hashCode()}"
+    authRecipient.onResult { vm.authUserItem.value = it }
 
-    @Composable
-    override fun Content() {
-        val navigator = LocalNavigator.root
-        val vm = koinViewModel<ItemViewModel> { parametersOf(item) }
-        val dialogState = rememberDialogState()
-        val scope = rememberCoroutineScope()
-        val clipboardManager = LocalClipboardManager.current
-
-        DisposableEffect(vm) {
-            onDispose { vm.updateItemResentDate() }
-        }
-
-        ContentLayout(
-            item = vm.item,
-            nameState = vm.nameState,
-            usernameState = vm.usernameState,
-            passwordState = vm.passwordState,
-            commentState = vm.commentState,
-            dialogState = dialogState,
-            onBack = { if (!vm.isUserItemEquals()) dialogState.show() else navigator.pop() },
-            onCopy = { text ->
-                clipboardManager.setText(AnnotatedString(text))
-                successToast("复制成功")
-            },
-            onSaveClick = {
-                if (!vm.isUserItemEquals()) {
-                    scope.launch {
-                        vm.updateItem()
-                            .onSuccess { successToast("修改成功") }
-                            .onFailure { errorToast(it.message) }
-                    }
-                }
-            },
-            onDialogConfirm = {
-                scope.launch {
-                    vm.updateItem()
-                        .onFailure { errorToast(it.message) }
-                        .onSuccess {
-                            successToast("修改成功")
-                            navigator.pop()
-                        }
-                }
-            },
-            onDialogCancel = {
-                dialogState.dismiss()
-                navigator.pop()
-            }
-        )
+    DisposableEffect(vm) {
+        onDispose { vm.updateItemResentDate() }
     }
 
+    ContentLayout(
+        item = vm.item,
+        nameState = vm.nameState,
+        usernameState = vm.usernameState,
+        passwordState = vm.passwordState,
+        commentState = vm.commentState,
+        authUserItem = vm.authUserItem,
+        dialogState = dialogState,
+        onBack = { if (!vm.isItemEquals()) dialogState.show() else navigator.navigateUp() },
+        onCopy = { text ->
+            clipboardManager.setText(AnnotatedString(text))
+            successToast("复制成功")
+        },
+        onSaveClick = {
+            if (!vm.isItemEquals()) {
+                scope.launch {
+                    vm.updateItem()
+                        .onSuccess { successToast("修改成功") }
+                        .onFailure { errorToast(it.message) }
+                }
+            }
+        },
+        onDialogConfirm = {
+            scope.launch {
+                vm.updateItem()
+                    .onFailure { errorToast(it.message) }
+                    .onSuccess {
+                        successToast("修改成功")
+                        navigator.navigateUp()
+                    }
+            }
+        },
+        onDialogCancel = {
+            dialogState.dismiss()
+            navigator.navigateUp()
+        },
+        onSelectAuth = {
+            navigator.navigate(RootSelectAuthScreenDestination)
+        }
+    )
 }
 
 
@@ -129,12 +133,14 @@ private fun ContentLayout(
     usernameState: MutableState<String> = mutableStateOf(""),
     passwordState: MutableState<String> = mutableStateOf(""),
     commentState: MutableState<String> = mutableStateOf(""),
+    authUserItem: MutableState<UserItem?> = mutableStateOf(null),
     dialogState: DialogState = rememberDialogState(),
     onSaveClick: () -> Unit = {},
     onBack: () -> Unit = {},
     onCopy: (String) -> Unit = {},
     onDialogConfirm: () -> Unit = {},
     onDialogCancel: () -> Unit = {},
+    onSelectAuth: () -> Unit = {},
 ) {
     Scaffold(
         topBar = {
@@ -202,7 +208,12 @@ private fun ContentLayout(
                     onCopy = onCopy
                 )
 
-                is AuthItem -> {}
+                is AuthItem -> AuthItemInfo(
+                    nameState = nameState,
+                    commentState = commentState,
+                    authUserItem = authUserItem.value,
+                    onSelectAuth = onSelectAuth,
+                )
             }
         }
     }
@@ -219,51 +230,23 @@ private fun ContentLayout(
 @Composable
 private fun ItemInfo(
     contentState: MutableState<String> = mutableStateOf(""),
-    label: String = "",
+    placeholder: (@Composable () -> Unit)? = null,
+    leadingIcon: (@Composable () -> Unit)? = null,
     onCopy: ((String) -> Unit)? = null,
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(60.dp)
-    ) {
-        InfoField(
-            contentState = contentState,
-            modifier = Modifier.weight(1f),
-            label = { Text(label) },
-            trailingIcon = {
-                if (onCopy != null) {
-                    IconButton(onClick = { onCopy(contentState.value) }) {
-                        Icon(imageVector = Icons.Rounded.ContentCopy, contentDescription = null)
-                    }
+    InfoField(
+        contentState = contentState,
+        modifier = Modifier.fillMaxWidth(),
+        placeholder = placeholder,
+        leadingIcon = leadingIcon,
+        trailingIcon = {
+            if (onCopy != null) {
+                IconButton(onClick = { onCopy(contentState.value) }) {
+                    Icon(imageVector = Icons.Rounded.ContentCopy, contentDescription = null)
                 }
             }
-        )
-    }
-}
-
-@Composable
-private fun CommentInfo(
-    contentState: MutableState<String> = mutableStateOf(""),
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .defaultMinSize(minHeight = 60.dp)
-    ) {
-        OutlinedTextField(
-            value = contentState.value,
-            onValueChange = { contentState.value = it },
-            shape = RoundedCornerShape(15.dp),
-            colors = MaterialTheme.outlinedTextFieldColor,
-            label = { Text("备注") },
-            modifier = Modifier
-                .height(200.dp)
-                .fillMaxWidth(),
-        )
-    }
+        }
+    )
 }
 
 @Composable
@@ -279,20 +262,54 @@ private fun UserItemInfo(
     ) {
         ItemInfo(
             contentState = nameState,
-            label = "网站名称",
+            placeholder = { Text("条目名称") },
+            leadingIcon = { Icon(Icons.Rounded.CreditCard, contentDescription = null) }
         )
         ItemInfo(
             contentState = usernameState,
-            label = "用户名",
+            placeholder = { Text("用户名") },
+            leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null) },
             onCopy = onCopy
         )
         ItemInfo(
             contentState = passwordState,
-            label = "密码",
+            placeholder = { Text("密码") },
+            leadingIcon = { Icon(Icons.Rounded.Key, contentDescription = null) },
             onCopy = onCopy
         )
-        CommentInfo(
+        CommentField(
             contentState = commentState,
+            modifier = Modifier
+                .height(200.dp)
+                .fillMaxWidth()
+        )
+    }
+}
+
+@Composable
+private fun AuthItemInfo(
+    nameState: MutableState<String> = mutableStateOf(""),
+    commentState: MutableState<String> = mutableStateOf(""),
+    authUserItem: UserItem? = null,
+    onSelectAuth: () -> Unit = {},
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(15.dp)
+    ) {
+        ItemInfo(
+            contentState = nameState,
+            placeholder = { Text("授权名称") },
+            leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null) }
+        )
+        SelectAuthButton(
+            value = if (authUserItem != null) "${authUserItem.name} ${authUserItem.username}" else "选择授权",
+            onClick = onSelectAuth,
+        )
+        CommentField(
+            contentState = commentState,
+            modifier = Modifier
+                .height(200.dp)
+                .fillMaxWidth()
         )
     }
 }
@@ -302,7 +319,7 @@ private fun UserItemInfo(
 @Composable
 private fun Preview() {
     AppTheme {
-        ContentLayout()
+        ContentLayout(item = AuthItem())
     }
 }
 

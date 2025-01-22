@@ -18,7 +18,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,7 +33,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -43,10 +41,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cafe.adriel.voyager.core.screen.ScreenKey
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.tab.Tab
-import cafe.adriel.voyager.navigator.tab.TabOptions
+import com.ramcosta.composedestinations.generated.destinations.ItemInfoScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.ItemListScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.TagListScreenDestination
 import kotlinx.coroutines.flow.map
 import org.koin.compose.koinInject
 import top.baymaxam.keyvault.R
@@ -60,47 +57,33 @@ import top.baymaxam.keyvault.ui.component.ResentList
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.ui.theme.IconColors
 import top.baymaxam.keyvault.ui.theme.robotoFont
-import top.baymaxam.keyvault.util.root
+import top.baymaxam.keyvault.util.LocalNavigator
+import top.baymaxam.keyvault.util.currentOrThrow
 
 /**
  * 首页
  * @author John
  * @since 22 6月 2024
  */
-object HomeTab : Tab {
+@Composable
+fun HomeScreen() {
+    val navigator = LocalNavigator.currentOrThrow
+    val dao = koinInject<KeyDao>()
+    val tagCountState = remember { mutableIntStateOf(0) }
+    val passwordCountState = dao.queryItemCounts().collectAsState(0)
+    val resentUsedItems = dao.queryOrderedByResentDate()
+        .map { l -> l.map { it.asItem() } }
+        .collectAsState(emptyList())
 
-    override val key: ScreenKey
-        get() = "Home-Tab"
-
-    override val options: TabOptions
-        @Composable
-        get() {
-            val icon = rememberVectorPainter(image = Icons.Filled.Home)
-            return remember { TabOptions(index = 0u, title = "首页", icon = icon) }
-        }
-
-    private fun readResolve(): Any = HomeTab
-
-    @Composable
-    override fun Content() {
-        val navigator = LocalNavigator.root
-        val dao = koinInject<KeyDao>()
-        val tagCountState = remember { mutableIntStateOf(0) }
-        val passwordCountState = dao.queryItemCounts().collectAsState(0)
-        val resentUsedItems = dao.queryOrderedByResentDate()
-            .map { l -> l.map { it.asItem() } }
-            .collectAsState(emptyList())
-
-        ContentLayout(
-            resentUsedItems = resentUsedItems.value,
-            passwordCountState = passwordCountState,
-            tagCountState = tagCountState,
-            onSearch = {},
-            onPasswordClick = { navigator += ItemListScreen() },
-            onTagClick = { navigator += TagListScreen() },
-            onItemClick = { navigator += ItemInfoScreen(it) }
-        )
-    }
+    ContentLayout(
+        resentUsedItems = resentUsedItems.value,
+        passwordCountState = passwordCountState,
+        tagCountState = tagCountState,
+        onSearch = {},
+        onItemClick = { navigator.navigate(ItemListScreenDestination) },
+        onTagClick = { navigator.navigate(TagListScreenDestination) },
+        onResentItemClick = { navigator.navigate(ItemInfoScreenDestination(it)) }
+    )
 }
 
 
@@ -110,9 +93,9 @@ private fun ContentLayout(
     passwordCountState: State<Int> = mutableIntStateOf(0),
     tagCountState: MutableIntState = mutableIntStateOf(0),
     onSearch: () -> Unit = {},
-    onPasswordClick: () -> Unit = {},
+    onItemClick: () -> Unit = {},
     onTagClick: () -> Unit = {},
-    onItemClick: (KeyItem) -> Unit = {},
+    onResentItemClick: (KeyItem) -> Unit = {},
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -120,15 +103,15 @@ private fun ContentLayout(
     ) {
         Header(
             onSearch = onSearch,
-            onPasswordClick = onPasswordClick,
+            onItemClick = onItemClick,
             onTagClick = onTagClick,
-            passwordCount = passwordCountState.value,
+            itemCount = passwordCountState.value,
             tagCount = tagCountState.intValue
         )
 
         ResentItemList(
             keyItems = resentUsedItems,
-            onItemClick = onItemClick
+            onItemClick = onResentItemClick
         )
     }
 }
@@ -136,9 +119,9 @@ private fun ContentLayout(
 @Composable
 private fun Header(
     onSearch: () -> Unit = {},
-    passwordCount: Int = 0,
+    itemCount: Int = 0,
     tagCount: Int = 0,
-    onPasswordClick: () -> Unit = {},
+    onItemClick: () -> Unit = {},
     onTagClick: () -> Unit = {}
 ) {
     Column(
@@ -176,9 +159,9 @@ private fun Header(
         }
 
         IndexView(
-            passwordCount = passwordCount,
+            itemCount = itemCount,
             tagCount = tagCount,
-            onPasswordClick = onPasswordClick,
+            onItemClick = onItemClick,
             onTagClick = onTagClick
         )
     }
@@ -221,9 +204,9 @@ private fun ResentItemList(
 
 @Composable
 fun IndexView(
-    passwordCount: Int = 0,
+    itemCount: Int = 0,
     tagCount: Int = 0,
-    onPasswordClick: () -> Unit = {},
+    onItemClick: () -> Unit = {},
     onTagClick: () -> Unit = {}
 ) {
     Row(
@@ -237,8 +220,8 @@ fun IndexView(
                 .weight(1f),
             icon = R.drawable.ic_key,
             iconColors = IconColors.CatalogKey,
-            text = "${passwordCount}条密码",
-            onClick = onPasswordClick
+            text = "${itemCount}个条目",
+            onClick = onItemClick
         )
 
         Spacer(modifier = Modifier.width(10.dp))

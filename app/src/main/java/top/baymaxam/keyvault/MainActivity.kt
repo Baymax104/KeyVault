@@ -6,12 +6,12 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
-import cafe.adriel.voyager.navigator.Navigator
-import cafe.adriel.voyager.transitions.SlideTransition
+import com.ramcosta.composedestinations.DestinationsNavHost
+import com.ramcosta.composedestinations.generated.NavGraphs
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import top.baymaxam.keyvault.ui.screen.MainScreen
 import top.baymaxam.keyvault.ui.theme.AppTheme
+import top.baymaxam.keyvault.util.BottomSheetNavigation
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,8 +20,11 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AppTheme {
-                Navigator(MainScreen()) {
-                    SlideTransition(it)
+                BottomSheetNavigation {
+                    DestinationsNavHost(
+                        navGraph = NavGraphs.root,
+                        navController = it,
+                    )
                 }
             }
         }

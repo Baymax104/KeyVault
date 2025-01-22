@@ -6,8 +6,10 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import top.baymaxam.keyvault.model.domain.AuthItem
 import top.baymaxam.keyvault.model.domain.KeyItem
+import top.baymaxam.keyvault.model.domain.KeyType
 import top.baymaxam.keyvault.model.domain.UserItem
 import top.baymaxam.keyvault.model.domain.asEntity
+import top.baymaxam.keyvault.model.entity.asItem
 import top.baymaxam.keyvault.repo.KeyDao
 import top.baymaxam.keyvault.repo.transaction
 import java.util.Date
@@ -23,6 +25,7 @@ class ItemViewModel(private val dao: KeyDao, val item: KeyItem) : ViewModel() {
     val commentState = mutableStateOf(item.comment)
     val usernameState = mutableStateOf("")
     val passwordState = mutableStateOf("")
+    val authUserItem = mutableStateOf<UserItem?>(null)
 
     init {
         when (item) {
@@ -32,6 +35,14 @@ class ItemViewModel(private val dao: KeyDao, val item: KeyItem) : ViewModel() {
             }
 
             is AuthItem -> {
+                if (item.authId.isNotEmpty()) {
+                    viewModelScope.launch {
+                        dao.queryById(item.authId)
+                            .takeIf { it.type == KeyType.User }
+                            ?.asItem()
+                            ?.let { authUserItem.value = it as UserItem }
+                    }
+                }
             }
         }
     }
@@ -45,12 +56,17 @@ class ItemViewModel(private val dao: KeyDao, val item: KeyItem) : ViewModel() {
         }
     }
 
-    fun isUserItemEquals(): Boolean {
-        item as UserItem
-        return item.name == nameState.value &&
-                item.username == usernameState.value &&
-                item.password == passwordState.value &&
-                item.comment == commentState.value
+    fun isItemEquals(): Boolean {
+        return when (item) {
+            is UserItem -> {
+                item.name == nameState.value && item.username == usernameState.value &&
+                        item.password == passwordState.value && item.comment == commentState.value
+            }
+
+            is AuthItem -> {
+                item.name == nameState.value && item.authId == (authUserItem.value?.id ?: "")
+            }
+        }
     }
 
     private suspend fun updateUserItem() {

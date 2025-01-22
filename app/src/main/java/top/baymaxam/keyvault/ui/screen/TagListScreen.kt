@@ -24,9 +24,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.core.screen.ScreenKey
-import cafe.adriel.voyager.navigator.LocalNavigator
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootGraph
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.koinViewModel
 import top.baymaxam.keyvault.model.domain.Tag
 import top.baymaxam.keyvault.state.SelectedState
@@ -35,46 +35,41 @@ import top.baymaxam.keyvault.ui.component.FloatingButton
 import top.baymaxam.keyvault.ui.component.TagList
 import top.baymaxam.keyvault.ui.component.TopBackBar
 import top.baymaxam.keyvault.ui.theme.AppTheme
-import top.baymaxam.keyvault.util.root
 
 /**
  * 标签列表页
  * @author John
  * @since 12 9月 2024
  */
-class TagListScreen : Screen {
+@Destination<RootGraph>()
+@Composable
+fun TagListScreen(
+    navigator: DestinationsNavigator
+) {
+    val vm = koinViewModel<TagListViewModel>()
+    var isEditable by remember { mutableStateOf(false) }
 
-    override val key: ScreenKey
-        get() = "Tag-List-Screen"
-
-    @Composable
-    override fun Content() {
-        val navigator = LocalNavigator.root
-        val vm = koinViewModel<TagListViewModel>()
-        var isEditable by remember { mutableStateOf(false) }
-
-        if (!isEditable) {
-            vm.tags.forEach { it.selected = false }
-        }
-
-        BackHandler(isEditable) {
-            isEditable = false
-        }
-
-        ContentLayout(
-            items = vm.tags,
-            isEditable = isEditable,
-            onBack = { if (isEditable) isEditable = false else navigator.pop() },
-            onAddClick = {},
-            onEditClick = { isEditable = !isEditable },
-            onDeleteClick = {},
-            onItemClick = {},
-            onItemSelected = {
-                isEditable = true
-                it.selected = !it.selected
-            }
-        )
+    if (!isEditable) {
+        vm.tags.forEach { it.selected = false }
     }
+
+    BackHandler(isEditable) {
+        isEditable = false
+    }
+
+    ContentLayout(
+        items = vm.tags,
+        isEditable = isEditable,
+        onBack = { if (isEditable) isEditable = false else navigator.navigateUp() },
+        onAddClick = {},
+        onEditClick = { isEditable = !isEditable },
+        onDeleteClick = {},
+        onItemClick = {},
+        onItemSelected = {
+            isEditable = true
+            it.selected = !it.selected
+        }
+    )
 }
 
 @Composable

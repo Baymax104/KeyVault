@@ -10,7 +10,8 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.repo.LocalDatabase
-import top.baymaxam.keyvault.state.AddScreenModel
+import top.baymaxam.keyvault.state.AddAuthViewModel
+import top.baymaxam.keyvault.state.AddInputViewModel
 import top.baymaxam.keyvault.state.ItemListViewModel
 import top.baymaxam.keyvault.state.ItemViewModel
 import top.baymaxam.keyvault.state.TagListViewModel
@@ -40,8 +41,9 @@ class KeyVaultApplication : Application() {
 
 val appModule = module {
     single { LocalDatabase.Instance.keyDao() }
-    factory { AddScreenModel(get()) }
+    viewModel { AddInputViewModel(get()) }
     viewModel { ItemListViewModel(get()) }
     viewModel { TagListViewModel() }
     viewModel { (item: KeyItem) -> ItemViewModel(get(), item) }
+    viewModel { AddAuthViewModel(get()) }
 }

@@ -7,10 +7,10 @@ pluginManagement {
                 includeGroupByRegex("androidx.*")
             }
         }
-        mavenCentral()
-        gradlePluginPortal()
         maven("https://maven.aliyun.com/repository/public/")
         maven("https://maven.aliyun.com/repository/google")
+        mavenCentral()
+        gradlePluginPortal()
     }
 }
 @Suppress("UnstableApiUsage")

@@ -26,53 +26,52 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.core.screen.ScreenKey
-import cafe.adriel.voyager.koin.koinNavigatorScreenModel
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootGraph
+import com.ramcosta.composedestinations.bottomsheet.spec.DestinationStyleBottomSheet
+import com.ramcosta.composedestinations.result.ResultBackNavigator
+import org.koin.androidx.compose.koinViewModel
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.UserItem
-import top.baymaxam.keyvault.state.AddScreenModel
+import top.baymaxam.keyvault.state.AddAuthViewModel
 import top.baymaxam.keyvault.ui.component.AddAuthList
 import top.baymaxam.keyvault.ui.component.SearchField
 import top.baymaxam.keyvault.ui.theme.AppTheme
+import top.baymaxam.keyvault.util.AddGraph
 
 /**
  * 添加页选择授权页
  * @author John
  * @since 03 8月 2024
  */
-class AddAuthScreen : Screen {
+@Destination<AddGraph>()
+@Destination<RootGraph>(
+    style = DestinationStyleBottomSheet::class
+)
+@Composable
+fun SelectAuthScreen(
+    navigator: ResultBackNavigator<UserItem>
+) {
+    val vm = koinViewModel<AddAuthViewModel>()
+    val searchContentState = remember { mutableStateOf("") }
+    val userItemListState = rememberLazyListState()
 
-    override val key: ScreenKey
-        get() = "Add-Auth-Screen"
-
-    @Composable
-    override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
-        val vm = navigator.koinNavigatorScreenModel<AddScreenModel>()
-        val searchContentState = remember { mutableStateOf("") }
-        val passItemListState = rememberLazyListState()
-
-        if (searchContentState.value.isEmpty()) {
-            LaunchedEffect(Unit) {
-                vm.candidateUserItems.refreshState()
-                passItemListState.scrollToItem(0)
-            }
+    if (searchContentState.value.isEmpty()) {
+        LaunchedEffect(Unit) {
+            vm.candidateUserItems.refreshState()
+            userItemListState.scrollToItem(0)
         }
-
-        ContentLayout(
-            searchContentState = searchContentState,
-            items = vm.candidateUserItems.state,
-            onSearch = { vm.searchPassItem(searchContentState.value) },
-            onBack = { navigator.pop() },
-            onPassItemClick = {
-                vm.selectedUserItem.value = it
-                navigator.pop()
-            }
-        )
     }
+
+    ContentLayout(
+        searchContentState = searchContentState,
+        items = vm.candidateUserItems.state,
+        onSearch = { vm.searchUserItem(searchContentState.value) },
+        onBack = { navigator.navigateBack() },
+        onUserItemClick = {
+            navigator.navigateBack(it)
+        }
+    )
 }
 
 @Composable
@@ -82,7 +81,7 @@ private fun ContentLayout(
     itemListState: LazyListState = rememberLazyListState(),
     onBack: () -> Unit = {},
     onSearch: () -> Unit = {},
-    onPassItemClick: (UserItem) -> Unit = {}
+    onUserItemClick: (UserItem) -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -105,7 +104,7 @@ private fun ContentLayout(
             state = itemListState,
             items = items,
             modifier = Modifier.weight(1f),
-            onItemClick = onPassItemClick
+            onItemClick = onUserItemClick
         )
     }
 }

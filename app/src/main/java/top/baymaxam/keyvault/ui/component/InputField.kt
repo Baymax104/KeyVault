@@ -1,5 +1,6 @@
 package top.baymaxam.keyvault.ui.component
 
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -10,10 +11,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -112,6 +115,27 @@ fun InfoField(
             }
         }
     )
+}
+
+
+@Composable
+fun CommentField(
+    contentState: MutableState<String>,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.defaultMinSize(minHeight = 60.dp)
+    ) {
+        OutlinedTextField(
+            value = contentState.value,
+            onValueChange = { contentState.value = it },
+            shape = RoundedCornerShape(15.dp),
+            colors = MaterialTheme.outlinedTextFieldColor,
+            label = { Text("备注") },
+            modifier = modifier,
+        )
+    }
 }
 
 

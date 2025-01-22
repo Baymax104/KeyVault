@@ -64,6 +64,10 @@ kotlin {
     }
 }
 
+ksp {
+    arg("compose-destinations.htmlMermaidGraph", "$rootDir/docs")
+}
+
 dependencies {
 
     implementation(libs.androidx.core.ktx)
@@ -75,6 +79,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -93,12 +98,9 @@ dependencies {
     implementation(libs.toasty)
     implementation(libs.jetbrains.kotlinx.serialization)
     implementation(libs.jetbrains.kotlinx.corouines)
-    implementation(libs.voyager.navigator)
-    implementation(libs.voyager.transitions)
-    implementation(libs.voyager.screenModel)
-    implementation(libs.voyager.bottomSheetNavigator)
-    implementation(libs.voyager.tabNavigator)
-    implementation(libs.voyager.koin)
     implementation(libs.koin)
     implementation(libs.splashscreen)
+    implementation(libs.destinations.core)
+    ksp(libs.destinations.ksp)
+    implementation(libs.destinations.bottomsheet)
 }

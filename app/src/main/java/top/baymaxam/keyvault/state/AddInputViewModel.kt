@@ -40,6 +40,14 @@ class AddInputViewModel(private val dao: KeyDao) : ViewModel() {
         )
     }
 
+    fun refreshInput() {
+        nameContentState.value = ""
+        usernameContentState.value = ""
+        passwordContentState.value = ""
+        selectedUserItemState.value = null
+        commentContentState.value = ""
+    }
+
     fun searchTag(content: String) {
         tags.cacheList.filter { it.value.name.contains(content, true) }
             .let { tags.refreshState(it) }

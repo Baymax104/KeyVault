@@ -11,21 +11,25 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CreditCard
 import androidx.compose.material.icons.rounded.Key
 import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
@@ -59,7 +63,6 @@ import top.baymaxam.keyvault.ui.component.CommentField
 import top.baymaxam.keyvault.ui.component.InfoField
 import top.baymaxam.keyvault.ui.component.SearchField
 import top.baymaxam.keyvault.ui.component.SelectAuthButton
-import top.baymaxam.keyvault.ui.component.SelectableTag
 import top.baymaxam.keyvault.ui.component.SelectionButton
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.util.AddGraph
@@ -95,6 +98,11 @@ fun AddInputScreen(
     val searchState = rememberSaveable { mutableStateOf("") }
 
     authRecipient.onResult { vm.selectedUserItemState.value = it }
+
+    DisposableEffect(vm.typeSelectedState.value) {
+        vm.refreshInput()
+        onDispose { vm.refreshInput() }
+    }
 
     if (searchState.value.isEmpty()) {
         LaunchedEffect(Unit) {
@@ -145,6 +153,8 @@ private fun ContentLayout(
     onCancel: () -> Unit = {},
     onSelectAuth: () -> Unit = {},
 ) {
+    val pagerState = rememberPagerState { 2 }
+    val scope = rememberCoroutineScope()
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -180,20 +190,17 @@ private fun ContentLayout(
                     modifier = Modifier
                         .padding(vertical = 10.dp)
                         .fillMaxWidth()
+                        .height(40.dp)
                 ) {
                     items(
                         items = tags,
                         key = { it.value.id }
                     ) {
                         val (item) = it
-                        SelectableTag(
-                            text = item.name,
+                        FilterChip(
                             selected = it.selected,
-                            shape = RoundedCornerShape(30),
                             onClick = { it.selected = !it.selected },
-                            modifier = Modifier
-                                .height(40.dp)
-                                .width(80.dp)
+                            label = { Text(item.name) }
                         )
                     }
                 }
@@ -209,49 +216,62 @@ private fun ContentLayout(
                 }
             }
             Row(
-                modifier = Modifier
-                    .padding(bottom = 10.dp)
-                    .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .padding(bottom = 15.dp)
+                    .fillMaxWidth(),
             ) {
                 Text(text = "条目类型：", color = MaterialTheme.colorScheme.onBackground)
-                Row(
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    modifier = Modifier.fillMaxWidth()
+                SingleChoiceSegmentedButtonRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(45.dp)
                 ) {
-                    TypeSelection(
-                        text = "用户",
+                    SegmentedButton(
                         selected = typeSelectedState.value == KeyType.User,
+                        shape = SegmentedButtonDefaults.itemShape(0, 2),
                         onClick = {
                             typeSelectedState.value = KeyType.User
-                            nameContentState.value = ""
-                            usernameContentState.value = ""
-                            passwordContentState.value = ""
-                            commentContentState.value = ""
+                            scope.launch { pagerState.animateScrollToPage(0) }
                         }
-                    )
+                    ) {
+                        Text("用户")
+                    }
 
-                    TypeSelection(
-                        text = "授权",
+                    SegmentedButton(
                         selected = typeSelectedState.value == KeyType.Authorization,
+                        shape = SegmentedButtonDefaults.itemShape(1, 2),
                         onClick = {
                             typeSelectedState.value = KeyType.Authorization
-                            nameContentState.value = ""
-                            commentContentState.value = ""
-                            selectedItemState.value = null
+                            scope.launch { pagerState.animateScrollToPage(1) }
                         }
+                    ) {
+                        Text("授权")
+                    }
+                }
+            }
+            HorizontalPager(
+                state = pagerState,
+                userScrollEnabled = false,
+                verticalAlignment = Alignment.Top,
+                pageSpacing = 10.dp
+            ) {
+                when (it) {
+                    0 -> UserInfoFields(
+                        nameState = nameContentState,
+                        usernameState = usernameContentState,
+                        passwordState = passwordContentState,
+                        commentState = commentContentState
+                    )
+
+                    1 -> AuthInfoFields(
+                        nameState = nameContentState,
+                        commentState = commentContentState,
+                        selectedItemState = selectedItemState,
+                        onSelectAuth = onSelectAuth
                     )
                 }
             }
-            InfoFields(
-                selectedType = typeSelectedState.value,
-                nameState = nameContentState,
-                usernameState = usernameContentState,
-                passwordState = passwordContentState,
-                commentState = commentContentState,
-                selectedItemState = selectedItemState,
-                onSelectAuth = onSelectAuth
-            )
         }
         SelectionButton(
             onConfirm = onConfirm,
@@ -265,14 +285,11 @@ private fun ContentLayout(
 }
 
 @Composable
-private fun InfoFields(
-    selectedType: KeyType = KeyType.User,
+private fun UserInfoFields(
     nameState: MutableState<String> = mutableStateOf(""),
     usernameState: MutableState<String> = mutableStateOf(""),
     passwordState: MutableState<String> = mutableStateOf(""),
     commentState: MutableState<String> = mutableStateOf(""),
-    selectedItemState: MutableState<UserItem?> = mutableStateOf(null),
-    onSelectAuth: () -> Unit = {},
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -280,48 +297,22 @@ private fun InfoFields(
     ) {
         InfoField(
             contentState = nameState,
-            placeholder = {
-                when (selectedType) {
-                    KeyType.User -> Text("条目名称")
-                    KeyType.Authorization -> Text("授权名称")
-                }
-            },
-            leadingIcon = {
-                Icon(
-                    imageVector = when (selectedType) {
-                        KeyType.User -> Icons.Rounded.CreditCard
-                        KeyType.Authorization -> Icons.Rounded.Person
-                    },
-                    contentDescription = null
-                )
-            },
+            placeholder = { Text("条目名称") },
+            leadingIcon = { Icon(Icons.Rounded.CreditCard, contentDescription = null) },
             modifier = Modifier.fillMaxWidth()
         )
-        if (selectedType == KeyType.User) {
-            InfoField(
-                contentState = usernameState,
-                placeholder = {
-                    Text("用户名")
-                },
-                leadingIcon = {
-                    Icon(imageVector = Icons.Rounded.Person, contentDescription = null)
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-            InfoField(
-                contentState = passwordState,
-                placeholder = { Text("密码") },
-                leadingIcon = {
-                    Icon(imageVector = Icons.Rounded.Key, contentDescription = null)
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-        } else {
-            SelectAuthButton(
-                value = selectedItemState.value?.name ?: "选择授权",
-                onClick = onSelectAuth
-            )
-        }
+        InfoField(
+            contentState = usernameState,
+            placeholder = { Text("用户名") },
+            leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null) },
+            modifier = Modifier.fillMaxWidth()
+        )
+        InfoField(
+            contentState = passwordState,
+            placeholder = { Text("密码") },
+            leadingIcon = { Icon(Icons.Rounded.Key, contentDescription = null) },
+            modifier = Modifier.fillMaxWidth()
+        )
         CommentField(
             contentState = commentState,
             modifier = Modifier
@@ -331,17 +322,37 @@ private fun InfoFields(
     }
 }
 
+
 @Composable
-private fun TypeSelection(
-    text: String,
-    selected: Boolean,
-    onClick: () -> Unit
+private fun AuthInfoFields(
+    nameState: MutableState<String> = mutableStateOf(""),
+    commentState: MutableState<String> = mutableStateOf(""),
+    selectedItemState: MutableState<UserItem?> = mutableStateOf(null),
+    onSelectAuth: () -> Unit = {}
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        RadioButton(selected = selected, onClick = onClick)
-        Text(text = text, color = MaterialTheme.colorScheme.onBackground)
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(15.dp)
+    ) {
+        InfoField(
+            contentState = nameState,
+            placeholder = { Text("授权名称") },
+            leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null) },
+            modifier = Modifier.fillMaxWidth()
+        )
+        SelectAuthButton(
+            value = selectedItemState.value?.name ?: "选择授权",
+            onClick = onSelectAuth
+        )
+        CommentField(
+            contentState = commentState,
+            modifier = Modifier
+                .height(120.dp)
+                .fillMaxWidth()
+        )
     }
 }
+
 
 @Composable
 private fun LineHeader(modifier: Modifier = Modifier) {

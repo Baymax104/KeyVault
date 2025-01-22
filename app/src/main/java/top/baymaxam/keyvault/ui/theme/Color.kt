@@ -79,18 +79,18 @@ val MaterialTheme.outlinedTextFieldColor: TextFieldColors
 
 object IconColors {
 
-    val CatalogKey
+    val IndexKey
         @Composable
         get() = FillIconDefaults.colors(
             iconColor = Color(0xff11834f),
             backgroundColor = Color(0xffd5ffd3)
         )
 
-    val CatalogTag
+    val IndexTag
         @Composable
         get() = FillIconDefaults.colors(
-            iconColor = Color(0xffe78529),
-            backgroundColor = Color(0xffffe8d3)
+            iconColor = Color(0xFFF57C00),
+            backgroundColor = Color(0xffffecdb)
         )
 
     val UserItem
@@ -103,8 +103,8 @@ object IconColors {
     val AuthItem
         @Composable
         get() = FillIconDefaults.colors(
-            iconColor = Color(0xFFF57C00),
-            backgroundColor = Color(0xffffecdb)
+            iconColor = Color(0xFF7960BB),
+            backgroundColor = Color(0xffede3ff)
         )
 }
 

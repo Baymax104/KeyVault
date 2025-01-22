@@ -219,7 +219,7 @@ fun IndexView(
                 .height(110.dp)
                 .weight(1f),
             icon = R.drawable.ic_key,
-            iconColors = IconColors.CatalogKey,
+            iconColors = IconColors.IndexKey,
             text = "${itemCount}个条目",
             onClick = onItemClick
         )
@@ -231,7 +231,7 @@ fun IndexView(
                 .height(110.dp)
                 .weight(1f),
             icon = R.drawable.ic_tag,
-            iconColors = IconColors.CatalogTag,
+            iconColors = IconColors.IndexTag,
             text = "${tagCount}个标签",
             onClick = onTagClick
         )

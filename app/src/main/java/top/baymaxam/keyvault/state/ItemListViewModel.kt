@@ -1,6 +1,5 @@
 package top.baymaxam.keyvault.state
 
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -18,7 +17,6 @@ import top.baymaxam.keyvault.util.replaceAllBy
  * @author John
  * @since 07 8月 2024
  */
-@Stable
 class ItemListViewModel(private val dao: KeyDao) : ViewModel() {
 
     var isInitialized by mutableStateOf(false)

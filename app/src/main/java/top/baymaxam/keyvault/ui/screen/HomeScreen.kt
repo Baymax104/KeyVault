@@ -25,7 +25,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableIntStateOf
@@ -51,6 +50,7 @@ import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.UserItem
 import top.baymaxam.keyvault.model.entity.asItem
 import top.baymaxam.keyvault.repo.KeyDao
+import top.baymaxam.keyvault.repo.TagDao
 import top.baymaxam.keyvault.ui.component.FillIcon
 import top.baymaxam.keyvault.ui.component.FillIconColors
 import top.baymaxam.keyvault.ui.component.ResentList
@@ -68,10 +68,11 @@ import top.baymaxam.keyvault.util.currentOrThrow
 @Composable
 fun HomeScreen() {
     val navigator = LocalNavigator.currentOrThrow
-    val dao = koinInject<KeyDao>()
-    val tagCountState = remember { mutableIntStateOf(0) }
-    val passwordCountState = dao.queryItemCounts().collectAsState(0)
-    val resentUsedItems = dao.queryOrderedByResentDate()
+    val keyDao = koinInject<KeyDao>()
+    val tagDao = koinInject<TagDao>()
+    val tagCountState = tagDao.queryCount().collectAsState(0)
+    val passwordCountState = keyDao.queryCount().collectAsState(0)
+    val resentUsedItems = keyDao.queryOrderedByResentDate()
         .map { l -> l.map { it.asItem() } }
         .collectAsState(emptyList())
 
@@ -91,7 +92,7 @@ fun HomeScreen() {
 private fun ContentLayout(
     resentUsedItems: List<KeyItem> = mutableStateListOf(),
     passwordCountState: State<Int> = mutableIntStateOf(0),
-    tagCountState: MutableIntState = mutableIntStateOf(0),
+    tagCountState: State<Int> = mutableIntStateOf(0),
     onSearch: () -> Unit = {},
     onItemClick: () -> Unit = {},
     onTagClick: () -> Unit = {},
@@ -106,7 +107,7 @@ private fun ContentLayout(
             onItemClick = onItemClick,
             onTagClick = onTagClick,
             itemCount = passwordCountState.value,
-            tagCount = tagCountState.intValue
+            tagCount = tagCountState.value
         )
 
         ResentItemList(

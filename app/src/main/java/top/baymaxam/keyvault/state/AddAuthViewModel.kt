@@ -22,7 +22,7 @@ class AddAuthViewModel(private val dao: KeyDao) : ViewModel() {
         viewModelScope.launch {
             dao.queryUserItems()
                 .map { l -> l.map { it.asItem() } }
-                .collect { candidateUserItems.cacheList = it.toMutableList() }
+                .collect { candidateUserItems.cacheList = it }
         }
     }
 

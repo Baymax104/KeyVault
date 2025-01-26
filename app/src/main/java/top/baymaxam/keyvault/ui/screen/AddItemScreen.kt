@@ -1,6 +1,5 @@
 package top.baymaxam.keyvault.ui.screen
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,9 +37,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ramcosta.composedestinations.DestinationsNavHost
@@ -48,7 +44,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.bottomsheet.spec.DestinationStyleBottomSheet
 import com.ramcosta.composedestinations.generated.NavGraphs
-import com.ramcosta.composedestinations.generated.destinations.AddSelectAuthScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.AddItemSelectAuthScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
 import com.ramcosta.composedestinations.result.onResult
@@ -57,15 +53,16 @@ import org.koin.androidx.compose.koinViewModel
 import top.baymaxam.keyvault.model.domain.KeyType
 import top.baymaxam.keyvault.model.domain.Tag
 import top.baymaxam.keyvault.model.domain.UserItem
-import top.baymaxam.keyvault.state.AddInputViewModel
+import top.baymaxam.keyvault.state.AddItemViewModel
 import top.baymaxam.keyvault.state.SelectedState
 import top.baymaxam.keyvault.ui.component.CommentField
-import top.baymaxam.keyvault.ui.component.InfoField
+import top.baymaxam.keyvault.ui.component.InputField
+import top.baymaxam.keyvault.ui.component.LineHeader
 import top.baymaxam.keyvault.ui.component.SearchField
 import top.baymaxam.keyvault.ui.component.SelectAuthButton
 import top.baymaxam.keyvault.ui.component.SelectionButton
 import top.baymaxam.keyvault.ui.theme.AppTheme
-import top.baymaxam.keyvault.util.AddGraph
+import top.baymaxam.keyvault.util.AddItemGraph
 import top.baymaxam.keyvault.util.LocalNavigator
 import top.baymaxam.keyvault.util.NavigatorProvider
 import top.baymaxam.keyvault.util.currentOrThrow
@@ -79,20 +76,20 @@ import top.baymaxam.keyvault.util.successToast
  */
 @Destination<RootGraph>(style = DestinationStyleBottomSheet::class)
 @Composable
-fun AddScreen(navigator: DestinationsNavigator) {
+fun AddItemScreen(navigator: DestinationsNavigator) {
     NavigatorProvider(navigator) {
-        DestinationsNavHost(NavGraphs.add)
+        DestinationsNavHost(NavGraphs.addItem)
     }
 }
 
-@Destination<AddGraph>(start = true)
+@Destination<AddItemGraph>(start = true)
 @Composable
 fun AddInputScreen(
     navigator: DestinationsNavigator,
-    authRecipient: ResultRecipient<AddSelectAuthScreenDestination, UserItem>
+    authRecipient: ResultRecipient<AddItemSelectAuthScreenDestination, UserItem>
 ) {
     val rootNavigator = LocalNavigator.currentOrThrow
-    val vm = koinViewModel<AddInputViewModel>()
+    val vm = koinViewModel<AddItemViewModel>()
     val tagListState = rememberLazyListState()
     val scope = rememberCoroutineScope()
     val searchState = rememberSaveable { mutableStateOf("") }
@@ -123,7 +120,7 @@ fun AddInputScreen(
         tagListState = tagListState,
         onSearch = { vm.searchTag(searchState.value) },
         onCancel = { rootNavigator.navigateUp() },
-        onSelectAuth = { navigator.navigate(AddSelectAuthScreenDestination) },
+        onSelectAuth = { navigator.navigate(AddItemSelectAuthScreenDestination) },
         onConfirm = {
             scope.launch {
                 vm.addItem()
@@ -295,19 +292,19 @@ private fun UserInfoFields(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(15.dp)
     ) {
-        InfoField(
+        InputField(
             contentState = nameState,
             placeholder = { Text("条目名称") },
             leadingIcon = { Icon(Icons.Rounded.CreditCard, contentDescription = null) },
             modifier = Modifier.fillMaxWidth()
         )
-        InfoField(
+        InputField(
             contentState = usernameState,
             placeholder = { Text("用户名") },
             leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null) },
             modifier = Modifier.fillMaxWidth()
         )
-        InfoField(
+        InputField(
             contentState = passwordState,
             placeholder = { Text("密码") },
             leadingIcon = { Icon(Icons.Rounded.Key, contentDescription = null) },
@@ -334,7 +331,7 @@ private fun AuthInfoFields(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(15.dp)
     ) {
-        InfoField(
+        InputField(
             contentState = nameState,
             placeholder = { Text("授权名称") },
             leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null) },
@@ -353,15 +350,6 @@ private fun AuthInfoFields(
     }
 }
 
-
-@Composable
-private fun LineHeader(modifier: Modifier = Modifier) {
-    Canvas(modifier = modifier) {
-        val start = Offset(0f, size.height / 2)
-        val end = Offset(size.width, size.height / 2)
-        drawLine(Color.Gray, start, end, size.height, StrokeCap.Round)
-    }
-}
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable

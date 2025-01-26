@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
-import com.ramcosta.composedestinations.generated.destinations.AddScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.AddItemScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.launch
 import top.baymaxam.keyvault.ui.component.BottomBar
@@ -35,7 +35,7 @@ fun MainScreen(navigator: DestinationsNavigator) {
     NavigatorProvider(navigator) {
         ContentLayout(
             pagerState = pagerState,
-            onAddClick = { navigator.navigate(AddScreenDestination) },
+            onAddClick = { navigator.navigate(AddItemScreenDestination) },
             isNavigationSelected = { pagerState.currentPage == it.index },
             onNavigationItemClick = { scope.launch { pagerState.scrollToPage(it.index) } }
         )

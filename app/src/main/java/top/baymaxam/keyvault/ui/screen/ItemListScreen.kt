@@ -36,7 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
-import com.ramcosta.composedestinations.generated.destinations.AddScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.AddItemScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.ItemInfoScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.launch
@@ -63,9 +63,7 @@ import top.baymaxam.keyvault.util.successToast
  */
 @Destination<RootGraph>()
 @Composable
-fun ItemListScreen(
-    navigator: DestinationsNavigator
-) {
+fun ItemListScreen(navigator: DestinationsNavigator) {
     var isEditable by remember { mutableStateOf(false) }
     val vm = koinViewModel<ItemListViewModel>()
     val scope = rememberCoroutineScope()
@@ -92,7 +90,7 @@ fun ItemListScreen(
         onBack = { if (isEditable) isEditable = false else navigator.navigateUp() },
         onEditClick = { isEditable = !isEditable },
         onItemClick = { navigator.navigate(ItemInfoScreenDestination(it)) },
-        onAddClick = { navigator.navigate(AddScreenDestination) },
+        onAddClick = { navigator.navigate(AddItemScreenDestination) },
         onItemCopy = { item ->
             clipboardManager.setText(AnnotatedString(item.password))
             successToast("复制密码成功")

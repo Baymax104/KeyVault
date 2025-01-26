@@ -36,7 +36,7 @@ interface KeyDao {
     fun queryOrderedByResentDate(): Flow<List<KeyEntity>>
 
     @Query("select count(*) from t_key")
-    fun queryItemCounts(): Flow<Int>
+    fun queryCount(): Flow<Int>
 
     @Query("select * from t_key where type != 'Authorization'")
     fun queryUserItems(): Flow<List<KeyEntity>>

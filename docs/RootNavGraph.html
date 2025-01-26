@@ -12,7 +12,8 @@ title: Root Navigation Graph
 %%{init: {'theme':'base', 'themeVariables': { 'primaryTextColor': '#fff' }}%%
 graph TD
 root(["RootGraph"]) -- "start" --- main_screen("MainScreen")
-root(["RootGraph"]) --- add_screen("AddScreen")
+root(["RootGraph"]) --- add_item_screen("AddItemScreen")
+root(["RootGraph"]) --- add_tag_screen("AddTagScreen")
 root(["RootGraph"]) --- item_info_screen("ItemInfoScreen")
 root(["RootGraph"]) --- item_list_screen("ItemListScreen")
 root(["RootGraph"]) --- root/select_auth_screen("SelectAuthScreen")
@@ -20,7 +21,7 @@ root(["RootGraph"]) --- tag_list_screen("TagListScreen")
 
 
 classDef destination fill:#5383EC,stroke:#ffffff;
-class add_screen,item_info_screen,item_list_screen,main_screen,root/select_auth_screen,tag_list_screen destination;
+class add_item_screen,add_tag_screen,item_info_screen,item_list_screen,main_screen,root/select_auth_screen,tag_list_screen destination;
 classDef navgraph fill:#63BC76,stroke:#ffffff;
 class root navgraph;
 

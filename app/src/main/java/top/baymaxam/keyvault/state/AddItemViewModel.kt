@@ -1,15 +1,19 @@
 package top.baymaxam.keyvault.state
 
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import top.baymaxam.keyvault.model.domain.AuthItem
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.KeyType
 import top.baymaxam.keyvault.model.domain.Tag
 import top.baymaxam.keyvault.model.domain.UserItem
 import top.baymaxam.keyvault.model.domain.asEntity
+import top.baymaxam.keyvault.model.entity.asItem
 import top.baymaxam.keyvault.repo.KeyDao
+import top.baymaxam.keyvault.repo.TagDao
 import top.baymaxam.keyvault.util.CachedStateList
 import java.util.Date
 
@@ -18,8 +22,7 @@ import java.util.Date
  * @author John
  * @since 01 8月 2024
  */
-@Stable
-class AddInputViewModel(private val dao: KeyDao) : ViewModel() {
+class AddItemViewModel(private val keyDao: KeyDao, private val tagDao: TagDao) : ViewModel() {
 
     val nameContentState = mutableStateOf("")
     val usernameContentState = mutableStateOf("")
@@ -31,13 +34,11 @@ class AddInputViewModel(private val dao: KeyDao) : ViewModel() {
     val tags = CachedStateList<SelectedState<Tag>>()
 
     init {
-        tags.cacheList = mutableListOf(
-            SelectedState(Tag(name = "Hello")),
-            SelectedState(Tag(name = "Hello1")),
-            SelectedState(Tag(name = "Hello2")),
-            SelectedState(Tag(name = "Hello3")),
-            SelectedState(Tag(name = "Hello4")),
-        )
+        viewModelScope.launch {
+            tagDao.queryAll()
+                .map { l -> l.map { SelectedState(it.asItem()) } }
+                .collect { tags.cacheList = it }
+        }
     }
 
     fun refreshInput() {
@@ -49,7 +50,8 @@ class AddInputViewModel(private val dao: KeyDao) : ViewModel() {
     }
 
     fun searchTag(content: String) {
-        tags.cacheList.filter { it.value.name.contains(content, true) }
+        tags.cacheList
+            .filter { it.value.name.contains(content, true) }
             .let { tags.refreshState(it) }
     }
 
@@ -75,7 +77,9 @@ class AddInputViewModel(private val dao: KeyDao) : ViewModel() {
                     createDate = Date(),
                 )
             }
-            dao.insert(item.asEntity())
+            keyDao.insert(item.asEntity())
+
+            // TODO 添加标签关联
         }
     }
 

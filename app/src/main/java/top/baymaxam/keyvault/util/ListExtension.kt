@@ -22,13 +22,13 @@ class CachedStateList<E> {
 
     val state = mutableStateListOf<E>()
 
-    private var cache by Delegates.observable(mutableListOf<E>()) { _, _, value ->
+    private var cache: List<E> by Delegates.observable(mutableListOf()) { _, _, value ->
         if (value.isNotEmpty()) {
             state.replaceAllBy(value)
         }
     }
 
-    var cacheList: MutableList<E>
+    var cacheList: List<E>
         get() = cache
         set(value) {
             cache = value

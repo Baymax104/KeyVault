@@ -81,20 +81,24 @@ fun SearchField(
 }
 
 @Composable
-fun InfoField(
+fun InputField(
     contentState: MutableState<String>,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    isError: Boolean = false,
     shape: Shape = InputFieldDefaults.shape,
     label: (@Composable () -> Unit)? = null,
     placeholder: (@Composable () -> Unit)? = null,
     leadingIcon: (@Composable () -> Unit)? = null,
-    trailingIcon: (@Composable () -> Unit)? = null
+    trailingIcon: (@Composable () -> Unit)? = null,
+    errorText: (@Composable () -> Unit)? = null,
 ) {
     OutlinedTextField(
         value = contentState.value,
         onValueChange = { contentState.value = it },
         enabled = enabled,
+        isError = isError,
+        supportingText = if (isError && errorText != null) errorText else null,
         modifier = modifier.defaultMinSize(
             minWidth = InputFieldDefaults.MinWidth,
             minHeight = InputFieldDefaults.MinHeight
@@ -105,15 +109,7 @@ fun InfoField(
         label = label,
         placeholder = placeholder,
         leadingIcon = leadingIcon,
-        trailingIcon = {
-            if (trailingIcon != null) {
-                trailingIcon()
-            } else if (enabled && contentState.value.isNotEmpty()) {
-                IconButton(onClick = { contentState.value = "" }) {
-                    Icon(imageVector = Icons.Rounded.Close, contentDescription = null)
-                }
-            }
-        }
+        trailingIcon = trailingIcon
     )
 }
 
@@ -150,7 +146,7 @@ object InputFieldDefaults {
 @Composable
 private fun Preview() {
     AppTheme {
-        InfoField(remember { mutableStateOf("") })
+        InputField(remember { mutableStateOf("") })
     }
 }
 

@@ -51,7 +51,7 @@ import top.baymaxam.keyvault.state.rememberDialogState
 import top.baymaxam.keyvault.ui.component.CommentField
 import top.baymaxam.keyvault.ui.component.ConfirmDialog
 import top.baymaxam.keyvault.ui.component.FillIcon
-import top.baymaxam.keyvault.ui.component.InfoField
+import top.baymaxam.keyvault.ui.component.InputField
 import top.baymaxam.keyvault.ui.component.SelectAuthButton
 import top.baymaxam.keyvault.ui.component.TopBackBar
 import top.baymaxam.keyvault.ui.theme.AppTheme
@@ -234,7 +234,7 @@ private fun ItemInfo(
     leadingIcon: (@Composable () -> Unit)? = null,
     onCopy: ((String) -> Unit)? = null,
 ) {
-    InfoField(
+    InputField(
         contentState = contentState,
         modifier = Modifier.fillMaxWidth(),
         placeholder = placeholder,

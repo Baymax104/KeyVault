@@ -79,7 +79,7 @@ fun BottomSheetNavigation(
 
 
 @NavHostGraph
-annotation class AddGraph
+annotation class AddItemGraph
 
 
 object SlideTransitions : DestinationStyle.Animated() {

@@ -10,7 +10,7 @@ import top.baymaxam.keyvault.model.domain.KeyType
 import top.baymaxam.keyvault.model.domain.UserItem
 import top.baymaxam.keyvault.model.domain.asEntity
 import top.baymaxam.keyvault.model.entity.asItem
-import top.baymaxam.keyvault.repo.KeyDao
+import top.baymaxam.keyvault.repo.KeyRepository
 import top.baymaxam.keyvault.repo.transaction
 import java.util.Date
 
@@ -19,7 +19,10 @@ import java.util.Date
  * @author John
  * @since 18 9月 2024
  */
-class ItemViewModel(private val dao: KeyDao, val item: KeyItem) : ViewModel() {
+class ItemViewModel(
+    private val keyRepository: KeyRepository,
+    val item: KeyItem
+) : ViewModel() {
 
     val nameState = mutableStateOf(item.name)
     val commentState = mutableStateOf(item.comment)
@@ -37,7 +40,7 @@ class ItemViewModel(private val dao: KeyDao, val item: KeyItem) : ViewModel() {
             is AuthItem -> {
                 if (item.authId.isNotEmpty()) {
                     viewModelScope.launch {
-                        dao.queryById(item.authId)
+                        keyRepository.queryById(item.authId)
                             .takeIf { it.type == KeyType.User }
                             ?.asItem()
                             ?.let { authUserItem.value = it as UserItem }
@@ -73,7 +76,7 @@ class ItemViewModel(private val dao: KeyDao, val item: KeyItem) : ViewModel() {
         item as UserItem
         transaction {
             if (item.name != nameState.value) {
-                dao.updateAuthName(item.id, nameState.value)
+                keyRepository.updateAuthName(item.id, nameState.value)
             }
             item.apply {
                 name = nameState.value
@@ -81,7 +84,7 @@ class ItemViewModel(private val dao: KeyDao, val item: KeyItem) : ViewModel() {
                 password = passwordState.value
                 comment = commentState.value
             }.let {
-                dao.update(it.asEntity())
+                keyRepository.update(it.asEntity())
             }
         }
     }
@@ -94,7 +97,7 @@ class ItemViewModel(private val dao: KeyDao, val item: KeyItem) : ViewModel() {
 
     fun updateItemResentDate() {
         viewModelScope.launch {
-            item.apply { resentDate = Date() }.let { dao.update(it.asEntity()) }
+            item.apply { resentDate = Date() }.let { keyRepository.update(it.asEntity()) }
         }
     }
 }

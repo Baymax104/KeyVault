@@ -1,10 +1,7 @@
 package top.baymaxam.keyvault.repo
 
 import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
 import androidx.room.Query
-import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 import top.baymaxam.keyvault.model.domain.KeyType
 import top.baymaxam.keyvault.model.entity.KeyEntity
@@ -15,19 +12,7 @@ import top.baymaxam.keyvault.model.entity.KeyEntity
  * @since 04 7月 2024
  */
 @Dao
-interface KeyDao {
-
-    @Insert
-    suspend fun insert(entity: KeyEntity)
-
-    @Delete
-    suspend fun delete(entity: KeyEntity)
-
-    @Delete
-    suspend fun delete(entities: List<KeyEntity>)
-
-    @Update
-    suspend fun update(entity: KeyEntity)
+interface KeyDao : BaseDao<KeyEntity> {
 
     @Query("select * from t_key")
     fun queryAll(): Flow<List<KeyEntity>>

@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.entity.asItem
-import top.baymaxam.keyvault.repo.KeyDao
+import top.baymaxam.keyvault.repo.KeyRepository
 import top.baymaxam.keyvault.util.CachedStateList
 
 /**
@@ -14,13 +14,13 @@ import top.baymaxam.keyvault.util.CachedStateList
  * @author John
  * @since 22 1月 2025
  */
-class AddAuthViewModel(private val dao: KeyDao) : ViewModel() {
+class AddAuthViewModel(private val repository: KeyRepository) : ViewModel() {
 
     val candidateUserItems = CachedStateList<KeyItem>()
 
     init {
         viewModelScope.launch {
-            dao.queryUserItems()
+            repository.queryUserItems()
                 .map { l -> l.map { it.asItem() } }
                 .collect { candidateUserItems.cacheList = it }
         }

@@ -12,8 +12,8 @@ import top.baymaxam.keyvault.model.domain.Tag
 import top.baymaxam.keyvault.model.domain.UserItem
 import top.baymaxam.keyvault.model.domain.asEntity
 import top.baymaxam.keyvault.model.entity.asItem
-import top.baymaxam.keyvault.repo.KeyDao
-import top.baymaxam.keyvault.repo.TagDao
+import top.baymaxam.keyvault.repo.KeyRepository
+import top.baymaxam.keyvault.repo.TagRepository
 import top.baymaxam.keyvault.util.CachedStateList
 import java.util.Date
 
@@ -22,7 +22,10 @@ import java.util.Date
  * @author John
  * @since 01 8月 2024
  */
-class AddItemViewModel(private val keyDao: KeyDao, private val tagDao: TagDao) : ViewModel() {
+class AddItemViewModel(
+    private val keyRepository: KeyRepository,
+    private val tagRepository: TagRepository,
+) : ViewModel() {
 
     val nameContentState = mutableStateOf("")
     val usernameContentState = mutableStateOf("")
@@ -35,7 +38,7 @@ class AddItemViewModel(private val keyDao: KeyDao, private val tagDao: TagDao) :
 
     init {
         viewModelScope.launch {
-            tagDao.queryAll()
+            tagRepository.queryAll()
                 .map { l -> l.map { SelectedState(it.asItem()) } }
                 .collect { tags.cacheList = it }
         }
@@ -77,9 +80,8 @@ class AddItemViewModel(private val keyDao: KeyDao, private val tagDao: TagDao) :
                     createDate = Date(),
                 )
             }
-            keyDao.insert(item.asEntity())
-
-            // TODO 添加标签关联
+            val selectedTags = tags.state.filter { it.selected }.map { it.value.asEntity() }
+            keyRepository.insertWithTags(item.asEntity(), selectedTags)
         }
     }
 

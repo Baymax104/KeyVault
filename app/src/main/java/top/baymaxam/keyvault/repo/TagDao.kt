@@ -1,8 +1,6 @@
 package top.baymaxam.keyvault.repo
 
 import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 import top.baymaxam.keyvault.model.entity.TagEntity
@@ -13,16 +11,7 @@ import top.baymaxam.keyvault.model.entity.TagEntity
  * @since 27 1月 2025
  */
 @Dao
-interface TagDao {
-
-    @Insert
-    suspend fun insert(entity: TagEntity)
-
-    @Delete
-    suspend fun delete(entity: TagEntity)
-
-    @Delete
-    suspend fun delete(entities: List<TagEntity>)
+interface TagDao : BaseDao<TagEntity> {
 
     @Query("select * from t_tag")
     fun queryAll(): Flow<List<TagEntity>>

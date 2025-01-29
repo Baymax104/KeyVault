@@ -30,7 +30,6 @@ import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
@@ -47,7 +46,7 @@ import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.bottomsheet.spec.DestinationStyleBottomSheet
 import com.ramcosta.composedestinations.generated.NavGraphs
 import com.ramcosta.composedestinations.generated.destinations.AddItemAddTagScreenDestination
-import com.ramcosta.composedestinations.generated.destinations.AddItemSelectAuthScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.AddItemSelectUserItemScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
 import com.ramcosta.composedestinations.result.onResult
@@ -62,7 +61,7 @@ import top.baymaxam.keyvault.ui.component.CommentField
 import top.baymaxam.keyvault.ui.component.InputField
 import top.baymaxam.keyvault.ui.component.LineHeader
 import top.baymaxam.keyvault.ui.component.SearchField
-import top.baymaxam.keyvault.ui.component.SelectAuthButton
+import top.baymaxam.keyvault.ui.component.SelectUserItemButton
 import top.baymaxam.keyvault.ui.component.SelectionButton
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.util.AddItemGraph
@@ -89,7 +88,7 @@ fun AddItemScreen(navigator: DestinationsNavigator) {
 @Composable
 fun AddInputScreen(
     navigator: DestinationsNavigator,
-    authRecipient: ResultRecipient<AddItemSelectAuthScreenDestination, UserItem>
+    authRecipient: ResultRecipient<AddItemSelectUserItemScreenDestination, UserItem>
 ) {
     val rootNavigator = LocalNavigator.currentOrThrow
     val vm = koinViewModel<AddItemViewModel>()
@@ -97,12 +96,7 @@ fun AddInputScreen(
     val scope = rememberCoroutineScope()
     val searchState = rememberSaveable { mutableStateOf("") }
 
-    authRecipient.onResult { vm.selectedUserItemState.value = it }
-
-    DisposableEffect(vm.typeSelectedState.value) {
-        vm.refreshInput()
-        onDispose { vm.refreshInput() }
-    }
+    authRecipient.onResult { vm.selectedUserItem = it }
 
     if (searchState.value.isEmpty()) {
         LaunchedEffect(Unit) {
@@ -119,11 +113,11 @@ fun AddInputScreen(
         usernameContentState = vm.usernameContentState,
         passwordContentState = vm.passwordContentState,
         commentContentState = vm.commentContentState,
-        selectedItemState = vm.selectedUserItemState,
+        selectedUserItem = vm.selectedUserItem,
         tagListState = tagListState,
         onSearch = { vm.searchTag(searchState.value) },
         onCancel = { rootNavigator.navigateUp() },
-        onSelectAuth = { navigator.navigate(AddItemSelectAuthScreenDestination) },
+        onSelectAuth = { navigator.navigate(AddItemSelectUserItemScreenDestination) },
         onTagAddClick = { navigator.navigate(AddItemAddTagScreenDestination) },
         onConfirm = {
             scope.launch {
@@ -147,7 +141,7 @@ private fun ContentLayout(
     usernameContentState: MutableState<String> = mutableStateOf(""),
     passwordContentState: MutableState<String> = mutableStateOf(""),
     commentContentState: MutableState<String> = mutableStateOf(""),
-    selectedItemState: MutableState<UserItem?> = mutableStateOf(null),
+    selectedUserItem: UserItem? = null,
     tagListState: LazyListState = rememberLazyListState(),
     onSearch: () -> Unit = {},
     onConfirm: () -> Unit = {},
@@ -263,7 +257,7 @@ private fun ContentLayout(
                     1 -> AuthInfoFields(
                         nameState = nameContentState,
                         commentState = commentContentState,
-                        selectedItemState = selectedItemState,
+                        selectedUserItem = selectedUserItem,
                         onSelectAuth = onSelectAuth
                     )
                 }
@@ -323,7 +317,7 @@ private fun UserInfoFields(
 private fun AuthInfoFields(
     nameState: MutableState<String> = mutableStateOf(""),
     commentState: MutableState<String> = mutableStateOf(""),
-    selectedItemState: MutableState<UserItem?> = mutableStateOf(null),
+    selectedUserItem: UserItem? = null,
     onSelectAuth: () -> Unit = {}
 ) {
     Column(
@@ -336,8 +330,8 @@ private fun AuthInfoFields(
             leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null) },
             modifier = Modifier.fillMaxWidth()
         )
-        SelectAuthButton(
-            value = selectedItemState.value?.name ?: "选择授权",
+        SelectUserItemButton(
+            value = selectedUserItem?.name ?: "选择授权",
             onClick = onSelectAuth
         )
         CommentField(

@@ -1,7 +1,9 @@
 package top.baymaxam.keyvault.state
 
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.map
@@ -34,7 +36,7 @@ class ItemViewModel(
     val commentState = mutableStateOf(item.comment)
     val usernameState = mutableStateOf("")
     val passwordState = mutableStateOf("")
-    val authUserItem = mutableStateOf<UserItem?>(null)
+    var authUserItem by mutableStateOf<UserItem?>(null)
     val keyTags = mutableStateListOf<Tag>()
 
     init {
@@ -50,7 +52,7 @@ class ItemViewModel(
                         keyRepository.queryById(item.authId)
                             .takeIf { it.type == KeyType.User }
                             ?.asItem()
-                            ?.let { authUserItem.value = it as UserItem }
+                            ?.let { authUserItem = it as UserItem }
                     }
                 }
             }
@@ -79,7 +81,8 @@ class ItemViewModel(
             }
 
             is AuthItem -> {
-                item.name == nameState.value && item.authId == (authUserItem.value?.id ?: "")
+                item.name == nameState.value && item.authId == (authUserItem?.id ?: "") &&
+                        item.comment == commentState.value
             }
         }
     }
@@ -103,7 +106,14 @@ class ItemViewModel(
 
     private suspend fun updateAuthItem() {
         item as AuthItem
-
+        item.apply {
+            name = nameState.value
+            authId = authUserItem?.id ?: ""
+            authName = authUserItem?.name ?: ""
+            comment = commentState.value
+        }.let {
+            keyRepository.update(item.asEntity())
+        }
     }
 
 

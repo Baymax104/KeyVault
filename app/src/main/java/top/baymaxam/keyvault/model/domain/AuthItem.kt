@@ -17,7 +17,7 @@ data class AuthItem(
     override val createDate: Date = Date(0),
     override var resentDate: Date = Date(0),
     override var comment: String = "",
-    val authId: String = "",
+    var authId: String = "",
     var authName: String = ""
 ) : KeyItem
 
@@ -27,6 +27,7 @@ fun AuthItem.asEntity(): KeyEntity {
         id,
         name,
         KeyType.Authorization,
+        comment = comment,
         authId = authId.ifEmpty { null },
         authName = authName.ifEmpty { null },
         createDate = createDate,

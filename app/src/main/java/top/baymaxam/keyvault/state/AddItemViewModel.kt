@@ -1,6 +1,8 @@
 package top.baymaxam.keyvault.state
 
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.map
@@ -32,7 +34,7 @@ class AddItemViewModel(
     val passwordContentState = mutableStateOf("")
     val commentContentState = mutableStateOf("")
     val typeSelectedState = mutableStateOf(KeyType.User)
-    val selectedUserItemState = mutableStateOf<UserItem?>(null)
+    var selectedUserItem by mutableStateOf<UserItem?>(null)
 
     val tags = CachedStateList<SelectedState<Tag>>()
 
@@ -42,14 +44,6 @@ class AddItemViewModel(
                 .map { l -> l.map { SelectedState(it.asItem()) } }
                 .collect { tags.cacheList = it }
         }
-    }
-
-    fun refreshInput() {
-        nameContentState.value = ""
-        usernameContentState.value = ""
-        passwordContentState.value = ""
-        selectedUserItemState.value = null
-        commentContentState.value = ""
     }
 
     fun searchTag(content: String) {
@@ -75,8 +69,8 @@ class AddItemViewModel(
                 KeyType.Authorization -> AuthItem(
                     name = nameContentState.value,
                     comment = commentContentState.value,
-                    authId = selectedUserItemState.value?.id ?: "",
-                    authName = selectedUserItemState.value?.name ?: "",
+                    authId = selectedUserItem?.id ?: "",
+                    authName = selectedUserItem?.name ?: "",
                     createDate = Date(),
                 )
             }

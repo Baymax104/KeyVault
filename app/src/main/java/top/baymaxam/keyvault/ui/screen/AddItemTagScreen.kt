@@ -39,7 +39,7 @@ import org.koin.core.parameter.parametersOf
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.Tag
 import top.baymaxam.keyvault.model.domain.UserItem
-import top.baymaxam.keyvault.state.AddKeyTagViewModel
+import top.baymaxam.keyvault.state.AddItemTagViewModel
 import top.baymaxam.keyvault.state.SelectedState
 import top.baymaxam.keyvault.ui.component.FlowSelectableTags
 import top.baymaxam.keyvault.ui.component.SheetHeader
@@ -81,7 +81,7 @@ fun SelectTagScreen(
     keyItem: KeyItem = UserItem(),
 ) {
     val rootNavigator = LocalNavigator.currentOrThrow
-    val vm = koinInject<AddKeyTagViewModel> { parametersOf(keyItem) }
+    val vm = koinInject<AddItemTagViewModel> { parametersOf(keyItem) }
     val scope = rememberCoroutineScope()
 
     ContentLayout(

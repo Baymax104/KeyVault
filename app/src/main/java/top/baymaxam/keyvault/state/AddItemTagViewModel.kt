@@ -17,7 +17,7 @@ import top.baymaxam.keyvault.util.replaceAllBy
  * @author John
  * @since 29 1月 2025
  */
-class AddKeyTagViewModel(
+class AddItemTagViewModel(
     private val tagRepository: TagRepository,
     private val item: KeyItem
 ) : ViewModel() {

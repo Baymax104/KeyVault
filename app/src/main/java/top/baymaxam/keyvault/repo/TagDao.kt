@@ -2,6 +2,7 @@ package top.baymaxam.keyvault.repo
 
 import androidx.room.Dao
 import androidx.room.Query
+import androidx.room.RewriteQueriesToDropUnusedColumns
 import kotlinx.coroutines.flow.Flow
 import top.baymaxam.keyvault.model.entity.TagEntity
 
@@ -22,6 +23,7 @@ interface TagDao : BaseDao<TagEntity> {
     @Query("select count(*) from t_tag where name = :name")
     suspend fun queryCountByName(name: String): Int
 
+    @RewriteQueriesToDropUnusedColumns
     @Query(
         """
             select * from t_tag

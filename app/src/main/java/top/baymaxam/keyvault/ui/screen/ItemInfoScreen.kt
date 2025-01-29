@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.sp
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.AddItemTagScreenDestination
-import com.ramcosta.composedestinations.generated.destinations.RootSelectAuthScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.RootSelectUserItemScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
 import com.ramcosta.composedestinations.result.onResult
@@ -57,7 +57,7 @@ import top.baymaxam.keyvault.ui.component.ConfirmDialog
 import top.baymaxam.keyvault.ui.component.FillIcon
 import top.baymaxam.keyvault.ui.component.FlowTags
 import top.baymaxam.keyvault.ui.component.InputField
-import top.baymaxam.keyvault.ui.component.SelectAuthButton
+import top.baymaxam.keyvault.ui.component.SelectUserItemButton
 import top.baymaxam.keyvault.ui.component.TopBackBar
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.ui.theme.IconColors
@@ -75,14 +75,14 @@ import top.baymaxam.keyvault.util.toDateString
 fun ItemInfoScreen(
     navigator: DestinationsNavigator,
     item: KeyItem,
-    authRecipient: ResultRecipient<RootSelectAuthScreenDestination, UserItem>
+    authRecipient: ResultRecipient<RootSelectUserItemScreenDestination, UserItem>
 ) {
     val vm = koinViewModel<ItemViewModel> { parametersOf(item) }
     val dialogState = rememberDialogState()
     val scope = rememberCoroutineScope()
     val clipboardManager = LocalClipboardManager.current
 
-    authRecipient.onResult { vm.authUserItem.value = it }
+    authRecipient.onResult { vm.authUserItem = it }
 
     DisposableEffect(vm) {
         onDispose { vm.updateItemResentDate() }
@@ -98,7 +98,7 @@ fun ItemInfoScreen(
         tags = vm.keyTags,
         dialogState = dialogState,
         onBack = { if (!vm.isItemEquals()) dialogState.show() else navigator.navigateUp() },
-        onSelectAuth = { navigator.navigate(RootSelectAuthScreenDestination) },
+        onSelectAuth = { navigator.navigate(RootSelectUserItemScreenDestination) },
         onTagAddClick = { navigator.navigate(AddItemTagScreenDestination(vm.item)) },
         onCopy = { text ->
             clipboardManager.setText(AnnotatedString(text))
@@ -138,7 +138,7 @@ private fun ContentLayout(
     usernameState: MutableState<String> = mutableStateOf(""),
     passwordState: MutableState<String> = mutableStateOf(""),
     commentState: MutableState<String> = mutableStateOf(""),
-    authUserItem: MutableState<UserItem?> = mutableStateOf(null),
+    authUserItem: UserItem? = null,
     tags: List<Tag> = emptyList(),
     dialogState: DialogState = rememberDialogState(),
     onSaveClick: () -> Unit = {},
@@ -225,7 +225,7 @@ private fun ContentLayout(
                         nameState = nameState,
                         commentState = commentState,
                         tags = tags,
-                        authUserItem = authUserItem.value,
+                        authUserItem = authUserItem,
                         onSelectAuth = onSelectAuth,
                         onTagAddClick = onTagAddClick
                     )
@@ -323,7 +323,7 @@ private fun AuthItemInfo(
         placeholder = { Text("授权名称") },
         leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null) }
     )
-    SelectAuthButton(
+    SelectUserItemButton(
         value = if (authUserItem != null) "${authUserItem.name} ${authUserItem.username}" else "选择授权",
         onClick = onSelectAuth,
     )

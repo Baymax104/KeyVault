@@ -44,7 +44,7 @@ import top.baymaxam.keyvault.util.AddItemGraph
 @Destination<AddItemGraph>
 @Destination<RootGraph>(style = DestinationStyleBottomSheet::class)
 @Composable
-fun SelectAuthScreen(navigator: ResultBackNavigator<UserItem>) {
+fun SelectUserItemScreen(navigator: ResultBackNavigator<UserItem>) {
     val vm = koinViewModel<AddAuthViewModel>()
     val searchContentState = remember { mutableStateOf("") }
     val userItemListState = rememberLazyListState()
@@ -84,10 +84,7 @@ private fun ContentLayout(
             title = "选择授权",
             leadingIcon = {
                 IconButton(onClick = onBack) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                        contentDescription = null
-                    )
+                    Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = null)
                 }
             }
         )

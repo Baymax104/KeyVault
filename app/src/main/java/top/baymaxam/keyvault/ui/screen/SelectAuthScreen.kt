@@ -44,9 +44,7 @@ import top.baymaxam.keyvault.util.AddItemGraph
 @Destination<AddItemGraph>
 @Destination<RootGraph>(style = DestinationStyleBottomSheet::class)
 @Composable
-fun SelectAuthScreen(
-    navigator: ResultBackNavigator<UserItem>
-) {
+fun SelectAuthScreen(navigator: ResultBackNavigator<UserItem>) {
     val vm = koinViewModel<AddAuthViewModel>()
     val searchContentState = remember { mutableStateOf("") }
     val userItemListState = rememberLazyListState()

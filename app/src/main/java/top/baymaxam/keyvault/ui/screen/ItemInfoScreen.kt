@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
-import com.ramcosta.composedestinations.generated.destinations.AddKeyTagScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.AddItemTagScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.RootSelectAuthScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
@@ -99,7 +99,7 @@ fun ItemInfoScreen(
         dialogState = dialogState,
         onBack = { if (!vm.isItemEquals()) dialogState.show() else navigator.navigateUp() },
         onSelectAuth = { navigator.navigate(RootSelectAuthScreenDestination) },
-        onTagAddClick = { navigator.navigate(AddKeyTagScreenDestination(vm.item)) },
+        onTagAddClick = { navigator.navigate(AddItemTagScreenDestination(vm.item)) },
         onCopy = { text ->
             clipboardManager.setText(AnnotatedString(text))
             successToast("复制成功")

@@ -2,23 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>AddKeyTag Navigation Graph</title>
+    <title>AddItemTag Navigation Graph</title>
 </head>
 <body>
 <pre id='scene' class="mermaid">
 ---
-title: AddKeyTag Navigation Graph
+title: AddItemTag Navigation Graph
 ---
 %%{init: {'theme':'base', 'themeVariables': { 'primaryTextColor': '#fff' }}%%
 graph TD
-add_key_tag(["AddKeyTagGraph"]) -- "start" --- select_tag_screen("SelectTagScreen")
-add_key_tag(["AddKeyTagGraph"]) --- add_key_tag/add_tag_screen("AddTagScreen")
+add_item_tag(["AddItemTagGraph"]) -- "start" --- select_tag_screen("SelectTagScreen")
+add_item_tag(["AddItemTagGraph"]) --- add_item_tag/add_tag_screen("AddTagScreen")
 
 
 classDef destination fill:#5383EC,stroke:#ffffff;
-class select_tag_screen,add_key_tag/add_tag_screen destination;
+class select_tag_screen,add_item_tag/add_tag_screen destination;
 classDef navgraph fill:#63BC76,stroke:#ffffff;
-class add_key_tag navgraph;
+class add_item_tag navgraph;
 
 </pre>
 <script src='https://unpkg.com/panzoom@9.4.0/dist/panzoom.min.js'></script>

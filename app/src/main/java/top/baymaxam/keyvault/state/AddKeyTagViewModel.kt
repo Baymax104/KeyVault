@@ -1,6 +1,5 @@
 package top.baymaxam.keyvault.state
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

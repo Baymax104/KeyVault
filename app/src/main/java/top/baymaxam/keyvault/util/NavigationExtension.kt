@@ -82,7 +82,7 @@ fun BottomSheetNavigation(
 annotation class AddItemGraph
 
 @NavHostGraph
-annotation class AddKeyTagGraph
+annotation class AddItemTagGraph
 
 
 object SlideTransitions : DestinationStyle.Animated() {

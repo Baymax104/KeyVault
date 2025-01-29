@@ -29,7 +29,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.bottomsheet.spec.DestinationStyleBottomSheet
 import com.ramcosta.composedestinations.generated.NavGraphs
-import com.ramcosta.composedestinations.generated.destinations.AddKeyTagAddTagScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.AddItemTagAddTagScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.SelectTagScreenDestination
 import com.ramcosta.composedestinations.manualcomposablecalls.composable
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -44,7 +44,7 @@ import top.baymaxam.keyvault.state.SelectedState
 import top.baymaxam.keyvault.ui.component.FlowSelectableTags
 import top.baymaxam.keyvault.ui.component.SheetHeader
 import top.baymaxam.keyvault.ui.theme.AppTheme
-import top.baymaxam.keyvault.util.AddKeyTagGraph
+import top.baymaxam.keyvault.util.AddItemTagGraph
 import top.baymaxam.keyvault.util.LocalNavigator
 import top.baymaxam.keyvault.util.NavigatorProvider
 import top.baymaxam.keyvault.util.currentOrThrow
@@ -58,14 +58,12 @@ import top.baymaxam.keyvault.util.successToast
  */
 @Destination<RootGraph>(style = DestinationStyleBottomSheet::class)
 @Composable
-fun AddKeyTagScreen(
+fun AddItemTagScreen(
     navigator: DestinationsNavigator,
     keyItem: KeyItem,
 ) {
     NavigatorProvider(navigator) {
-        DestinationsNavHost(
-            navGraph = NavGraphs.addKeyTag,
-        ) {
+        DestinationsNavHost(NavGraphs.addItemTag) {
             composable(SelectTagScreenDestination) {
                 SelectTagScreen(
                     navigator = destinationsNavigator,
@@ -76,7 +74,7 @@ fun AddKeyTagScreen(
     }
 }
 
-@Destination<AddKeyTagGraph>(start = true)
+@Destination<AddItemTagGraph>(start = true)
 @Composable
 fun SelectTagScreen(
     navigator: DestinationsNavigator,
@@ -90,7 +88,7 @@ fun SelectTagScreen(
         tags = vm.tags,
         onBack = { rootNavigator.navigateUp() },
         onToggleTag = { it.selected = !it.selected },
-        onAddTagClick = { navigator.navigate(AddKeyTagAddTagScreenDestination) },
+        onAddTagClick = { navigator.navigate(AddItemTagAddTagScreenDestination) },
         onDone = {
             scope.launch {
                 vm.updateTags()

@@ -32,6 +32,7 @@ import top.baymaxam.keyvault.state.TagListViewModel
 import top.baymaxam.keyvault.ui.component.InputField
 import top.baymaxam.keyvault.ui.component.SheetHeader
 import top.baymaxam.keyvault.ui.theme.AppTheme
+import top.baymaxam.keyvault.util.AddItemGraph
 import top.baymaxam.keyvault.util.errorToast
 import top.baymaxam.keyvault.util.successToast
 
@@ -41,6 +42,7 @@ import top.baymaxam.keyvault.util.successToast
  * @since 26 1月 2025
  */
 @Destination<RootGraph>(style = DestinationStyleBottomSheet::class)
+@Destination<AddItemGraph>
 @Composable
 fun AddTagScreen(navigator: DestinationsNavigator) {
     val vm = koinViewModel<TagListViewModel>()

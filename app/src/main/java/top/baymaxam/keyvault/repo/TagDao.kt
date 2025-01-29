@@ -22,4 +22,13 @@ interface TagDao : BaseDao<TagEntity> {
     @Query("select count(*) from t_tag where name = :name")
     suspend fun queryCountByName(name: String): Int
 
+    @Query(
+        """
+            select * from t_tag
+            join t_key_tag on t_key_tag.tagId = t_tag.id
+            where t_key_tag.keyId = :keyId
+        """
+    )
+    fun queryByKeyId(keyId: String): Flow<List<TagEntity>>
+
 }

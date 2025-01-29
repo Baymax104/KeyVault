@@ -1,6 +1,8 @@
 package top.baymaxam.keyvault.model.entity
 
 import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
 
 /**
  * Key、Tag关联表

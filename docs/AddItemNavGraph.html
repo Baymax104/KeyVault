@@ -12,11 +12,12 @@ title: AddItem Navigation Graph
 %%{init: {'theme':'base', 'themeVariables': { 'primaryTextColor': '#fff' }}%%
 graph TD
 add_item(["AddItemGraph"]) -- "start" --- add_input_screen("AddInputScreen")
+add_item(["AddItemGraph"]) --- add_item/add_tag_screen("AddTagScreen")
 add_item(["AddItemGraph"]) --- add_item/select_auth_screen("SelectAuthScreen")
 
 
 classDef destination fill:#5383EC,stroke:#ffffff;
-class add_input_screen,add_item/select_auth_screen destination;
+class add_input_screen,add_item/add_tag_screen,add_item/select_auth_screen destination;
 classDef navgraph fill:#63BC76,stroke:#ffffff;
 class add_item navgraph;
 

@@ -33,7 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
-import com.ramcosta.composedestinations.generated.destinations.AddTagScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.RootAddTagScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -78,7 +78,7 @@ fun TagListScreen(navigator: DestinationsNavigator) {
         isEditable = isEditable,
         isInitialized = vm.isInitialized,
         onBack = { if (isEditable) isEditable = false else navigator.navigateUp() },
-        onAddClick = { navigator.navigate(AddTagScreenDestination) },
+        onAddClick = { navigator.navigate(RootAddTagScreenDestination) },
         onEditClick = { isEditable = !isEditable },
         onItemClick = {},
         onItemSelected = {

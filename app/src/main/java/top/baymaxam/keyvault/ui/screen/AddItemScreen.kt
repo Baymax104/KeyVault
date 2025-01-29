@@ -17,9 +17,11 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.CreditCard
 import androidx.compose.material.icons.rounded.Key
 import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -44,6 +46,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.bottomsheet.spec.DestinationStyleBottomSheet
 import com.ramcosta.composedestinations.generated.NavGraphs
+import com.ramcosta.composedestinations.generated.destinations.AddItemAddTagScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.AddItemSelectAuthScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
@@ -121,6 +124,7 @@ fun AddInputScreen(
         onSearch = { vm.searchTag(searchState.value) },
         onCancel = { rootNavigator.navigateUp() },
         onSelectAuth = { navigator.navigate(AddItemSelectAuthScreenDestination) },
+        onTagAddClick = { navigator.navigate(AddItemAddTagScreenDestination) },
         onConfirm = {
             scope.launch {
                 vm.addItem()
@@ -149,6 +153,7 @@ private fun ContentLayout(
     onConfirm: () -> Unit = {},
     onCancel: () -> Unit = {},
     onSelectAuth: () -> Unit = {},
+    onTagAddClick: () -> Unit = {},
 ) {
     val pagerState = rememberPagerState { 2 }
     val scope = rememberCoroutineScope()
@@ -178,38 +183,32 @@ private fun ContentLayout(
                 onSearch = onSearch,
                 modifier = Modifier.fillMaxWidth()
             )
-            if (tags.isNotEmpty()) {
-                LazyRow(
-                    state = tagListState,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    contentPadding = PaddingValues(horizontal = 5.dp),
-                    modifier = Modifier
-                        .padding(vertical = 10.dp)
-                        .fillMaxWidth()
-                        .height(40.dp)
-                ) {
-                    items(
-                        items = tags,
-                        key = { it.value.id }
-                    ) {
-                        val (item) = it
-                        FilterChip(
-                            selected = it.selected,
-                            onClick = { it.selected = !it.selected },
-                            label = { Text(item.name) }
-                        )
-                    }
+            LazyRow(
+                state = tagListState,
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                contentPadding = PaddingValues(horizontal = 5.dp),
+                modifier = Modifier
+                    .padding(vertical = 10.dp)
+                    .fillMaxWidth()
+                    .height(40.dp)
+            ) {
+                item {
+                    AssistChip(
+                        onClick = onTagAddClick,
+                        label = { Icon(Icons.Rounded.Add, contentDescription = null) }
+                    )
                 }
-            } else {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .padding(vertical = 10.dp)
-                        .fillMaxWidth()
-                        .height(40.dp)
+                items(
+                    items = tags,
+                    key = { it.value.id }
                 ) {
-                    Text(text = "未找到标签", color = MaterialTheme.colorScheme.onBackground)
+                    val (item) = it
+                    FilterChip(
+                        selected = it.selected,
+                        onClick = { it.selected = !it.selected },
+                        label = { Text(item.name) }
+                    )
                 }
             }
             Row(

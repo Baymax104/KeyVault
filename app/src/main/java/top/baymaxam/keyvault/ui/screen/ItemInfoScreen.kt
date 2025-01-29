@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.CreditCard
@@ -35,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
+import com.ramcosta.composedestinations.generated.destinations.AddKeyTagScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.RootSelectAuthScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
@@ -44,6 +47,7 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import top.baymaxam.keyvault.model.domain.AuthItem
 import top.baymaxam.keyvault.model.domain.KeyItem
+import top.baymaxam.keyvault.model.domain.Tag
 import top.baymaxam.keyvault.model.domain.UserItem
 import top.baymaxam.keyvault.state.DialogState
 import top.baymaxam.keyvault.state.ItemViewModel
@@ -51,6 +55,7 @@ import top.baymaxam.keyvault.state.rememberDialogState
 import top.baymaxam.keyvault.ui.component.CommentField
 import top.baymaxam.keyvault.ui.component.ConfirmDialog
 import top.baymaxam.keyvault.ui.component.FillIcon
+import top.baymaxam.keyvault.ui.component.FlowTags
 import top.baymaxam.keyvault.ui.component.InputField
 import top.baymaxam.keyvault.ui.component.SelectAuthButton
 import top.baymaxam.keyvault.ui.component.TopBackBar
@@ -90,8 +95,11 @@ fun ItemInfoScreen(
         passwordState = vm.passwordState,
         commentState = vm.commentState,
         authUserItem = vm.authUserItem,
+        tags = vm.keyTags,
         dialogState = dialogState,
         onBack = { if (!vm.isItemEquals()) dialogState.show() else navigator.navigateUp() },
+        onSelectAuth = { navigator.navigate(RootSelectAuthScreenDestination) },
+        onTagAddClick = { navigator.navigate(AddKeyTagScreenDestination(vm.item)) },
         onCopy = { text ->
             clipboardManager.setText(AnnotatedString(text))
             successToast("复制成功")
@@ -118,9 +126,6 @@ fun ItemInfoScreen(
         onDialogCancel = {
             dialogState.dismiss()
             navigator.navigateUp()
-        },
-        onSelectAuth = {
-            navigator.navigate(RootSelectAuthScreenDestination)
         }
     )
 }
@@ -134,6 +139,7 @@ private fun ContentLayout(
     passwordState: MutableState<String> = mutableStateOf(""),
     commentState: MutableState<String> = mutableStateOf(""),
     authUserItem: MutableState<UserItem?> = mutableStateOf(null),
+    tags: List<Tag> = emptyList(),
     dialogState: DialogState = rememberDialogState(),
     onSaveClick: () -> Unit = {},
     onBack: () -> Unit = {},
@@ -141,6 +147,7 @@ private fun ContentLayout(
     onDialogConfirm: () -> Unit = {},
     onDialogCancel: () -> Unit = {},
     onSelectAuth: () -> Unit = {},
+    onTagAddClick: () -> Unit = {},
 ) {
     Scaffold(
         topBar = {
@@ -158,6 +165,7 @@ private fun ContentLayout(
         Column(
             modifier = Modifier
                 .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
                 .fillMaxSize()
                 .padding(start = 15.dp, end = 15.dp, top = 25.dp)
         ) {
@@ -199,21 +207,29 @@ private fun ContentLayout(
 
             Spacer(modifier = Modifier.height(25.dp))
 
-            when (item) {
-                is UserItem -> UserItemInfo(
-                    nameState = nameState,
-                    usernameState = usernameState,
-                    passwordState = passwordState,
-                    commentState = commentState,
-                    onCopy = onCopy
-                )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(15.dp),
+            ) {
+                when (item) {
+                    is UserItem -> UserItemInfo(
+                        nameState = nameState,
+                        usernameState = usernameState,
+                        passwordState = passwordState,
+                        commentState = commentState,
+                        tags = tags,
+                        onCopy = onCopy,
+                        onTagAddClick = onTagAddClick
+                    )
 
-                is AuthItem -> AuthItemInfo(
-                    nameState = nameState,
-                    commentState = commentState,
-                    authUserItem = authUserItem.value,
-                    onSelectAuth = onSelectAuth,
-                )
+                    is AuthItem -> AuthItemInfo(
+                        nameState = nameState,
+                        commentState = commentState,
+                        tags = tags,
+                        authUserItem = authUserItem.value,
+                        onSelectAuth = onSelectAuth,
+                        onTagAddClick = onTagAddClick
+                    )
+                }
             }
         }
     }
@@ -255,33 +271,40 @@ private fun UserItemInfo(
     usernameState: MutableState<String> = mutableStateOf(""),
     passwordState: MutableState<String> = mutableStateOf(""),
     commentState: MutableState<String> = mutableStateOf(""),
+    tags: List<Tag> = emptyList(),
     onCopy: (String) -> Unit = {},
+    onTagAddClick: () -> Unit = {},
 ) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(15.dp),
-    ) {
-        ItemInfo(
-            contentState = nameState,
-            placeholder = { Text("条目名称") },
-            leadingIcon = { Icon(Icons.Rounded.CreditCard, contentDescription = null) }
-        )
-        ItemInfo(
-            contentState = usernameState,
-            placeholder = { Text("用户名") },
-            leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null) },
-            onCopy = onCopy
-        )
-        ItemInfo(
-            contentState = passwordState,
-            placeholder = { Text("密码") },
-            leadingIcon = { Icon(Icons.Rounded.Key, contentDescription = null) },
-            onCopy = onCopy
-        )
-        CommentField(
-            contentState = commentState,
-            modifier = Modifier
-                .height(200.dp)
-                .fillMaxWidth()
+    ItemInfo(
+        contentState = nameState,
+        placeholder = { Text("条目名称") },
+        leadingIcon = { Icon(Icons.Rounded.CreditCard, contentDescription = null) }
+    )
+    ItemInfo(
+        contentState = usernameState,
+        placeholder = { Text("用户名") },
+        leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null) },
+        onCopy = onCopy
+    )
+    ItemInfo(
+        contentState = passwordState,
+        placeholder = { Text("密码") },
+        leadingIcon = { Icon(Icons.Rounded.Key, contentDescription = null) },
+        onCopy = onCopy
+    )
+    CommentField(
+        contentState = commentState,
+        modifier = Modifier
+            .height(200.dp)
+            .fillMaxWidth()
+    )
+    Column {
+        Text("标签")
+        FlowTags(
+            items = tags,
+            maxItemsInEachRow = 5,
+            onAddClick = onTagAddClick,
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }
@@ -290,26 +313,33 @@ private fun UserItemInfo(
 private fun AuthItemInfo(
     nameState: MutableState<String> = mutableStateOf(""),
     commentState: MutableState<String> = mutableStateOf(""),
+    tags: List<Tag> = emptyList(),
     authUserItem: UserItem? = null,
     onSelectAuth: () -> Unit = {},
+    onTagAddClick: () -> Unit = {},
 ) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(15.dp)
-    ) {
-        ItemInfo(
-            contentState = nameState,
-            placeholder = { Text("授权名称") },
-            leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null) }
-        )
-        SelectAuthButton(
-            value = if (authUserItem != null) "${authUserItem.name} ${authUserItem.username}" else "选择授权",
-            onClick = onSelectAuth,
-        )
-        CommentField(
-            contentState = commentState,
-            modifier = Modifier
-                .height(200.dp)
-                .fillMaxWidth()
+    ItemInfo(
+        contentState = nameState,
+        placeholder = { Text("授权名称") },
+        leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null) }
+    )
+    SelectAuthButton(
+        value = if (authUserItem != null) "${authUserItem.name} ${authUserItem.username}" else "选择授权",
+        onClick = onSelectAuth,
+    )
+    CommentField(
+        contentState = commentState,
+        modifier = Modifier
+            .height(200.dp)
+            .fillMaxWidth()
+    )
+    Column {
+        Text("标签")
+        FlowTags(
+            items = tags,
+            maxItemsInEachRow = 5,
+            onAddClick = onTagAddClick,
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }

@@ -42,7 +42,7 @@ class ItemListViewModel(private val repository: KeyRepository) : ViewModel() {
             if (removedItems.isEmpty()) {
                 return Result.success(Unit)
             }
-            removedItems.map { it.value.asEntity() }.let { repository.deleteWithTags(it) }
+            removedItems.map { it.value.asEntity() }.let { repository.delete(it) }
         }
     }
 }

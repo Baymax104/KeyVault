@@ -22,12 +22,4 @@ class KeyRepository(
         }
     }
 
-    suspend fun deleteWithTags(keyEntities: List<KeyEntity>) {
-        transaction {
-            keyEntities.forEach {
-                delete(it)
-                keyTagDao.deleteByKeyId(it.id)
-            }
-        }
-    }
 }

@@ -55,7 +55,7 @@ class TagListViewModel(private val repository: TagRepository) : ViewModel() {
             if (removedTags.isEmpty()) {
                 return Result.success(Unit)
             }
-            removedTags.map { it.value.asEntity() }.let { repository.deleteWithKeys(it) }
+            removedTags.map { it.value.asEntity() }.let { repository.delete(it) }
         }
     }
 }

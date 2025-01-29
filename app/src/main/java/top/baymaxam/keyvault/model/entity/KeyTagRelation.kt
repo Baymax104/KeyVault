@@ -9,7 +9,12 @@ import androidx.room.Entity
  */
 @Entity(
     tableName = "t_key_tag",
-    primaryKeys = ["keyId", "tagId"]
+    primaryKeys = ["keyId", "tagId"],
+    foreignKeys = [
+        ForeignKey(KeyEntity::class, ["id"], ["keyId"], onDelete = ForeignKey.CASCADE),
+        ForeignKey(TagEntity::class, ["id"], ["tagId"], onDelete = ForeignKey.CASCADE)
+    ],
+    indices = [Index("keyId", "tagId")]
 )
 data class KeyTagRelation(
     val keyId: String,

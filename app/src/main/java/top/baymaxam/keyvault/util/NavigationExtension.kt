@@ -81,6 +81,9 @@ fun BottomSheetNavigation(
 @NavHostGraph
 annotation class AddItemGraph
 
+@NavHostGraph
+annotation class AddKeyTagGraph
+
 
 object SlideTransitions : DestinationStyle.Animated() {
     override val enterTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition? =

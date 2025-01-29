@@ -1,17 +1,22 @@
 package top.baymaxam.keyvault.state
 
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import top.baymaxam.keyvault.model.domain.AuthItem
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.KeyType
+import top.baymaxam.keyvault.model.domain.Tag
 import top.baymaxam.keyvault.model.domain.UserItem
 import top.baymaxam.keyvault.model.domain.asEntity
 import top.baymaxam.keyvault.model.entity.asItem
 import top.baymaxam.keyvault.repo.KeyRepository
+import top.baymaxam.keyvault.repo.TagRepository
 import top.baymaxam.keyvault.repo.transaction
+import top.baymaxam.keyvault.util.replaceAllBy
 import java.util.Date
 
 /**
@@ -21,6 +26,7 @@ import java.util.Date
  */
 class ItemViewModel(
     private val keyRepository: KeyRepository,
+    private val tagRepository: TagRepository,
     val item: KeyItem
 ) : ViewModel() {
 
@@ -29,6 +35,7 @@ class ItemViewModel(
     val usernameState = mutableStateOf("")
     val passwordState = mutableStateOf("")
     val authUserItem = mutableStateOf<UserItem?>(null)
+    val keyTags = mutableStateListOf<Tag>()
 
     init {
         when (item) {
@@ -47,6 +54,11 @@ class ItemViewModel(
                     }
                 }
             }
+        }
+        viewModelScope.launch {
+            tagRepository.queryByKeyId(item.id)
+                .map { l -> l.map { it.asItem() } }
+                .collect { keyTags.replaceAllBy(it) }
         }
     }
 

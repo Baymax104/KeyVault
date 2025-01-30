@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,11 +14,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
+import androidx.compose.material.icons.rounded.CreditCard
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,6 +37,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -46,6 +52,7 @@ import com.ramcosta.composedestinations.generated.destinations.TagListScreenDest
 import kotlinx.coroutines.flow.map
 import org.koin.compose.koinInject
 import top.baymaxam.keyvault.R
+import top.baymaxam.keyvault.model.domain.AuthItem
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.UserItem
 import top.baymaxam.keyvault.model.entity.asItem
@@ -53,7 +60,6 @@ import top.baymaxam.keyvault.repo.KeyDao
 import top.baymaxam.keyvault.repo.TagDao
 import top.baymaxam.keyvault.ui.component.FillIcon
 import top.baymaxam.keyvault.ui.component.FillIconColors
-import top.baymaxam.keyvault.ui.component.ResentList
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.ui.theme.IconColors
 import top.baymaxam.keyvault.ui.theme.robotoFont
@@ -288,6 +294,98 @@ private fun IndexCard(
         }
     }
 }
+
+@Composable
+fun ResentList(
+    keyItems: List<KeyItem>,
+    modifier: Modifier = Modifier,
+    state: LazyListState = rememberLazyListState(),
+    onItemClick: (KeyItem) -> Unit = {},
+) {
+    LazyColumn(
+        state = state,
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        contentPadding = PaddingValues(vertical = 10.dp)
+    ) {
+        items(
+            items = keyItems,
+            key = { it.id }
+        ) {
+            RecentItem(
+                item = it,
+                onClick = onItemClick
+            )
+        }
+    }
+}
+
+
+@Composable
+private fun RecentItem(
+    item: KeyItem = UserItem(),
+    onClick: (KeyItem) -> Unit,
+) {
+    Surface(
+        shape = RoundedCornerShape(20.dp),
+        modifier = Modifier.fillMaxWidth(),
+        tonalElevation = 0.dp,
+        shadowElevation = 1.dp,
+        onClick = { onClick(item) }
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                FillIcon(
+                    icon = when (item) {
+                        is UserItem -> Icons.Rounded.CreditCard
+                        is AuthItem -> Icons.Rounded.Person
+                    },
+                    shape = RoundedCornerShape(20),
+                    modifier = Modifier.size(45.dp),
+                    colors = when (item) {
+                        is UserItem -> IconColors.UserItem
+                        is AuthItem -> IconColors.AuthItem
+                    }
+                )
+
+                Column(
+                    verticalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier
+                        .height(50.dp)
+                        .padding(horizontal = 10.dp)
+                ) {
+                    Text(
+                        text = item.name,
+                        style = TextStyle(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 17.sp
+                        )
+                    )
+                    Text(
+                        text = when (item) {
+                            is UserItem -> item.username
+                            is AuthItem -> item.authName
+                        },
+                        style = TextStyle(
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Normal,
+                            color = Color.Gray
+                        )
+                    )
+                }
+            }
+        }
+    }
+}
+
 
 @Preview(showBackground = true)
 @Composable

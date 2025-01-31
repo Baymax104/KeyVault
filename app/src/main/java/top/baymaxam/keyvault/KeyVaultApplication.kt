@@ -9,6 +9,7 @@ import org.koin.core.context.startKoin
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 import top.baymaxam.keyvault.model.domain.KeyItem
+import top.baymaxam.keyvault.model.domain.Tag
 import top.baymaxam.keyvault.repo.KeyRepository
 import top.baymaxam.keyvault.repo.LocalDatabase
 import top.baymaxam.keyvault.repo.TagRepository
@@ -17,6 +18,7 @@ import top.baymaxam.keyvault.state.AddItemTagViewModel
 import top.baymaxam.keyvault.state.AddItemViewModel
 import top.baymaxam.keyvault.state.ItemListViewModel
 import top.baymaxam.keyvault.state.ItemViewModel
+import top.baymaxam.keyvault.state.TagItemListViewModel
 import top.baymaxam.keyvault.state.TagListViewModel
 
 /**
@@ -54,4 +56,5 @@ val appModule = module {
     viewModel { AddAuthViewModel(get()) }
     viewModel { (item: KeyItem) -> AddItemTagViewModel(get(), item) }
     viewModel { TagListViewModel(get()) }
+    viewModel { (tag: Tag) -> TagItemListViewModel(get(), tag) }
 }

@@ -18,11 +18,12 @@ root(["RootGraph"]) --- root/add_tag_screen("AddTagScreen")
 root(["RootGraph"]) --- item_info_screen("ItemInfoScreen")
 root(["RootGraph"]) --- item_list_screen("ItemListScreen")
 root(["RootGraph"]) --- root/select_user_item_screen("SelectUserItemScreen")
+root(["RootGraph"]) --- tag_item_list_screen("TagItemListScreen")
 root(["RootGraph"]) --- tag_list_screen("TagListScreen")
 
 
 classDef destination fill:#5383EC,stroke:#ffffff;
-class add_item_screen,add_item_tag_screen,root/add_tag_screen,item_info_screen,item_list_screen,main_screen,root/select_user_item_screen,tag_list_screen destination;
+class add_item_screen,add_item_tag_screen,root/add_tag_screen,item_info_screen,item_list_screen,main_screen,root/select_user_item_screen,tag_item_list_screen,tag_list_screen destination;
 classDef navgraph fill:#63BC76,stroke:#ffffff;
 class root navgraph;
 

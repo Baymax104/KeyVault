@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
@@ -227,7 +228,8 @@ private fun EditBar(
             modifier = Modifier.weight(1f)
         )
         TextButton(
-            onClick = { if (selectedNumber > 0) onDeleteClick() }
+            onClick = { if (selectedNumber > 0) onDeleteClick() },
+            colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
         ) {
             Text("删除", color = MaterialTheme.colorScheme.error)
         }

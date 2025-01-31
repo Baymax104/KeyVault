@@ -30,7 +30,7 @@ import org.koin.androidx.compose.koinViewModel
 import top.baymaxam.keyvault.model.domain.Tag
 import top.baymaxam.keyvault.state.TagListViewModel
 import top.baymaxam.keyvault.ui.component.InputField
-import top.baymaxam.keyvault.ui.component.SheetHeader
+import top.baymaxam.keyvault.ui.component.TitleHeader
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.util.AddItemGraph
 import top.baymaxam.keyvault.util.AddItemTagGraph
@@ -88,7 +88,7 @@ private fun ContentLayout(
             .fillMaxHeight(0.45f)
             .background(MaterialTheme.colorScheme.background)
     ) {
-        SheetHeader(
+        TitleHeader(
             title = "新建标签",
             leadingIcon = {
                 IconButton(onClick = onBack) {

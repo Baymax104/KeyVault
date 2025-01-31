@@ -46,7 +46,7 @@ import top.baymaxam.keyvault.model.domain.UserItem
 import top.baymaxam.keyvault.state.AddAuthViewModel
 import top.baymaxam.keyvault.ui.component.FillIcon
 import top.baymaxam.keyvault.ui.component.SearchField
-import top.baymaxam.keyvault.ui.component.SheetHeader
+import top.baymaxam.keyvault.ui.component.TitleHeader
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.ui.theme.IconColors
 import top.baymaxam.keyvault.util.AddItemGraph
@@ -95,7 +95,7 @@ private fun ContentLayout(
             .fillMaxHeight(0.8f)
             .background(MaterialTheme.colorScheme.background)
     ) {
-        SheetHeader(
+        TitleHeader(
             title = "选择授权",
             leadingIcon = {
                 IconButton(onClick = onBack) {

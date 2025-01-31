@@ -42,7 +42,7 @@ import top.baymaxam.keyvault.model.domain.UserItem
 import top.baymaxam.keyvault.state.AddItemTagViewModel
 import top.baymaxam.keyvault.state.SelectedState
 import top.baymaxam.keyvault.ui.component.FlowSelectableTags
-import top.baymaxam.keyvault.ui.component.SheetHeader
+import top.baymaxam.keyvault.ui.component.TitleHeader
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.util.AddItemTagGraph
 import top.baymaxam.keyvault.util.LocalNavigator
@@ -116,7 +116,7 @@ private fun ContentLayout(
             .fillMaxHeight(0.8f)
             .background(MaterialTheme.colorScheme.background)
     ) {
-        SheetHeader(
+        TitleHeader(
             title = "设置标签",
             leadingIcon = {
                 IconButton(onClick = onBack) {

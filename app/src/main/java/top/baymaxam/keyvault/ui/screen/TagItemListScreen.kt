@@ -20,8 +20,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.CreditCard
 import androidx.compose.material.icons.rounded.Person
@@ -33,15 +33,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -55,134 +53,113 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
-import com.ramcosta.composedestinations.generated.destinations.AddItemScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.ItemInfoScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 import top.baymaxam.keyvault.R
 import top.baymaxam.keyvault.model.domain.AuthItem
 import top.baymaxam.keyvault.model.domain.KeyItem
+import top.baymaxam.keyvault.model.domain.Tag
 import top.baymaxam.keyvault.model.domain.UserItem
 import top.baymaxam.keyvault.state.DialogState
-import top.baymaxam.keyvault.state.ItemListViewModel
 import top.baymaxam.keyvault.state.SelectedState
+import top.baymaxam.keyvault.state.TagItemListViewModel
 import top.baymaxam.keyvault.state.rememberDialogState
 import top.baymaxam.keyvault.ui.component.ConfirmDialog
 import top.baymaxam.keyvault.ui.component.FillIcon
-import top.baymaxam.keyvault.ui.component.FloatingButton
 import top.baymaxam.keyvault.ui.component.TopBackBar
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.ui.theme.IconColors
-import top.baymaxam.keyvault.util.errorToast
 import top.baymaxam.keyvault.util.successToast
 
 /**
- * 条目列表页
+ * 标签条目页
  * @author John
- * @since 06 8月 2024
+ * @since 31 1月 2025
  */
-@Destination<RootGraph>()
+@Destination<RootGraph>
 @Composable
-fun ItemListScreen(navigator: DestinationsNavigator) {
-    var isEditable by remember { mutableStateOf(false) }
-    val vm = koinViewModel<ItemListViewModel>()
-    val scope = rememberCoroutineScope()
-    val dialogState = rememberDialogState()
+fun TagItemListScreen(
+    navigator: DestinationsNavigator,
+    tag: Tag
+) {
+    val vm = koinViewModel<TagItemListViewModel> { parametersOf(tag) }
+    val editableState = remember { mutableStateOf(false) }
     val clipboardManager = LocalClipboardManager.current
+    val dialogState = rememberDialogState()
 
-    if (!isEditable) {
+    if (!editableState.value) {
         vm.items.forEach { it.selected = false }
     }
 
-    BackHandler(isEditable) {
-        isEditable = false
+    BackHandler(editableState.value) {
+        editableState.value = false
     }
 
     ContentLayout(
+        tag = vm.tag,
         items = vm.items,
-        isInitialized = vm.isInitialized,
-        isEditable = isEditable,
+        editableState = editableState,
         dialogState = dialogState,
-        onBack = { if (isEditable) isEditable = false else navigator.navigateUp() },
-        onEditClick = { isEditable = !isEditable },
-        onItemClick = { navigator.navigate(ItemInfoScreenDestination(it)) },
-        onAddClick = { navigator.navigate(AddItemScreenDestination) },
+        isInitialized = vm.isInitialized,
+        onBack = { navigator.navigateUp() },
         onItemCopy = {
             clipboardManager.setText(AnnotatedString(it.password))
             successToast("复制密码成功")
         },
         onSelected = {
-            isEditable = true
+            editableState.value = true
             it.selected = !it.selected
         },
+        onItemClick = { navigator.navigate(ItemInfoScreenDestination(it)) },
+        onAddClick = { },
         onDialogConfirm = {
-            scope.launch {
-                vm.removeSelectedItems()
-                    .onSuccess { successToast("删除成功") }
-                    .onFailure { errorToast(it.message) }
-            }
-        },
+            // TODO 删除
+        }
     )
 }
 
 @Composable
 private fun ContentLayout(
+    tag: Tag = Tag(),
     items: List<SelectedState<KeyItem>> = emptyList(),
-    isInitialized: Boolean = true,
     dialogState: DialogState = rememberDialogState(),
-    isEditable: Boolean = false,
+    editableState: MutableState<Boolean> = mutableStateOf(false),
+    isInitialized: Boolean = true,
     onBack: () -> Unit = {},
-    onItemClick: (KeyItem) -> Unit = {},
     onItemCopy: (UserItem) -> Unit = {},
+    onItemClick: (KeyItem) -> Unit = {},
     onSelected: (SelectedState<KeyItem>) -> Unit = {},
-    onEditClick: () -> Unit = {},
     onAddClick: () -> Unit = {},
     onDialogConfirm: () -> Unit = {},
 ) {
-
     Scaffold(
         topBar = {
-            TopBackBar(
-                onBack = onBack,
-                actions = {
-                    TextButton(onClick = onEditClick) {
-                        Text(if (!isEditable) "管理" else "完成")
-                    }
-                }
-            ) {
-                Text("密码本")
-            }
-        },
-        floatingActionButton = {
-            if (!isEditable) {
-                FloatingButton(
-                    icon = Icons.Rounded.Add,
-                    modifier = Modifier.padding(end = 15.dp, bottom = 25.dp),
-                    onClick = onAddClick
-                )
+            TopBackBar(onBack = onBack) {
+                Text(tag.name, fontSize = 18.sp, fontWeight = FontWeight.Bold)
             }
         }
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .padding(paddingValues)
-                .fillMaxSize(),
+                .fillMaxSize()
         ) {
             ItemListView(
                 items = items,
                 isInitialized = isInitialized,
-                isEditable = isEditable,
+                isEditable = editableState.value,
                 onItemCopy = onItemCopy,
                 onItemClick = onItemClick,
                 onSelected = onSelected
             )
-            if (isEditable) {
-                EditBar(
-                    items = items,
-                    onDeleteClick = { dialogState.show() }
-                )
-            }
+            EditBar(
+                items = items,
+                isEditable = editableState,
+                onAddClick = onAddClick,
+                onDeleteClick = { dialogState.show() }
+            )
         }
     }
     ConfirmDialog(
@@ -196,26 +173,41 @@ private fun ContentLayout(
 @Composable
 private fun EditBar(
     items: List<SelectedState<KeyItem>> = emptyList(),
+    isEditable: MutableState<Boolean> = mutableStateOf(false),
+    onAddClick: () -> Unit = {},
     onDeleteClick: () -> Unit = {},
 ) {
     val selectedNumber by remember { derivedStateOf { items.count { it.selected } } }
     Row(
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
             .fillMaxWidth()
             .height(60.dp)
             .background(MaterialTheme.colorScheme.inverseOnSurface)
             .padding(vertical = 5.dp, horizontal = 15.dp)
     ) {
-        Text(
-            text = "已选：${selectedNumber}项，共${items.size}项",
-            modifier = Modifier.weight(1f)
-        )
+        if (isEditable.value) {
+            Text(
+                text = "已选：${selectedNumber}项，共${items.size}项",
+                modifier = Modifier.weight(1f)
+            )
+        } else {
+            TextButton(onClick = onAddClick) {
+                Text("添加")
+            }
+        }
         TextButton(
-            onClick = { if (selectedNumber > 0) onDeleteClick() },
-            colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+            colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
+            onClick = {
+                if (!isEditable.value) {
+                    isEditable.value = true
+                } else if (selectedNumber > 0) {
+                    onDeleteClick()
+                }
+            }
         ) {
-            Text("删除", color = MaterialTheme.colorScheme.error)
+            Text("移出", color = MaterialTheme.colorScheme.error)
         }
     }
 }
@@ -337,7 +329,7 @@ private fun KeyItemLayout(
                         .weight(1f)
                         .padding(horizontal = 10.dp)
                 ) {
-                    Text(
+                    androidx.compose.material3.Text(
                         text = keyItem.name,
                         style = TextStyle(
                             fontWeight = FontWeight.Normal,
@@ -345,7 +337,7 @@ private fun KeyItemLayout(
                         )
                     )
                     Spacer(modifier = Modifier.height(5.dp))
-                    Text(
+                    androidx.compose.material3.Text(
                         text = when (keyItem) {
                             is UserItem -> keyItem.username
                             is AuthItem -> keyItem.authName
@@ -374,19 +366,19 @@ private fun KeyItemLayout(
 }
 
 
-@Preview(showSystemUi = true, showBackground = true)
+@Preview(showBackground = true)
 @Composable
 private fun Preview() {
     AppTheme {
+        val items = listOf(
+            SelectedState(UserItem(name = "Hello1")),
+            SelectedState(UserItem()),
+            SelectedState(UserItem()),
+            SelectedState(UserItem()),
+        )
         ContentLayout(
-            items = listOf(
-                SelectedState(UserItem(name = "hello1")),
-                SelectedState(UserItem(name = "hello1")),
-                SelectedState(UserItem(name = "hello1")),
-                SelectedState(UserItem(name = "hello1")),
-                SelectedState(UserItem(name = "hello1")),
-            ),
-            isEditable = true
+            tag = Tag(name = "hello"),
+            items = items
         )
     }
 }

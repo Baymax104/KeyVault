@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
  * @since 26 1月 2025
  */
 @Composable
-fun SheetHeader(
+fun TitleHeader(
     title: String,
     leadingIcon: @Composable BoxScope.() -> Unit = {},
     trailingIcon: @Composable BoxScope.() -> Unit = {},

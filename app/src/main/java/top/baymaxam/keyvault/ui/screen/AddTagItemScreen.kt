@@ -9,18 +9,19 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Done
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,72 +29,97 @@ import androidx.compose.ui.unit.dp
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.bottomsheet.spec.DestinationStyleBottomSheet
-import com.ramcosta.composedestinations.result.ResultBackNavigator
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
+import top.baymaxam.keyvault.model.domain.AuthItem
 import top.baymaxam.keyvault.model.domain.KeyItem
+import top.baymaxam.keyvault.model.domain.Tag
 import top.baymaxam.keyvault.model.domain.UserItem
-import top.baymaxam.keyvault.state.SelectUserItemViewModel
+import top.baymaxam.keyvault.state.SelectItemViewModel
+import top.baymaxam.keyvault.state.SelectedState
 import top.baymaxam.keyvault.ui.component.SearchField
-import top.baymaxam.keyvault.ui.component.SelectUserItemLayout
+import top.baymaxam.keyvault.ui.component.SelectKeyItemLayout
 import top.baymaxam.keyvault.ui.component.TitleHeader
 import top.baymaxam.keyvault.ui.theme.AppTheme
-import top.baymaxam.keyvault.util.AddItemGraph
+import top.baymaxam.keyvault.util.errorToast
+import top.baymaxam.keyvault.util.successToast
 
 /**
- * 添加页选择授权页
+ * AddTagItemScreen
  * @author John
- * @since 03 8月 2024
+ * @since 06 2月 2025
  */
-@Destination<AddItemGraph>
 @Destination<RootGraph>(style = DestinationStyleBottomSheet::class)
 @Composable
-fun SelectUserItemScreen(navigator: ResultBackNavigator<UserItem>) {
-    val vm = koinViewModel<SelectUserItemViewModel>()
-    val searchContentState = remember { mutableStateOf("") }
-    val userItemListState = rememberLazyListState()
+fun AddTagItemScreen(
+    navigator: DestinationsNavigator,
+    tag: Tag
+) {
+    val searchState = remember { mutableStateOf("") }
+    val vm = koinViewModel<SelectItemViewModel> { parametersOf(tag) }
+    val itemListState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
 
-    if (searchContentState.value.isEmpty()) {
+    if (searchState.value.isEmpty()) {
         LaunchedEffect(Unit) {
             vm.candidateItems.refreshState()
-            userItemListState.scrollToItem(0)
+            itemListState.scrollToItem(0)
         }
     }
 
     ContentLayout(
-        searchContentState = searchContentState,
         items = vm.candidateItems.state,
-        onSearch = { vm.search(searchContentState.value) },
-        onBack = { navigator.navigateBack() },
-        onUserItemClick = { navigator.navigateBack(it) }
+        searchState = searchState,
+        itemListState = itemListState,
+        onBack = { navigator.navigateUp() },
+        onSearch = { vm.search(searchState.value) },
+        onDone = {
+            scope.launch {
+                vm.addItem()
+                    .onFailure { errorToast(it.message) }
+                    .onSuccess {
+                        successToast("添加成功")
+                        navigator.navigateUp()
+                    }
+            }
+        }
     )
 }
 
 @Composable
 private fun ContentLayout(
-    searchContentState: MutableState<String> = mutableStateOf(""),
-    items: List<KeyItem> = mutableStateListOf(),
+    items: List<SelectedState<KeyItem>> = emptyList(),
+    searchState: MutableState<String> = mutableStateOf(""),
     itemListState: LazyListState = rememberLazyListState(),
     onBack: () -> Unit = {},
+    onDone: () -> Unit = {},
     onSearch: () -> Unit = {},
-    onUserItemClick: (UserItem) -> Unit = {}
 ) {
     Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight(0.8f)
             .background(MaterialTheme.colorScheme.background)
     ) {
         TitleHeader(
-            title = "选择授权",
+            title = "添加条目",
             leadingIcon = {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = null)
+                    Icon(Icons.Rounded.Close, contentDescription = null)
+                }
+            },
+            trailingIcon = {
+                IconButton(onClick = onDone) {
+                    Icon(Icons.Rounded.Done, contentDescription = null)
                 }
             }
         )
 
         SearchField(
-            contentState = searchContentState,
+            contentState = searchState,
             placeholder = { Text("搜索条目") },
             onSearch = onSearch,
             modifier = Modifier
@@ -103,35 +129,31 @@ private fun ContentLayout(
 
         LazyColumn(
             state = itemListState,
-            modifier = Modifier.weight(1f),
-            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.weight(1f)
         ) {
             items(
                 items = items,
-                key = { it.id }
-            ) {
-                SelectUserItemLayout(
-                    item = it as UserItem,
-                    onClick = onUserItemClick
+                key = { it.value.id }
+            ) { item ->
+                SelectKeyItemLayout(
+                    item = item,
+                    onClick = { it.selected = !it.selected },
+                    onSelected = { it.selected = !it.selected }
                 )
             }
         }
     }
 }
 
-
-@Preview(showBackground = true)
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun Preview() {
     AppTheme {
-        val list = remember {
-            mutableStateListOf(
-                UserItem(name = "测试", username = "username"),
-                UserItem(name = "TestCard", username = "code")
-            )
-        }
         ContentLayout(
-            items = list
+            items = listOf(
+                SelectedState(UserItem(name = "Hello")),
+                SelectedState(AuthItem(name = "Hello1"))
+            )
         )
     }
 }

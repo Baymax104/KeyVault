@@ -49,7 +49,7 @@ class AddItemTagViewModel(
             val oldTags = cache.map { it.asEntity() }
             val inserted = newTags.filterNot { i1 -> oldTags.any { i2 -> i1.id == i2.id } }
             val removed = oldTags.filterNot { i2 -> newTags.any { i1 -> i1.id == i2.id } }
-            tagRepository.setTagsByKeyId(item.id, inserted, removed)
+            tagRepository.updateTagsByKeyId(item.id, inserted, removed)
         }
     }
 }

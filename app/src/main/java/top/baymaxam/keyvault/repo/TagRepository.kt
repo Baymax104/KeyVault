@@ -13,7 +13,11 @@ class TagRepository(
     private val keyTagDao: KeyTagDao,
 ) : TagDao by dao {
 
-    suspend fun setTagsByKeyId(keyId: String, inserted: List<TagEntity>, removed: List<TagEntity>) {
+    suspend fun updateTagsByKeyId(
+        keyId: String,
+        inserted: List<TagEntity>,
+        removed: List<TagEntity>
+    ) {
         transaction {
             val insertedRelations = inserted.map { KeyTagRelation(keyId, it.id) }
             val removedRelations = removed.map { KeyTagRelation(keyId, it.id) }

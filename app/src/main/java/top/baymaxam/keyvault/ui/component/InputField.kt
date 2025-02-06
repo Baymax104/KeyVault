@@ -40,6 +40,9 @@ fun SearchField(
     onSearch: () -> Unit = {}
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
+    if (contentState.value.isNotEmpty()) {
+        onSearch()
+    }
     OutlinedTextField(
         value = contentState.value,
         onValueChange = { contentState.value = it },

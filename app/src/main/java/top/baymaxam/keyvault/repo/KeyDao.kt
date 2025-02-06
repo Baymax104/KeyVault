@@ -2,6 +2,7 @@ package top.baymaxam.keyvault.repo
 
 import androidx.room.Dao
 import androidx.room.Query
+import androidx.room.RewriteQueriesToDropUnusedColumns
 import kotlinx.coroutines.flow.Flow
 import top.baymaxam.keyvault.model.domain.KeyType
 import top.baymaxam.keyvault.model.entity.KeyEntity
@@ -23,9 +24,6 @@ interface KeyDao : BaseDao<KeyEntity> {
     @Query("select count(*) from t_key")
     fun queryCount(): Flow<Int>
 
-    @Query("select * from t_key where type != 'Authorization'")
-    fun queryUserItems(): Flow<List<KeyEntity>>
-
     @Query("select * from t_key where id = :id")
     suspend fun queryById(id: String): KeyEntity
 
@@ -34,4 +32,14 @@ interface KeyDao : BaseDao<KeyEntity> {
 
     @Query("update t_key set authName = :authName where authId = :authId")
     suspend fun updateAuthName(authId: String, authName: String)
+
+    @RewriteQueriesToDropUnusedColumns
+    @Query(
+        """
+            select * from t_key
+            join t_key_tag on t_key.id = t_key_tag.keyId
+            where t_key_tag.tagId = :tagId
+        """
+    )
+    fun queryByTagId(tagId: String): Flow<List<KeyEntity>>
 }

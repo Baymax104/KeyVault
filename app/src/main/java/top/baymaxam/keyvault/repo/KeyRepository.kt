@@ -22,4 +22,14 @@ class KeyRepository(
         }
     }
 
+    suspend fun insertTagItems(tagEntity: TagEntity, keyEntities: List<KeyEntity>) {
+        val relations = keyEntities.map { KeyTagRelation(it.id, tagEntity.id) }
+        keyTagDao.insert(relations)
+    }
+
+    suspend fun deleteTagItems(tagEntity: TagEntity, keyEntities: List<KeyEntity>) {
+        val relations = keyEntities.map { KeyTagRelation(it.id, tagEntity.id) }
+        keyTagDao.delete(relations)
+    }
+
 }

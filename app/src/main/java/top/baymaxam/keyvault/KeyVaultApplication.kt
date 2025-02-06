@@ -13,11 +13,12 @@ import top.baymaxam.keyvault.model.domain.Tag
 import top.baymaxam.keyvault.repo.KeyRepository
 import top.baymaxam.keyvault.repo.LocalDatabase
 import top.baymaxam.keyvault.repo.TagRepository
-import top.baymaxam.keyvault.state.AddAuthViewModel
 import top.baymaxam.keyvault.state.AddItemTagViewModel
 import top.baymaxam.keyvault.state.AddItemViewModel
 import top.baymaxam.keyvault.state.ItemListViewModel
 import top.baymaxam.keyvault.state.ItemViewModel
+import top.baymaxam.keyvault.state.SelectItemViewModel
+import top.baymaxam.keyvault.state.SelectUserItemViewModel
 import top.baymaxam.keyvault.state.TagItemListViewModel
 import top.baymaxam.keyvault.state.TagListViewModel
 
@@ -53,8 +54,9 @@ val appModule = module {
     viewModel { ItemListViewModel(get()) }
     viewModel { (item: KeyItem) -> ItemViewModel(get(), get(), item) }
     viewModel { AddItemViewModel(get(), get()) }
-    viewModel { AddAuthViewModel(get()) }
+    viewModel { SelectUserItemViewModel(get()) }
     viewModel { (item: KeyItem) -> AddItemTagViewModel(get(), item) }
+    viewModel { (tag: Tag) -> SelectItemViewModel(get(), tag) }
     viewModel { TagListViewModel(get()) }
     viewModel { (tag: Tag) -> TagItemListViewModel(get(), tag) }
 }

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import top.baymaxam.keyvault.model.domain.KeyItem
+import top.baymaxam.keyvault.model.domain.KeyType
 import top.baymaxam.keyvault.model.entity.asItem
 import top.baymaxam.keyvault.repo.KeyRepository
 import top.baymaxam.keyvault.util.CachedStateList
@@ -14,20 +15,20 @@ import top.baymaxam.keyvault.util.CachedStateList
  * @author John
  * @since 22 1月 2025
  */
-class AddAuthViewModel(private val repository: KeyRepository) : ViewModel() {
+class SelectUserItemViewModel(private val repository: KeyRepository) : ViewModel() {
 
-    val candidateUserItems = CachedStateList<KeyItem>()
+    val candidateItems = CachedStateList<KeyItem>()
 
     init {
         viewModelScope.launch {
-            repository.queryUserItems()
+            repository.queryByType(KeyType.User)
                 .map { l -> l.map { it.asItem() } }
-                .collect { candidateUserItems.cacheList = it }
+                .collect { candidateItems.cacheList = it }
         }
     }
 
-    fun searchUserItem(content: String) {
-        candidateUserItems.cacheList.filter { it.name.contains(content, true) }
-            .let { candidateUserItems.refreshState(it) }
+    fun search(content: String) {
+        candidateItems.cacheList.filter { it.name.contains(content, true) }
+            .let { candidateItems.refreshState(it) }
     }
 }

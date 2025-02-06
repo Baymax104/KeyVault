@@ -1,16 +1,13 @@
 package top.baymaxam.keyvault.ui.screen
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,13 +17,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -40,13 +35,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.RootAddTagScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.TagItemListScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -57,11 +51,10 @@ import top.baymaxam.keyvault.state.SelectedState
 import top.baymaxam.keyvault.state.TagListViewModel
 import top.baymaxam.keyvault.state.rememberDialogState
 import top.baymaxam.keyvault.ui.component.ConfirmDialog
-import top.baymaxam.keyvault.ui.component.FillIcon
 import top.baymaxam.keyvault.ui.component.FloatingButton
+import top.baymaxam.keyvault.ui.component.TagItemLayout
 import top.baymaxam.keyvault.ui.component.TopBackBar
 import top.baymaxam.keyvault.ui.theme.AppTheme
-import top.baymaxam.keyvault.ui.theme.IconColors
 import top.baymaxam.keyvault.util.errorToast
 import top.baymaxam.keyvault.util.successToast
 
@@ -86,7 +79,6 @@ fun TagListScreen(navigator: DestinationsNavigator) {
         isEditable = false
     }
 
-    // TODO 标签详情条目列表
     ContentLayout(
         items = vm.tags,
         dialogState = dialogState,
@@ -95,7 +87,7 @@ fun TagListScreen(navigator: DestinationsNavigator) {
         onBack = { if (isEditable) isEditable = false else navigator.navigateUp() },
         onAddClick = { navigator.navigate(RootAddTagScreenDestination) },
         onEditClick = { isEditable = !isEditable },
-        onItemClick = {},
+        onItemClick = { navigator.navigate(TagItemListScreenDestination(it)) },
         onItemSelected = {
             isEditable = true
             it.selected = !it.selected
@@ -255,7 +247,7 @@ fun TagList(
             items = items,
             key = { it.value.id }
         ) {
-            TagListItem(
+            TagItemLayout(
                 item = it,
                 isEditable = isEditable,
                 onClick = onItemClick,
@@ -264,54 +256,6 @@ fun TagList(
         }
     }
 }
-
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-private fun TagListItem(
-    item: SelectedState<Tag>,
-    isEditable: Boolean = false,
-    onClick: (Tag) -> Unit = {},
-    onSelected: (SelectedState<Tag>) -> Unit = {},
-) {
-    val (tag) = item
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .combinedClickable(
-                onLongClick = { if (!isEditable) onSelected(item) },
-                onClick = { if (isEditable) onSelected(item) else onClick(tag) }
-            )
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxHeight()
-                .padding(start = 10.dp, top = 15.dp, bottom = 15.dp)
-                .align(Alignment.CenterStart)
-        ) {
-            FillIcon(
-                icon = painterResource(R.drawable.ic_tag),
-                colors = IconColors.IndexTag,
-                shape = RoundedCornerShape(10.dp)
-            )
-            Text(
-                text = tag.name,
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp,
-                modifier = Modifier.padding(start = 10.dp)
-            )
-        }
-        if (isEditable) {
-            RadioButton(
-                selected = item.selected,
-                onClick = { onSelected(item) },
-                modifier = Modifier.align(Alignment.CenterEnd)
-            )
-        }
-    }
-}
-
 
 @Preview(showBackground = true)
 @Composable

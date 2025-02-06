@@ -56,8 +56,8 @@ import top.baymaxam.keyvault.model.domain.AuthItem
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.UserItem
 import top.baymaxam.keyvault.model.entity.asItem
-import top.baymaxam.keyvault.repo.KeyDao
-import top.baymaxam.keyvault.repo.TagDao
+import top.baymaxam.keyvault.repo.KeyRepository
+import top.baymaxam.keyvault.repo.TagRepository
 import top.baymaxam.keyvault.ui.component.FillIcon
 import top.baymaxam.keyvault.ui.component.FillIconColors
 import top.baymaxam.keyvault.ui.theme.AppTheme
@@ -74,8 +74,8 @@ import top.baymaxam.keyvault.util.currentOrThrow
 @Composable
 fun HomeScreen() {
     val navigator = LocalNavigator.currentOrThrow
-    val keyDao = koinInject<KeyDao>()
-    val tagDao = koinInject<TagDao>()
+    val keyDao = koinInject<KeyRepository>()
+    val tagDao = koinInject<TagRepository>()
     val tagCountState = tagDao.queryCount().collectAsState(0)
     val passwordCountState = keyDao.queryCount().collectAsState(0)
     val resentUsedItems = keyDao.queryOrderedByResentDate()
@@ -131,46 +131,47 @@ private fun Header(
     onItemClick: () -> Unit = {},
     onTagClick: () -> Unit = {}
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .padding(horizontal = 15.dp)
-            .statusBarsPadding(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-
-        Box(
-            modifier = Modifier.fillMaxWidth()
+    Surface(color = MaterialTheme.colorScheme.surfaceVariant) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 15.dp)
+                .statusBarsPadding()
         ) {
-            Text(
-                text = stringResource(id = R.string.app_name),
-                style = TextStyle(
-                    fontFamily = robotoFont,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Black,
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onBackground
-                ),
-                modifier = Modifier.align(Alignment.Center)
-            )
-            IconButton(
-                onClick = onSearch,
-                modifier = Modifier.align(Alignment.CenterEnd)
-            ) {
-                Icon(
-                    imageVector = Icons.Rounded.Search,
-                    contentDescription = null
-                )
-            }
-        }
 
-        IndexView(
-            itemCount = itemCount,
-            tagCount = tagCount,
-            onItemClick = onItemClick,
-            onTagClick = onTagClick
-        )
+            Box(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = stringResource(id = R.string.app_name),
+                    style = TextStyle(
+                        fontFamily = robotoFont,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Black,
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onBackground
+                    ),
+                    modifier = Modifier.align(Alignment.Center)
+                )
+                IconButton(
+                    onClick = onSearch,
+                    modifier = Modifier.align(Alignment.CenterEnd)
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Search,
+                        contentDescription = null
+                    )
+                }
+            }
+
+            IndexView(
+                itemCount = itemCount,
+                tagCount = tagCount,
+                onItemClick = onItemClick,
+                onTagClick = onTagClick
+            )
+        }
     }
 }
 

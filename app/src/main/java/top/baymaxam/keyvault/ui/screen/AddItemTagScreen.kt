@@ -1,6 +1,5 @@
 package top.baymaxam.keyvault.ui.screen
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,6 +17,7 @@ import androidx.compose.material.icons.rounded.Done
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -110,59 +110,60 @@ private fun ContentLayout(
     onAddTagClick: () -> Unit = {},
     onDone: () -> Unit = {},
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(0.8f)
-            .background(MaterialTheme.colorScheme.background)
-    ) {
-        TitleHeader(
-            title = "设置标签",
-            leadingIcon = {
-                IconButton(onClick = onBack) {
-                    Icon(Icons.Rounded.Close, contentDescription = null)
-                }
-            },
-            trailingIcon = {
-                IconButton(onClick = onDone) {
-                    Icon(Icons.Rounded.Done, contentDescription = null)
-                }
-            }
-        )
-
+    Surface(color = MaterialTheme.colorScheme.background) {
         Column(
             modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 15.dp, vertical = 10.dp)
+                .fillMaxWidth()
+                .fillMaxHeight(0.8f)
         ) {
-            Text("已选标签：")
-            FlowSelectableTags(
-                items = tags.filter { it.selected },
-                modifier = Modifier.fillMaxWidth(),
-                maxItemsInEachRow = 5,
-                onCloseClick = onToggleTag,
-                onItemClick = onToggleTag
+            TitleHeader(
+                title = "设置标签",
+                leadingIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.Rounded.Close, contentDescription = null)
+                    }
+                },
+                trailingIcon = {
+                    IconButton(onClick = onDone) {
+                        Icon(Icons.Rounded.Done, contentDescription = null)
+                    }
+                }
             )
 
-            Spacer(Modifier.height(20.dp))
-
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
+            Column(
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 15.dp, vertical = 10.dp)
             ) {
-                Text("可选标签：")
-                Text(
-                    "新建",
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.clickable(onClick = onAddTagClick)
+                Text("已选标签：")
+                FlowSelectableTags(
+                    items = tags.filter { it.selected },
+                    modifier = Modifier.fillMaxWidth(),
+                    maxItemsInEachRow = 5,
+                    onCloseClick = onToggleTag,
+                    onItemClick = onToggleTag
+                )
+
+                Spacer(Modifier.height(20.dp))
+
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("可选标签：")
+                    Text(
+                        "新建",
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.clickable(onClick = onAddTagClick)
+                    )
+                }
+                FlowSelectableTags(
+                    items = tags.filter { !it.selected },
+                    modifier = Modifier.fillMaxWidth(),
+                    maxItemsInEachRow = 5,
+                    onItemClick = onToggleTag
                 )
             }
-            FlowSelectableTags(
-                items = tags.filter { !it.selected },
-                modifier = Modifier.fillMaxWidth(),
-                maxItemsInEachRow = 5,
-                onItemClick = onToggleTag
-            )
         }
     }
 }

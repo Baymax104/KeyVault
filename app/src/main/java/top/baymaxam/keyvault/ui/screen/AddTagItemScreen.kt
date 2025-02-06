@@ -1,6 +1,5 @@
 package top.baymaxam.keyvault.ui.screen
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,13 +8,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Done
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -97,49 +97,50 @@ private fun ContentLayout(
     onDone: () -> Unit = {},
     onSearch: () -> Unit = {},
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(0.8f)
-            .background(MaterialTheme.colorScheme.background)
-    ) {
-        TitleHeader(
-            title = "添加条目",
-            leadingIcon = {
-                IconButton(onClick = onBack) {
-                    Icon(Icons.Rounded.Close, contentDescription = null)
-                }
-            },
-            trailingIcon = {
-                IconButton(onClick = onDone) {
-                    Icon(Icons.Rounded.Done, contentDescription = null)
-                }
-            }
-        )
-
-        SearchField(
-            contentState = searchState,
-            placeholder = { Text("搜索条目") },
-            onSearch = onSearch,
+    Surface(color = MaterialTheme.colorScheme.background) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
-                .padding(horizontal = 20.dp, vertical = 5.dp)
                 .fillMaxWidth()
-        )
-
-        LazyColumn(
-            state = itemListState,
-            modifier = Modifier.weight(1f)
+                .fillMaxHeight(0.8f)
         ) {
-            items(
-                items = items,
-                key = { it.value.id }
-            ) { item ->
-                SelectKeyItemLayout(
-                    item = item,
-                    onClick = { it.selected = !it.selected },
-                    onSelected = { it.selected = !it.selected }
-                )
+            TitleHeader(
+                title = "添加条目",
+                leadingIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.Rounded.Close, contentDescription = null)
+                    }
+                },
+                trailingIcon = {
+                    IconButton(onClick = onDone) {
+                        Icon(Icons.Rounded.Done, contentDescription = null)
+                    }
+                }
+            )
+
+            SearchField(
+                contentState = searchState,
+                placeholder = { Text("搜索条目") },
+                onSearch = onSearch,
+                modifier = Modifier
+                    .padding(horizontal = 20.dp, vertical = 5.dp)
+                    .fillMaxWidth()
+            )
+
+            LazyColumn(
+                state = itemListState,
+                modifier = Modifier.weight(1f)
+            ) {
+                items(
+                    items = items,
+                    key = { it.value.id }
+                ) { item ->
+                    SelectKeyItemLayout(
+                        item = item,
+                        onClick = { it.selected = !it.selected },
+                        onSelected = { it.selected = !it.selected }
+                    )
+                }
             }
         }
     }

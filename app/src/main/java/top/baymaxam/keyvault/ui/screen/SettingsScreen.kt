@@ -3,6 +3,8 @@ package top.baymaxam.keyvault.ui.screen
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import top.baymaxam.keyvault.ui.theme.AppTheme
+import top.baymaxam.keyvault.util.LocalNavigator
+import top.baymaxam.keyvault.util.currentOrThrow
 
 /**
  * 设置页
@@ -11,6 +13,7 @@ import top.baymaxam.keyvault.ui.theme.AppTheme
  */
 @Composable
 fun SettingScreen() {
+    val navigator = LocalNavigator.currentOrThrow
     ContentLayout()
 }
 

@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -25,9 +24,7 @@ import top.baymaxam.keyvault.util.NavigatorProvider
  * @author John
  * @since 23 6月 2024
  */
-@Destination<RootGraph>(
-    start = true,
-)
+@Destination<RootGraph>(start = true)
 @Composable
 fun MainScreen(navigator: DestinationsNavigator) {
     val pagerState = rememberPagerState { 2 }
@@ -57,7 +54,7 @@ private fun ContentLayout(
         ) {
             when (it) {
                 0 -> HomeScreen()
-                1 -> Text("Page2")
+                1 -> SettingScreen()
             }
         }
         BottomBar(

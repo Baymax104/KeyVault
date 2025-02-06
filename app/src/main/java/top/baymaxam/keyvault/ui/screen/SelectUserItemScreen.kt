@@ -1,6 +1,5 @@
 package top.baymaxam.keyvault.ui.screen
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +13,7 @@ import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -77,43 +77,44 @@ private fun ContentLayout(
     onSearch: () -> Unit = {},
     onUserItemClick: (UserItem) -> Unit = {}
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(0.8f)
-            .background(MaterialTheme.colorScheme.background)
-    ) {
-        TitleHeader(
-            title = "选择授权",
-            leadingIcon = {
-                IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = null)
-                }
-            }
-        )
-
-        SearchField(
-            contentState = searchContentState,
-            placeholder = { Text("搜索条目") },
-            onSearch = onSearch,
+    Surface(color = MaterialTheme.colorScheme.background) {
+        Column(
             modifier = Modifier
-                .padding(horizontal = 20.dp, vertical = 5.dp)
                 .fillMaxWidth()
-        )
-
-        LazyColumn(
-            state = itemListState,
-            modifier = Modifier.weight(1f),
-            horizontalAlignment = Alignment.CenterHorizontally,
+                .fillMaxHeight(0.8f)
         ) {
-            items(
-                items = items,
-                key = { it.id }
+            TitleHeader(
+                title = "选择授权",
+                leadingIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = null)
+                    }
+                }
+            )
+
+            SearchField(
+                contentState = searchContentState,
+                placeholder = { Text("搜索条目") },
+                onSearch = onSearch,
+                modifier = Modifier
+                    .padding(horizontal = 20.dp, vertical = 5.dp)
+                    .fillMaxWidth()
+            )
+
+            LazyColumn(
+                state = itemListState,
+                modifier = Modifier.weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                SelectUserItemLayout(
-                    item = it as UserItem,
-                    onClick = onUserItemClick
-                )
+                items(
+                    items = items,
+                    key = { it.id }
+                ) {
+                    SelectUserItemLayout(
+                        item = it as UserItem,
+                        onClick = onUserItemClick
+                    )
+                }
             }
         }
     }

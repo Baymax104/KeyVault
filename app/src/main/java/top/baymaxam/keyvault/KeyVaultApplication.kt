@@ -21,6 +21,8 @@ import top.baymaxam.keyvault.state.SelectItemViewModel
 import top.baymaxam.keyvault.state.SelectUserItemViewModel
 import top.baymaxam.keyvault.state.TagItemListViewModel
 import top.baymaxam.keyvault.state.TagListViewModel
+import top.baymaxam.keyvault.util.DataStoreHelper
+import top.baymaxam.keyvault.util.KeyStoreHelper
 
 /**
  * Application
@@ -46,6 +48,8 @@ class KeyVaultApplication : Application() {
 }
 
 val appModule = module {
+    single { KeyStoreHelper() }
+    single { DataStoreHelper(androidContext()) }
     single { LocalDatabase.Instance.keyDao() }
     single { LocalDatabase.Instance.tagDao() }
     single { LocalDatabase.Instance.keyTagDao() }

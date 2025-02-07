@@ -64,7 +64,6 @@ import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.ui.theme.IconColors
 import top.baymaxam.keyvault.ui.theme.robotoFont
 import top.baymaxam.keyvault.util.LocalNavigator
-import top.baymaxam.keyvault.util.currentOrThrow
 
 /**
  * 首页
@@ -73,7 +72,7 @@ import top.baymaxam.keyvault.util.currentOrThrow
  */
 @Composable
 fun HomeScreen() {
-    val navigator = LocalNavigator.currentOrThrow
+    val navigator = LocalNavigator.current
     val keyDao = koinInject<KeyRepository>()
     val tagDao = koinInject<TagRepository>()
     val tagCountState = tagDao.queryCount().collectAsState(0)

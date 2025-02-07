@@ -103,4 +103,5 @@ dependencies {
     implementation(libs.destinations.core)
     ksp(libs.destinations.ksp)
     implementation(libs.destinations.bottomsheet)
+    implementation(libs.datastore.preferences)
 }

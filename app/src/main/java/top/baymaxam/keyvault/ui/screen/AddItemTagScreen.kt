@@ -54,7 +54,6 @@ import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.util.AddItemTagGraph
 import top.baymaxam.keyvault.util.LocalNavigator
 import top.baymaxam.keyvault.util.NavigatorProvider
-import top.baymaxam.keyvault.util.currentOrThrow
 import top.baymaxam.keyvault.util.errorToast
 import top.baymaxam.keyvault.util.successToast
 
@@ -87,7 +86,7 @@ fun SelectTagScreen(
     navigator: DestinationsNavigator,
     keyItem: KeyItem = UserItem(),
 ) {
-    val rootNavigator = LocalNavigator.currentOrThrow
+    val rootNavigator = LocalNavigator.current
     val vm = koinInject<AddItemTagViewModel> { parametersOf(keyItem) }
     val scope = rememberCoroutineScope()
 

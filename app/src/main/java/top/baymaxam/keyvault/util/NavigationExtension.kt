@@ -40,12 +40,9 @@ enum class MainTabDestination(
     Settings(1, Icons.Rounded.Settings)
 }
 
-val LocalNavigator: ProvidableCompositionLocal<DestinationsNavigator?> =
-    staticCompositionLocalOf { null }
+val LocalNavigator: ProvidableCompositionLocal<DestinationsNavigator> =
+    staticCompositionLocalOf { error("CompositionLocal is null") }
 
-val <T> ProvidableCompositionLocal<T?>.currentOrThrow: T
-    @Composable
-    get() = current ?: error("CompositionLocal is null")
 
 @Composable
 fun NavigatorProvider(

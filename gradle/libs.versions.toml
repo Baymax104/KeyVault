@@ -19,6 +19,7 @@ toasty = "1.5.2"
 koin = "4.0.0-RC1"
 splashscreen = "1.0.0"
 destinations = "2.1.0-beta15"
+datastore = "1.1.2"
 
 
 [libraries]
@@ -53,6 +54,7 @@ splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "spla
 destinations-core = { module = "io.github.raamcosta.compose-destinations:core", version.ref = "destinations" }
 destinations-ksp = { module = "io.github.raamcosta.compose-destinations:ksp", version.ref = "destinations" }
 destinations-bottomsheet = { module = "io.github.raamcosta.compose-destinations:bottom-sheet", version.ref = "destinations"}
+datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 
 
 [plugins]

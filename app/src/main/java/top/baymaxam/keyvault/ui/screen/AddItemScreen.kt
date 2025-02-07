@@ -67,7 +67,6 @@ import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.util.AddItemGraph
 import top.baymaxam.keyvault.util.LocalNavigator
 import top.baymaxam.keyvault.util.NavigatorProvider
-import top.baymaxam.keyvault.util.currentOrThrow
 import top.baymaxam.keyvault.util.errorToast
 import top.baymaxam.keyvault.util.successToast
 
@@ -90,7 +89,7 @@ fun AddInputScreen(
     navigator: DestinationsNavigator,
     authRecipient: ResultRecipient<AddItemSelectUserItemScreenDestination, UserItem>
 ) {
-    val rootNavigator = LocalNavigator.currentOrThrow
+    val rootNavigator = LocalNavigator.current
     val vm = koinViewModel<AddItemViewModel>()
     val tagListState = rememberLazyListState()
     val scope = rememberCoroutineScope()

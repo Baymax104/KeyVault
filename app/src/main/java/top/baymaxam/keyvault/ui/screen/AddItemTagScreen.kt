@@ -3,23 +3,31 @@ package top.baymaxam.keyvault.ui.screen
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Done
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,7 +49,6 @@ import top.baymaxam.keyvault.model.domain.Tag
 import top.baymaxam.keyvault.model.domain.UserItem
 import top.baymaxam.keyvault.state.AddItemTagViewModel
 import top.baymaxam.keyvault.state.SelectedState
-import top.baymaxam.keyvault.ui.component.FlowSelectableTags
 import top.baymaxam.keyvault.ui.component.TitleHeader
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.util.AddItemTagGraph
@@ -167,6 +174,54 @@ private fun ContentLayout(
         }
     }
 }
+
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun FlowSelectableTags(
+    items: List<SelectedState<Tag>>,
+    modifier: Modifier = Modifier,
+    maxItemsInEachRow: Int = Int.MAX_VALUE,
+    maxLines: Int = Int.MAX_VALUE,
+    onAddClick: (() -> Unit)? = null,
+    onCloseClick: ((SelectedState<Tag>) -> Unit)? = null,
+    onItemClick: (SelectedState<Tag>) -> Unit = {},
+) {
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(5.dp),
+        modifier = modifier,
+        maxItemsInEachRow = maxItemsInEachRow,
+        maxLines = maxLines
+    ) {
+        items.forEach {
+            key(it.value.id) {
+                FilterChip(
+                    selected = it.selected,
+                    onClick = { onItemClick(it) },
+                    label = { Text(it.value.name) },
+                    trailingIcon = if (onCloseClick != null) {
+                        {
+                            Icon(
+                                imageVector = Icons.Rounded.Close,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(AssistChipDefaults.IconSize)
+                                    .clickable { onCloseClick(it) }
+                            )
+                        }
+                    } else null
+                )
+            }
+        }
+        if (onAddClick != null) {
+            AssistChip(
+                onClick = onAddClick,
+                label = { Icon(Icons.Rounded.Add, contentDescription = null) }
+            )
+        }
+    }
+}
+
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable

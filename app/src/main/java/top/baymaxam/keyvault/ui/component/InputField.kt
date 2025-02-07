@@ -4,9 +4,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.Visibility
+import androidx.compose.material.icons.rounded.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -21,6 +25,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import top.baymaxam.keyvault.ui.theme.AppTheme
@@ -135,6 +142,36 @@ fun CommentField(
             modifier = modifier,
         )
     }
+}
+
+
+@Composable
+fun PasswordField(
+    contentState: MutableState<String>,
+    modifier: Modifier = Modifier,
+    visualState: MutableState<Boolean> = mutableStateOf(false),
+    placeholder: @Composable (() -> Unit)? = null,
+) {
+    OutlinedTextField(
+        value = contentState.value,
+        onValueChange = { contentState.value = it },
+        singleLine = true,
+        shape = InputFieldDefaults.shape,
+        colors = MaterialTheme.outlinedTextFieldColor,
+        modifier = modifier,
+        visualTransformation = if (!visualState.value) PasswordVisualTransformation() else VisualTransformation.None,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        placeholder = placeholder,
+        leadingIcon = { Icon(Icons.Rounded.Lock, contentDescription = null) },
+        trailingIcon = {
+            IconButton(onClick = { visualState.value = !visualState.value }) {
+                Icon(
+                    imageVector = if (visualState.value) Icons.Rounded.VisibilityOff else Icons.Rounded.Visibility,
+                    contentDescription = null
+                )
+            }
+        }
+    )
 }
 
 

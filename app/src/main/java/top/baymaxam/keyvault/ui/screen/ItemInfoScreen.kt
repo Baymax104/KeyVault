@@ -2,6 +2,8 @@ package top.baymaxam.keyvault.ui.screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,18 +15,23 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.CreditCard
 import androidx.compose.material.icons.rounded.Key
 import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -55,7 +62,6 @@ import top.baymaxam.keyvault.state.rememberDialogState
 import top.baymaxam.keyvault.ui.component.CommentField
 import top.baymaxam.keyvault.ui.component.ConfirmDialog
 import top.baymaxam.keyvault.ui.component.FillIcon
-import top.baymaxam.keyvault.ui.component.FlowTags
 import top.baymaxam.keyvault.ui.component.InputField
 import top.baymaxam.keyvault.ui.component.SelectUserItemButton
 import top.baymaxam.keyvault.ui.component.TopBackBar
@@ -341,6 +347,45 @@ private fun AuthItemInfo(
             onAddClick = onTagAddClick,
             modifier = Modifier.fillMaxWidth()
         )
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun FlowTags(
+    items: List<Tag>,
+    modifier: Modifier = Modifier,
+    maxItemsInEachRow: Int = Int.MAX_VALUE,
+    maxLines: Int = Int.MAX_VALUE,
+    onAddClick: (() -> Unit)? = null,
+) {
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(5.dp),
+        modifier = modifier,
+        maxItemsInEachRow = maxItemsInEachRow,
+        maxLines = maxLines
+    ) {
+        items.forEach {
+            key(it.id) {
+                AssistChip(
+                    onClick = {},
+                    enabled = false,
+                    label = { Text(it.name) },
+                    border = AssistChipDefaults.assistChipBorder(true),
+                    colors = AssistChipDefaults.assistChipColors(
+                        disabledContainerColor = MaterialTheme.colorScheme.background,
+                        disabledLabelColor = MaterialTheme.colorScheme.onBackground,
+                        disabledTrailingIconContentColor = MaterialTheme.colorScheme.onBackground
+                    ),
+                )
+            }
+        }
+        if (onAddClick != null) {
+            AssistChip(
+                onClick = onAddClick,
+                label = { Icon(Icons.Rounded.Add, contentDescription = null) }
+            )
+        }
     }
 }
 

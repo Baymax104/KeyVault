@@ -49,11 +49,11 @@ import top.baymaxam.keyvault.util.successToast
 fun AddTagScreen(navigator: DestinationsNavigator) {
     val vm = koinViewModel<TagListViewModel>()
     val nameState = remember { mutableStateOf("") }
-    val nameErrorMessageState = remember { mutableStateOf<String?>(null) }
+    val nameErrorState = remember { mutableStateOf<Boolean>(false) }
     val scope = rememberCoroutineScope()
     ContentLayout(
         nameState = nameState,
-        nameErrorMessageState = nameErrorMessageState,
+        nameErrorState = nameErrorState,
         onBack = { navigator.navigateUp() },
         onConfirm = {
             scope.launch {
@@ -64,11 +64,8 @@ fun AddTagScreen(navigator: DestinationsNavigator) {
                         navigator.navigateUp()
                     }
                     .onFailure {
-                        if (it is IllegalArgumentException) {
-                            nameErrorMessageState.value = it.message
-                        } else {
-                            errorToast(it.message)
-                        }
+                        nameErrorState.value = it is IllegalArgumentException
+                        errorToast(it.message)
                     }
             }
         }
@@ -78,7 +75,7 @@ fun AddTagScreen(navigator: DestinationsNavigator) {
 @Composable
 private fun ContentLayout(
     nameState: MutableState<String> = mutableStateOf(""),
-    nameErrorMessageState: MutableState<String?> = mutableStateOf(null),
+    nameErrorState: MutableState<Boolean> = mutableStateOf(false),
     onBack: () -> Unit = {},
     onConfirm: () -> Unit = {},
 ) {
@@ -106,22 +103,16 @@ private fun ContentLayout(
         ) {
             InputField(
                 contentState = nameState,
-                label = { Text("标签名称") },
-                isError = nameErrorMessageState.value != null,
                 modifier = Modifier
                     .fillMaxWidth(0.8f)
                     .align(Alignment.Center),
-                errorText = {
-                    Text(
-                        text = nameErrorMessageState.value!!,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                },
+                isError = nameErrorState.value,
+                label = { Text("标签名称") },
                 trailingIcon = {
                     if (nameState.value.isNotEmpty()) {
                         IconButton(onClick = {
                             nameState.value = ""
-                            nameErrorMessageState.value = null
+                            nameErrorState.value = false
                         }) {
                             Icon(imageVector = Icons.Rounded.Close, contentDescription = null)
                         }

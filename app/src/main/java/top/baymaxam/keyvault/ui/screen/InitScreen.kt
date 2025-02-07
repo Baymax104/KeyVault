@@ -13,8 +13,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -27,6 +29,7 @@ import top.baymaxam.keyvault.R
 import top.baymaxam.keyvault.ui.component.PasswordField
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.ui.theme.robotoFont
+import top.baymaxam.keyvault.util.errorToast
 
 /**
  * 初始化页
@@ -37,11 +40,19 @@ import top.baymaxam.keyvault.ui.theme.robotoFont
 fun InitScreen() {
     val passwordState = remember { mutableStateOf("") }
     val repeatState = remember { mutableStateOf("") }
+    var isError by remember { mutableStateOf(false) }
 
     ContentLayout(
         passwordState = passwordState,
         repeatState = repeatState,
-        onConfirm = {}
+        isError = isError,
+        onConfirm = {
+            if (passwordState.value != repeatState.value) {
+                isError = true
+                errorToast("两次输入密钥不一致")
+                return@ContentLayout
+            }
+        }
     )
 }
 
@@ -49,6 +60,7 @@ fun InitScreen() {
 private fun ContentLayout(
     passwordState: MutableState<String> = mutableStateOf(""),
     repeatState: MutableState<String> = mutableStateOf(""),
+    isError: Boolean = false,
     onConfirm: () -> Unit = {},
 ) {
     val passwordVisualState = remember { mutableStateOf(false) }
@@ -91,7 +103,8 @@ private fun ContentLayout(
                 contentState = repeatState,
                 visualState = repeatVisualState,
                 placeholder = { Text("再次输入密钥") },
-                modifier = Modifier.fillMaxWidth(0.8f)
+                modifier = Modifier.fillMaxWidth(0.8f),
+                isError = isError,
             )
 
             Button(

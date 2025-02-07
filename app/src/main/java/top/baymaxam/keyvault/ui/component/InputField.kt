@@ -101,25 +101,23 @@ fun InputField(
     placeholder: (@Composable () -> Unit)? = null,
     leadingIcon: (@Composable () -> Unit)? = null,
     trailingIcon: (@Composable () -> Unit)? = null,
-    errorText: (@Composable () -> Unit)? = null,
 ) {
     OutlinedTextField(
         value = contentState.value,
         onValueChange = { contentState.value = it },
         enabled = enabled,
         isError = isError,
-        supportingText = if (isError && errorText != null) errorText else null,
-        modifier = modifier.defaultMinSize(
-            minWidth = InputFieldDefaults.MinWidth,
-            minHeight = InputFieldDefaults.MinHeight
-        ),
         shape = shape,
         singleLine = true,
         colors = MaterialTheme.outlinedTextFieldColor,
         label = label,
         placeholder = placeholder,
         leadingIcon = leadingIcon,
-        trailingIcon = trailingIcon
+        trailingIcon = trailingIcon,
+        modifier = modifier.defaultMinSize(
+            minWidth = InputFieldDefaults.MinWidth,
+            minHeight = InputFieldDefaults.MinHeight
+        )
     )
 }
 
@@ -151,6 +149,7 @@ fun PasswordField(
     modifier: Modifier = Modifier,
     visualState: MutableState<Boolean> = mutableStateOf(false),
     placeholder: @Composable (() -> Unit)? = null,
+    isError: Boolean = false,
 ) {
     OutlinedTextField(
         value = contentState.value,
@@ -159,6 +158,7 @@ fun PasswordField(
         shape = InputFieldDefaults.shape,
         colors = MaterialTheme.outlinedTextFieldColor,
         modifier = modifier,
+        isError = isError,
         visualTransformation = if (!visualState.value) PasswordVisualTransformation() else VisualTransformation.None,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         placeholder = placeholder,

@@ -287,21 +287,21 @@ private fun UserInfoFields(
     ) {
         InputField(
             contentState = nameState,
+            modifier = Modifier.fillMaxWidth(),
             placeholder = { Text("条目名称") },
-            leadingIcon = { Icon(Icons.Rounded.CreditCard, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth()
+            leadingIcon = { Icon(Icons.Rounded.CreditCard, contentDescription = null) }
         )
         InputField(
             contentState = usernameState,
+            modifier = Modifier.fillMaxWidth(),
             placeholder = { Text("用户名") },
-            leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth()
+            leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null) }
         )
         InputField(
             contentState = passwordState,
+            modifier = Modifier.fillMaxWidth(),
             placeholder = { Text("密码") },
-            leadingIcon = { Icon(Icons.Rounded.Key, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth()
+            leadingIcon = { Icon(Icons.Rounded.Key, contentDescription = null) }
         )
         CommentField(
             contentState = commentState,
@@ -326,9 +326,9 @@ private fun AuthInfoFields(
     ) {
         InputField(
             contentState = nameState,
+            modifier = Modifier.fillMaxWidth(),
             placeholder = { Text("授权名称") },
-            leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth()
+            leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null) }
         )
         SelectUserItemButton(
             value = selectedUserItem?.name ?: "选择授权",

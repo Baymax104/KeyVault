@@ -27,8 +27,8 @@ import com.ramcosta.composedestinations.bottomsheet.spec.DestinationStyleBottomS
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import top.baymaxam.keyvault.vm.TagListViewModel
 import top.baymaxam.keyvault.model.domain.Tag
-import top.baymaxam.keyvault.state.TagListViewModel
 import top.baymaxam.keyvault.ui.component.InputField
 import top.baymaxam.keyvault.ui.component.TitleHeader
 import top.baymaxam.keyvault.ui.theme.AppTheme

@@ -1,4 +1,4 @@
-package top.baymaxam.keyvault.state
+package top.baymaxam.keyvault.vm
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf

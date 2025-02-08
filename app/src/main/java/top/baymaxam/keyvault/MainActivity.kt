@@ -8,9 +8,14 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.generated.NavGraphs
+import com.ramcosta.composedestinations.generated.destinations.InitScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.MainScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.VerifyScreenDestination
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import top.baymaxam.keyvault.ui.screen.InitScreen
+import org.koin.compose.koinInject
+import top.baymaxam.keyvault.model.domain.VerifyState
+import top.baymaxam.keyvault.state.AuthState
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.util.BottomSheetNavigation
 
@@ -21,11 +26,16 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AppTheme {
-//                InitScreen()
+                val authState = koinInject<AuthState>()
                 BottomSheetNavigation {
                     DestinationsNavHost(
                         navGraph = NavGraphs.root,
                         navController = it,
+                        start = when (authState.value) {
+                            VerifyState.Init -> InitScreenDestination
+                            VerifyState.Verify -> VerifyScreenDestination
+                            VerifyState.Default -> MainScreenDestination
+                        }
                     )
                 }
             }

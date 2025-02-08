@@ -1,4 +1,4 @@
-package top.baymaxam.keyvault.state
+package top.baymaxam.keyvault.vm
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -16,6 +16,7 @@ import top.baymaxam.keyvault.model.domain.asEntity
 import top.baymaxam.keyvault.model.entity.asItem
 import top.baymaxam.keyvault.repo.KeyRepository
 import top.baymaxam.keyvault.repo.TagRepository
+import top.baymaxam.keyvault.state.SelectedState
 import top.baymaxam.keyvault.util.CachedStateList
 import java.util.Date
 

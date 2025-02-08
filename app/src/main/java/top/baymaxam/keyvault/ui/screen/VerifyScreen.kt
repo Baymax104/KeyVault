@@ -8,10 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,18 +29,13 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.navOptions
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
-import com.ramcosta.composedestinations.generated.destinations.InitScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.MainScreenDestination
-import com.ramcosta.composedestinations.generated.destinations.SelectExpiryScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.VerifyScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.ramcosta.composedestinations.result.ResultRecipient
-import com.ramcosta.composedestinations.result.onResult
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import top.baymaxam.keyvault.R
 import top.baymaxam.keyvault.vm.AuthViewModel
-import top.baymaxam.keyvault.model.domain.ExpiryDuration
-import top.baymaxam.keyvault.ui.component.FieldButton
 import top.baymaxam.keyvault.ui.component.PasswordField
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.ui.theme.robotoFont
@@ -51,51 +43,39 @@ import top.baymaxam.keyvault.util.errorToast
 import top.baymaxam.keyvault.util.successToast
 
 /**
- * 初始化页
+ * VerifyScreen
  * @author John
  * @since 07 2月 2025
  */
 @Destination<RootGraph>
 @Composable
-fun InitScreen(
-    navigator: DestinationsNavigator,
-    expiryRecipient: ResultRecipient<SelectExpiryScreenDestination, ExpiryDuration>
-) {
+fun VerifyScreen(navigator: DestinationsNavigator) {
     val passwordState = remember { mutableStateOf("") }
-    val repeatState = remember { mutableStateOf("") }
-    val expiryState = remember { mutableStateOf(ExpiryDuration.ThirtyMinutes) }
     var isError by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
     val authViewModel = koinInject<AuthViewModel>()
-
-    expiryRecipient.onResult { expiryState.value = it }
+    val scope = rememberCoroutineScope()
 
     ContentLayout(
         passwordState = passwordState,
-        repeatState = repeatState,
-        expiryState = expiryState,
         isError = isError,
-        onExpiryClick = { navigator.navigate(SelectExpiryScreenDestination) },
         onConfirm = {
             if (passwordState.value.isEmpty()) {
                 isError = true
                 errorToast("密钥不能为空")
                 return@ContentLayout
             }
-            if (passwordState.value != repeatState.value) {
-                isError = true
-                errorToast("两次输入密钥不一致")
-                return@ContentLayout
-            }
             scope.launch {
-                authViewModel.initAuthorization(passwordState.value, expiryState.value)
-                    .onFailure { errorToast(it.message) }
+                authViewModel.verify(passwordState.value)
+                    .onFailure {
+                        isError = it is IllegalArgumentException
+                        errorToast(it.message)
+                    }
                     .onSuccess {
                         val options = navOptions {
                             launchSingleTop = true
-                            popUpTo(route = InitScreenDestination.route) { inclusive = true }
+                            popUpTo(route = VerifyScreenDestination.route) { inclusive = true }
                         }
-                        successToast("设置成功")
+                        successToast("验证成功")
                         navigator.navigate(MainScreenDestination, options)
                     }
             }
@@ -106,14 +86,10 @@ fun InitScreen(
 @Composable
 private fun ContentLayout(
     passwordState: MutableState<String> = mutableStateOf(""),
-    repeatState: MutableState<String> = mutableStateOf(""),
-    expiryState: MutableState<ExpiryDuration> = mutableStateOf(ExpiryDuration.Forever),
     isError: Boolean = false,
-    onExpiryClick: () -> Unit = {},
     onConfirm: () -> Unit = {},
 ) {
     val passwordVisualState = remember { mutableStateOf(false) }
-    val repeatVisualState = remember { mutableStateOf(false) }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -136,7 +112,7 @@ private fun ContentLayout(
             modifier = Modifier.align(Alignment.Center)
         ) {
             Text(
-                "设置密钥",
+                "验证密钥",
                 fontFamily = robotoFont,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Black,
@@ -148,20 +124,6 @@ private fun ContentLayout(
                 placeholder = { Text("输入密钥") },
                 modifier = Modifier.fillMaxWidth(0.8f),
                 isError = isError
-            )
-            PasswordField(
-                contentState = repeatState,
-                visualState = repeatVisualState,
-                placeholder = { Text("再次输入密钥") },
-                modifier = Modifier.fillMaxWidth(0.8f),
-                isError = isError,
-            )
-
-            FieldButton(
-                value = expiryState.value.description,
-                modifier = Modifier.fillMaxWidth(0.8f),
-                leadingIcon = { Icon(Icons.Rounded.Schedule, contentDescription = null) },
-                onClick = onExpiryClick
             )
 
             Button(

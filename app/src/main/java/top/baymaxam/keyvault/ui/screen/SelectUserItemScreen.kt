@@ -30,9 +30,9 @@ import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.bottomsheet.spec.DestinationStyleBottomSheet
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import org.koin.androidx.compose.koinViewModel
+import top.baymaxam.keyvault.vm.SelectUserItemViewModel
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.UserItem
-import top.baymaxam.keyvault.state.SelectUserItemViewModel
 import top.baymaxam.keyvault.ui.component.SearchField
 import top.baymaxam.keyvault.ui.component.SelectUserItemLayout
 import top.baymaxam.keyvault.ui.component.TitleHeader

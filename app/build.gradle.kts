@@ -73,7 +73,9 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.process)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.constraintlayout)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
@@ -103,5 +105,6 @@ dependencies {
     implementation(libs.destinations.core)
     ksp(libs.destinations.ksp)
     implementation(libs.destinations.bottomsheet)
-    implementation(libs.datastore.preferences)
+    implementation(libs.jbcrypt)
+    implementation(libs.mmkv)
 }

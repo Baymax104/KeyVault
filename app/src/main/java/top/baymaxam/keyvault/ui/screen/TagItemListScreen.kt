@@ -47,12 +47,12 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import top.baymaxam.keyvault.R
+import top.baymaxam.keyvault.vm.TagItemListViewModel
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.Tag
 import top.baymaxam.keyvault.model.domain.UserItem
 import top.baymaxam.keyvault.state.DialogState
 import top.baymaxam.keyvault.state.SelectedState
-import top.baymaxam.keyvault.state.TagItemListViewModel
 import top.baymaxam.keyvault.state.rememberDialogState
 import top.baymaxam.keyvault.ui.component.ConfirmDialog
 import top.baymaxam.keyvault.ui.component.KeyItemLayout

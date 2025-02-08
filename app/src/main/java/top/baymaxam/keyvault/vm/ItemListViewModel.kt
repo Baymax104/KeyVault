@@ -1,4 +1,4 @@
-package top.baymaxam.keyvault.state
+package top.baymaxam.keyvault.vm
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -9,29 +9,26 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import top.baymaxam.keyvault.model.domain.KeyItem
-import top.baymaxam.keyvault.model.domain.Tag
 import top.baymaxam.keyvault.model.domain.asEntity
 import top.baymaxam.keyvault.model.entity.asItem
 import top.baymaxam.keyvault.repo.KeyRepository
+import top.baymaxam.keyvault.state.SelectedState
 import top.baymaxam.keyvault.util.replaceAllBy
 
 /**
- * TagItemListViewModel
+ * ItemsListScreenModel
  * @author John
- * @since 31 1月 2025
+ * @since 07 8月 2024
  */
-class TagItemListViewModel(
-    private val keyRepository: KeyRepository,
-    val tag: Tag
-) : ViewModel() {
-
-    val items = mutableStateListOf<SelectedState<KeyItem>>()
+class ItemListViewModel(private val repository: KeyRepository) : ViewModel() {
 
     var isInitialized by mutableStateOf(false)
 
+    val items = mutableStateListOf<SelectedState<KeyItem>>()
+
     init {
         viewModelScope.launch {
-            keyRepository.queryByTagId(tag.id)
+            repository.queryAll()
                 .map { l -> l.map { SelectedState(it.asItem()) } }
                 .collect {
                     items.replaceAllBy(it)
@@ -40,10 +37,13 @@ class TagItemListViewModel(
         }
     }
 
-    suspend fun removeSelectedItem(): Result<Unit> {
+    suspend fun removeSelectedItems(): Result<Unit> {
         return runCatching {
-            val selectedItems = items.filter { it.selected }.map { it.value.asEntity() }
-            keyRepository.deleteTagItems(tag.asEntity(), selectedItems)
+            val removedItems = items.filter { it.selected }
+            if (removedItems.isEmpty()) {
+                return Result.success(Unit)
+            }
+            removedItems.map { it.value.asEntity() }.let { repository.delete(it) }
         }
     }
 }

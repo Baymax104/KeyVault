@@ -4,13 +4,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.CreditCard
+import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FloatingActionButton
@@ -19,6 +20,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -80,9 +82,10 @@ fun SelectionButton(
 
 
 @Composable
-fun SelectUserItemButton(
+fun FieldButton(
+    value: String,
     modifier: Modifier = Modifier,
-    value: String = "",
+    leadingIcon: (@Composable () -> Unit)? = null,
     onClick: () -> Unit = {},
 ) {
     Box(
@@ -97,6 +100,20 @@ fun SelectUserItemButton(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(50),
             singleLine = true,
+            leadingIcon = leadingIcon,
+            trailingIcon = {
+                Surface(color = MaterialTheme.colorScheme.primary) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.defaultMinSize(
+                            minHeight = InputFieldDefaults.MinHeight + 2.dp,
+                            minWidth = InputFieldDefaults.MinHeight
+                        )
+                    ) {
+                        Icon(Icons.AutoMirrored.Rounded.ArrowForward, contentDescription = null)
+                    }
+                }
+            },
             colors = OutlinedTextFieldDefaults.colors(
                 unfocusedContainerColor = MaterialTheme.colorScheme.background,
                 focusedContainerColor = MaterialTheme.colorScheme.background,
@@ -106,8 +123,7 @@ fun SelectUserItemButton(
                 disabledLeadingIconColor = MaterialTheme.colorScheme.onBackground,
                 disabledTextColor = MaterialTheme.colorScheme.onBackground,
                 disabledTrailingIconColor = MaterialTheme.colorScheme.onBackground
-            ),
-            leadingIcon = { Icon(Icons.Rounded.CreditCard, contentDescription = null) },
+            )
         )
     }
 }
@@ -144,7 +160,7 @@ private fun Preview() {
     AppTheme {
         Column {
             SelectionButton(Modifier.height(60.dp))
-            SelectUserItemButton()
+            FieldButton("")
         }
     }
 }

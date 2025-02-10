@@ -1,6 +1,5 @@
 package top.baymaxam.keyvault.ui.screen
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -12,6 +11,7 @@ import androidx.compose.material.icons.rounded.Done
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -27,7 +27,6 @@ import com.ramcosta.composedestinations.bottomsheet.spec.DestinationStyleBottomS
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import top.baymaxam.keyvault.vm.TagListViewModel
 import top.baymaxam.keyvault.model.domain.Tag
 import top.baymaxam.keyvault.ui.component.InputField
 import top.baymaxam.keyvault.ui.component.TitleHeader
@@ -36,6 +35,7 @@ import top.baymaxam.keyvault.util.AddItemGraph
 import top.baymaxam.keyvault.util.AddItemTagGraph
 import top.baymaxam.keyvault.util.errorToast
 import top.baymaxam.keyvault.util.successToast
+import top.baymaxam.keyvault.vm.TagListViewModel
 
 /**
  * 添加标签页
@@ -49,7 +49,7 @@ import top.baymaxam.keyvault.util.successToast
 fun AddTagScreen(navigator: DestinationsNavigator) {
     val vm = koinViewModel<TagListViewModel>()
     val nameState = remember { mutableStateOf("") }
-    val nameErrorState = remember { mutableStateOf<Boolean>(false) }
+    val nameErrorState = remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     ContentLayout(
         nameState = nameState,
@@ -79,46 +79,47 @@ private fun ContentLayout(
     onBack: () -> Unit = {},
     onConfirm: () -> Unit = {},
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(0.45f)
-            .background(MaterialTheme.colorScheme.background)
-    ) {
-        TitleHeader(
-            title = "新建标签",
-            leadingIcon = {
-                IconButton(onClick = onBack) {
-                    Icon(Icons.Rounded.Close, contentDescription = null)
-                }
-            },
-            trailingIcon = {
-                IconButton(onClick = onConfirm) {
-                    Icon(Icons.Rounded.Done, contentDescription = null)
-                }
-            }
-        )
-        Box(
-            modifier = Modifier.fillMaxSize()
+    Surface(color = MaterialTheme.colorScheme.background) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.45f)
         ) {
-            InputField(
-                contentState = nameState,
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .align(Alignment.Center),
-                isError = nameErrorState.value,
-                label = { Text("标签名称") },
+            TitleHeader(
+                title = "新建标签",
+                leadingIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.Rounded.Close, contentDescription = null)
+                    }
+                },
                 trailingIcon = {
-                    if (nameState.value.isNotEmpty()) {
-                        IconButton(onClick = {
-                            nameState.value = ""
-                            nameErrorState.value = false
-                        }) {
-                            Icon(imageVector = Icons.Rounded.Close, contentDescription = null)
-                        }
+                    IconButton(onClick = onConfirm) {
+                        Icon(Icons.Rounded.Done, contentDescription = null)
                     }
                 }
             )
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                InputField(
+                    contentState = nameState,
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .align(Alignment.Center),
+                    isError = nameErrorState.value,
+                    label = { Text("标签名称") },
+                    trailingIcon = {
+                        if (nameState.value.isNotEmpty()) {
+                            IconButton(onClick = {
+                                nameState.value = ""
+                                nameErrorState.value = false
+                            }) {
+                                Icon(imageVector = Icons.Rounded.Close, contentDescription = null)
+                            }
+                        }
+                    }
+                )
+            }
         }
     }
 }

@@ -1,6 +1,5 @@
 package top.baymaxam.keyvault.ui.screen
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,6 +27,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -150,126 +150,127 @@ private fun ContentLayout(
 ) {
     val pagerState = rememberPagerState { 2 }
     val scope = rememberCoroutineScope()
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(0.8f)
-            .background(MaterialTheme.colorScheme.background)
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
+    Surface(color = MaterialTheme.colorScheme.background) {
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-                .align(Alignment.TopCenter)
+                .fillMaxHeight(0.8f)
         ) {
-            LineHeader(
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
-                    .padding(vertical = 15.dp)
-                    .height(5.dp)
-                    .fillMaxWidth(0.4f)
-            )
-
-            SearchField(
-                contentState = searchContentState,
-                placeholder = { Text("搜索标签") },
-                onSearch = onSearch,
-                modifier = Modifier.fillMaxWidth()
-            )
-            LazyRow(
-                state = tagListState,
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                contentPadding = PaddingValues(horizontal = 5.dp),
-                modifier = Modifier
-                    .padding(vertical = 10.dp)
                     .fillMaxWidth()
-                    .height(40.dp)
+                    .padding(horizontal = 20.dp)
+                    .align(Alignment.TopCenter)
             ) {
-                item {
-                    AssistChip(
-                        onClick = onTagAddClick,
-                        label = { Icon(Icons.Rounded.Add, contentDescription = null) }
-                    )
-                }
-                items(
-                    items = tags,
-                    key = { it.value.id }
-                ) {
-                    val (item) = it
-                    FilterChip(
-                        selected = it.selected,
-                        onClick = { it.selected = !it.selected },
-                        label = { Text(item.name) }
-                    )
-                }
-            }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .padding(bottom = 15.dp)
-                    .fillMaxWidth(),
-            ) {
-                Text(text = "条目类型：", color = MaterialTheme.colorScheme.onBackground)
-                SingleChoiceSegmentedButtonRow(
+                LineHeader(
                     modifier = Modifier
+                        .padding(vertical = 15.dp)
+                        .height(5.dp)
+                        .fillMaxWidth(0.4f)
+                )
+
+                SearchField(
+                    contentState = searchContentState,
+                    placeholder = { Text("搜索标签") },
+                    onSearch = onSearch,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                LazyRow(
+                    state = tagListState,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    contentPadding = PaddingValues(horizontal = 5.dp),
+                    modifier = Modifier
+                        .padding(vertical = 10.dp)
                         .fillMaxWidth()
-                        .height(45.dp)
+                        .height(40.dp)
                 ) {
-                    SegmentedButton(
-                        selected = typeSelectedState.value == KeyType.User,
-                        shape = SegmentedButtonDefaults.itemShape(0, 2),
-                        onClick = {
-                            typeSelectedState.value = KeyType.User
-                            scope.launch { pagerState.animateScrollToPage(0) }
-                        }
-                    ) {
-                        Text("用户")
+                    item {
+                        AssistChip(
+                            onClick = onTagAddClick,
+                            label = { Icon(Icons.Rounded.Add, contentDescription = null) }
+                        )
                     }
-
-                    SegmentedButton(
-                        selected = typeSelectedState.value == KeyType.Authorization,
-                        shape = SegmentedButtonDefaults.itemShape(1, 2),
-                        onClick = {
-                            typeSelectedState.value = KeyType.Authorization
-                            scope.launch { pagerState.animateScrollToPage(1) }
-                        }
+                    items(
+                        items = tags,
+                        key = { it.value.id }
                     ) {
-                        Text("授权")
+                        val (item) = it
+                        FilterChip(
+                            selected = it.selected,
+                            onClick = { it.selected = !it.selected },
+                            label = { Text(item.name) }
+                        )
+                    }
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .padding(bottom = 15.dp)
+                        .fillMaxWidth(),
+                ) {
+                    Text(text = "条目类型：", color = MaterialTheme.colorScheme.onBackground)
+                    SingleChoiceSegmentedButtonRow(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(45.dp)
+                    ) {
+                        SegmentedButton(
+                            selected = typeSelectedState.value == KeyType.User,
+                            shape = SegmentedButtonDefaults.itemShape(0, 2),
+                            onClick = {
+                                typeSelectedState.value = KeyType.User
+                                scope.launch { pagerState.animateScrollToPage(0) }
+                            }
+                        ) {
+                            Text("用户")
+                        }
+
+                        SegmentedButton(
+                            selected = typeSelectedState.value == KeyType.Authorization,
+                            shape = SegmentedButtonDefaults.itemShape(1, 2),
+                            onClick = {
+                                typeSelectedState.value = KeyType.Authorization
+                                scope.launch { pagerState.animateScrollToPage(1) }
+                            }
+                        ) {
+                            Text("授权")
+                        }
+                    }
+                }
+                HorizontalPager(
+                    state = pagerState,
+                    userScrollEnabled = false,
+                    verticalAlignment = Alignment.Top,
+                    pageSpacing = 10.dp
+                ) {
+                    when (it) {
+                        0 -> UserInfoFields(
+                            nameState = nameContentState,
+                            usernameState = usernameContentState,
+                            passwordState = passwordContentState,
+                            commentState = commentContentState
+                        )
+
+                        1 -> AuthInfoFields(
+                            nameState = nameContentState,
+                            commentState = commentContentState,
+                            selectedUserItem = selectedUserItem,
+                            onSelectAuth = onSelectAuth
+                        )
                     }
                 }
             }
-            HorizontalPager(
-                state = pagerState,
-                userScrollEnabled = false,
-                verticalAlignment = Alignment.Top,
-                pageSpacing = 10.dp
-            ) {
-                when (it) {
-                    0 -> UserInfoFields(
-                        nameState = nameContentState,
-                        usernameState = usernameContentState,
-                        passwordState = passwordContentState,
-                        commentState = commentContentState
-                    )
-
-                    1 -> AuthInfoFields(
-                        nameState = nameContentState,
-                        commentState = commentContentState,
-                        selectedUserItem = selectedUserItem,
-                        onSelectAuth = onSelectAuth
-                    )
-                }
-            }
+            SelectionButton(
+                onConfirm = onConfirm,
+                onCancel = onCancel,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(70.dp)
+                    .align(Alignment.BottomCenter)
+            )
         }
-        SelectionButton(
-            onConfirm = onConfirm,
-            onCancel = onCancel,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(70.dp)
-                .align(Alignment.BottomCenter)
-        )
     }
 }
 

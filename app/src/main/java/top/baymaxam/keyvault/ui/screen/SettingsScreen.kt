@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.DarkMode
+import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -23,6 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ramcosta.composedestinations.generated.destinations.AuthScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.DarkModeScreenDestination
 import org.koin.compose.koinInject
 import top.baymaxam.keyvault.model.domain.DarkMode
@@ -44,7 +46,7 @@ fun SettingScreen() {
     val darkModeState = preferenceStateHolder.darkModeFlow.collectAsState()
     ContentLayout(
         darkModeState = darkModeState,
-        onKeyClick = {},
+        onKeyClick = { navigator.navigate(AuthScreenDestination) },
         onDarkClick = { navigator.navigate(DarkModeScreenDestination) }
     )
 }
@@ -54,6 +56,7 @@ private fun ContentLayout(
     darkModeState: State<DarkMode> = mutableStateOf(DarkMode.System),
     onKeyClick: () -> Unit = {},
     onDarkClick: () -> Unit = {},
+    onInfoClick: () -> Unit = {}
 ) {
     Surface(color = MaterialTheme.colorScheme.background) {
         Column(
@@ -84,6 +87,11 @@ private fun ContentLayout(
                 leading = { Icon(Icons.Rounded.DarkMode, contentDescription = null) },
                 trailing = { Text(darkModeState.value.label) },
                 onClick = onDarkClick
+            )
+            ContainerButton(
+                label = { Text("关于") },
+                leading = { Icon(Icons.Rounded.Info, contentDescription = null) },
+                onClick = onInfoClick
             )
         }
     }

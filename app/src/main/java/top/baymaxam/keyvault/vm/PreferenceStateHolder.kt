@@ -29,14 +29,19 @@ class PreferenceStateHolder(private val store: KVStore) {
             return System.currentTimeMillis() - lastVerifyTime >= expiry
         }
 
-    val darkModeFlow: MutableStateFlow<DarkMode> = MutableStateFlow(DarkMode.System)
+    val darkModeFlow: MutableStateFlow<DarkMode>
 
-    val expiryFlow: MutableStateFlow<Expiry> =
-        MutableStateFlow(Expiry.ThirtyMinutes)
+    val expiryFlow: MutableStateFlow<Expiry>
 
     init {
-        store[darkModeKey] = DarkMode.System.name
-        store[expiryKey] = Expiry.ThirtyMinutes.name
+        if (darkModeKey !in store) {
+            store[darkModeKey] = DarkMode.System.name
+        }
+        if (expiryKey !in store) {
+            store[expiryKey] = Expiry.ThirtyMinutes.name
+        }
+        darkModeFlow = MutableStateFlow(DarkMode.valueOf(store[darkModeKey]))
+        expiryFlow = MutableStateFlow(Expiry.valueOf(store[expiryKey]))
     }
 
     fun setAuthorization(password: String) {
@@ -46,6 +51,7 @@ class PreferenceStateHolder(private val store: KVStore) {
 
     fun setExpiry(expiry: Expiry) {
         store[expiryKey] = expiry.name
+        store[lastVerifyTimeKey] = System.currentTimeMillis()
         expiryFlow.value = expiry
     }
 
@@ -54,10 +60,11 @@ class PreferenceStateHolder(private val store: KVStore) {
         darkModeFlow.value = darkMode
     }
 
+    fun matchKey(password: String): Boolean = BCrypt.checkpw(password, store[authKey])
 
     fun verify(password: String): Result<Unit> {
         return runCatching {
-            if (!BCrypt.checkpw(password, store[authKey])) {
+            if (!matchKey(password)) {
                 throw IllegalArgumentException("密钥错误")
             }
             store[lastVerifyTimeKey] = System.currentTimeMillis()

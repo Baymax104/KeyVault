@@ -4,14 +4,17 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
+import androidx.compose.material.icons.automirrored.rounded.ArrowForwardIos
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FloatingActionButton
@@ -21,11 +24,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -82,7 +87,7 @@ fun SelectionButton(
 
 
 @Composable
-fun FieldButton(
+fun EntryButton(
     value: String,
     modifier: Modifier = Modifier,
     leadingIcon: (@Composable () -> Unit)? = null,
@@ -151,7 +156,78 @@ fun FloatingButton(
             contentDescription = null
         )
     }
+}
 
+@Composable
+fun ContainerButton(
+    label: @Composable () -> Unit,
+    leading: (@Composable () -> Unit)? = null,
+    trailing: (@Composable () -> Unit)? = null,
+    onClick: () -> Unit = {},
+) {
+    Surface(
+        shape = RectangleShape,
+        contentColor = MaterialTheme.colorScheme.onBackground,
+        color = MaterialTheme.colorScheme.background,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(55.dp)
+            .clickable(onClick = onClick)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
+        ) {
+            if (leading != null) {
+                Box {
+                    leading()
+                }
+            }
+            Spacer(Modifier.width(10.dp))
+            Box(modifier = Modifier.weight(1f)) {
+                label()
+            }
+            if (trailing != null) {
+                Box {
+                    trailing()
+                }
+            }
+            Spacer(Modifier.width(10.dp))
+            Icon(
+                Icons.AutoMirrored.Rounded.ArrowForwardIos,
+                contentDescription = null,
+            )
+        }
+    }
+}
+
+@Composable
+fun SwitchButton(
+    isSelected: Boolean,
+    label: @Composable () -> Unit,
+    onSelected: (Boolean) -> Unit = {},
+) {
+    Surface(
+        color = MaterialTheme.colorScheme.background,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(55.dp)
+    ) {
+        Box(
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
+        ) {
+            Box(
+                modifier = Modifier.align(Alignment.CenterStart)
+            ) {
+                label()
+            }
+            Switch(
+                checked = isSelected,
+                onCheckedChange = onSelected,
+                modifier = Modifier.align(Alignment.CenterEnd)
+            )
+        }
+    }
 }
 
 @Preview(showBackground = true)
@@ -160,7 +236,7 @@ private fun Preview() {
     AppTheme {
         Column {
             SelectionButton(Modifier.height(60.dp))
-            FieldButton("")
+            EntryButton("")
         }
     }
 }

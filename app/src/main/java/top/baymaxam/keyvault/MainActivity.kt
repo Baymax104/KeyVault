@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.collectAsState
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.ramcosta.composedestinations.DestinationsNavHost
@@ -14,10 +16,10 @@ import com.ramcosta.composedestinations.generated.destinations.VerifyScreenDesti
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
-import top.baymaxam.keyvault.model.domain.VerifyState
-import top.baymaxam.keyvault.state.AuthState
+import top.baymaxam.keyvault.model.domain.DarkMode
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.util.BottomSheetNavigation
+import top.baymaxam.keyvault.vm.PreferenceStateHolder
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,16 +27,22 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            AppTheme {
-                val authState = koinInject<AuthState>()
+            val preferenceStateHolder = koinInject<PreferenceStateHolder>()
+            val darkModeState = preferenceStateHolder.darkModeFlow.collectAsState()
+            val darkTheme = if (darkModeState.value == DarkMode.System) {
+                isSystemInDarkTheme()
+            } else {
+                darkModeState.value == DarkMode.Dark
+            }
+            AppTheme(darkTheme) {
                 BottomSheetNavigation {
                     DestinationsNavHost(
                         navGraph = NavGraphs.root,
                         navController = it,
-                        start = when (authState.value) {
-                            VerifyState.Init -> InitScreenDestination
-                            VerifyState.Verify -> VerifyScreenDestination
-                            VerifyState.Default -> MainScreenDestination
+                        start = when {
+                            !preferenceStateHolder.hasAuthorization -> InitScreenDestination
+                            preferenceStateHolder.isExpired -> VerifyScreenDestination
+                            else -> MainScreenDestination
                         }
                     )
                 }

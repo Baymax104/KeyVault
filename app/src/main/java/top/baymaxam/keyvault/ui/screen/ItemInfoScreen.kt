@@ -52,7 +52,6 @@ import com.ramcosta.composedestinations.result.onResult
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
-import top.baymaxam.keyvault.vm.ItemViewModel
 import top.baymaxam.keyvault.model.domain.AuthItem
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.Tag
@@ -61,7 +60,7 @@ import top.baymaxam.keyvault.state.DialogState
 import top.baymaxam.keyvault.state.rememberDialogState
 import top.baymaxam.keyvault.ui.component.CommentField
 import top.baymaxam.keyvault.ui.component.ConfirmDialog
-import top.baymaxam.keyvault.ui.component.FieldButton
+import top.baymaxam.keyvault.ui.component.EntryButton
 import top.baymaxam.keyvault.ui.component.FillIcon
 import top.baymaxam.keyvault.ui.component.InputField
 import top.baymaxam.keyvault.ui.component.TopBackBar
@@ -70,6 +69,7 @@ import top.baymaxam.keyvault.ui.theme.IconColors
 import top.baymaxam.keyvault.util.errorToast
 import top.baymaxam.keyvault.util.successToast
 import top.baymaxam.keyvault.util.toDateString
+import top.baymaxam.keyvault.vm.ItemViewModel
 
 /**
  * 条目信息页
@@ -329,7 +329,7 @@ private fun AuthItemInfo(
         placeholder = { Text("授权名称") },
         leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null) }
     )
-    FieldButton(
+    EntryButton(
         value = if (authUserItem != null) "${authUserItem.name} ${authUserItem.username}" else "选择授权",
         onClick = onSelectAuth,
         leadingIcon = { Icon(Icons.Rounded.CreditCard, contentDescription = null) }

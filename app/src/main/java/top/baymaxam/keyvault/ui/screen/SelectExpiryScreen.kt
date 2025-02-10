@@ -23,7 +23,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.bottomsheet.spec.DestinationStyleBottomSheet
 import com.ramcosta.composedestinations.result.ResultBackNavigator
-import top.baymaxam.keyvault.model.domain.ExpiryDuration
+import top.baymaxam.keyvault.model.domain.Expiry
 import top.baymaxam.keyvault.ui.component.TitleHeader
 import top.baymaxam.keyvault.ui.theme.AppTheme
 
@@ -34,7 +34,7 @@ import top.baymaxam.keyvault.ui.theme.AppTheme
  */
 @Destination<RootGraph>(style = DestinationStyleBottomSheet::class)
 @Composable
-fun SelectExpiryScreen(navigator: ResultBackNavigator<ExpiryDuration>) {
+fun SelectExpiryScreen(navigator: ResultBackNavigator<Expiry>) {
     ContentLayout(
         onBack = { navigator.navigateBack() },
         onItemClick = { navigator.navigateBack(it) }
@@ -45,7 +45,7 @@ fun SelectExpiryScreen(navigator: ResultBackNavigator<ExpiryDuration>) {
 @Composable
 private fun ContentLayout(
     onBack: () -> Unit = {},
-    onItemClick: (ExpiryDuration) -> Unit = {},
+    onItemClick: (Expiry) -> Unit = {},
 ) {
     Surface(color = MaterialTheme.colorScheme.background) {
         Column(
@@ -60,7 +60,7 @@ private fun ContentLayout(
                     }
                 }
             )
-            ExpiryDuration.entries.forEach {
+            Expiry.entries.forEach {
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
@@ -68,9 +68,9 @@ private fun ContentLayout(
                         .clickable { onItemClick(it) }
                 ) {
                     Text(
-                        text = it.description,
+                        text = it.label,
                         fontSize = 18.sp,
-                        modifier = Modifier.padding(vertical = 20.dp)
+                        modifier = Modifier.padding(vertical = 15.dp)
                     )
                 }
             }

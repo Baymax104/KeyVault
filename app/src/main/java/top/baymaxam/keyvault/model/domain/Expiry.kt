@@ -11,7 +11,7 @@ import kotlin.time.Duration.Companion.minutes
  * @author John
  * @since 08 2月 2025
  */
-enum class ExpiryDuration(val description: String, val value: Duration) {
+enum class Expiry(val label: String, val value: Duration) {
     ThirtyMinutes("30分钟", 30.minutes),
     OneHour("1小时", 1.hours),
     OneDay("1天", 1.days),

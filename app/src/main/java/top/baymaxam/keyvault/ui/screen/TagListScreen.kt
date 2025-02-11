@@ -45,7 +45,6 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import top.baymaxam.keyvault.R
-import top.baymaxam.keyvault.vm.TagListViewModel
 import top.baymaxam.keyvault.model.domain.Tag
 import top.baymaxam.keyvault.state.DialogState
 import top.baymaxam.keyvault.state.SelectedState
@@ -57,6 +56,7 @@ import top.baymaxam.keyvault.ui.component.TopBackBar
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.util.errorToast
 import top.baymaxam.keyvault.util.successToast
+import top.baymaxam.keyvault.vm.TagListViewModel
 
 /**
  * 标签列表页
@@ -160,10 +160,25 @@ private fun ContentLayout(
     }
     ConfirmDialog(
         state = dialogState,
-        title = "确认删除",
-        text = "确认删除选中标签？",
-        onConfirm = onDialogConfirm
+        title = { Text("确认删除") },
+        text = { Text("确认删除选中标签？") },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    dialogState.dismiss()
+                    onDialogConfirm()
+                }
+            ) {
+                Text("确认 ")
+            }
+        },
+        cancelButton = {
+            TextButton(onClick = { dialogState.dismiss() }) {
+                Text("取消")
+            }
+        }
     )
+
 }
 
 

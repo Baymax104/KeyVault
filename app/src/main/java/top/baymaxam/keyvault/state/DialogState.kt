@@ -18,25 +18,27 @@ import androidx.compose.runtime.setValue
 class DialogState(
     isShow: Boolean = false
 ) {
-    var isShow by mutableStateOf(isShow)
+    private var _isShow by mutableStateOf(isShow)
+
+    val isShow: Boolean get() = _isShow
 
     companion object {
         val Saver: Saver<DialogState, *> = listSaver(
-            save = { listOf(it.isShow) },
+            save = { listOf(it._isShow) },
             restore = { DialogState(it[0]) }
         )
     }
 
     fun show() {
-        isShow = true
+        _isShow = true
     }
 
     fun dismiss() {
-        isShow = false
+        _isShow = false
     }
 }
 
 @Composable
-fun rememberDialogState(): DialogState {
-    return rememberSaveable(saver = DialogState.Saver) { DialogState() }
+fun rememberDialogState(isShow: Boolean = false): DialogState {
+    return rememberSaveable(saver = DialogState.Saver) { DialogState(isShow) }
 }

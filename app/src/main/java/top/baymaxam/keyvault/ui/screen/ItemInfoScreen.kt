@@ -241,11 +241,22 @@ private fun ContentLayout(
     }
     ConfirmDialog(
         state = dialogState,
-        text = "保留此次编辑？",
-        confirmText = "保留",
-        cancelText = "不保留",
-        onConfirm = onDialogConfirm,
-        onCancel = onDialogCancel
+        text = { Text("保留此次编辑？") },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    dialogState.dismiss()
+                    onDialogConfirm()
+                }
+            ) {
+                Text("保留")
+            }
+        },
+        cancelButton = {
+            TextButton(onClick = onDialogCancel) {
+                Text("不保留")
+            }
+        },
     )
 }
 

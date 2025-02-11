@@ -3,6 +3,7 @@ package top.baymaxam.keyvault.util
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -87,15 +88,36 @@ object SlideTransitions : DestinationStyle.Animated() {
         {
             slideIntoContainer(
                 AnimatedContentTransitionScope.SlideDirection.Start,
-                tween(500)
+                tween(300)
             )
         }
 
     override val exitTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition? =
         {
             slideOutOfContainer(
-                AnimatedContentTransitionScope.SlideDirection.End,
-                tween(500)
+                AnimatedContentTransitionScope.SlideDirection.Start,
+                tween(300)
             )
+        }
+
+    override val popEnterTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition? =
+        {
+            slideIntoContainer(
+                AnimatedContentTransitionScope.SlideDirection.End,
+                tween(300)
+            )
+        }
+
+    override val popExitTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition? =
+        {
+            slideOutOfContainer(
+                AnimatedContentTransitionScope.SlideDirection.End,
+                tween(300)
+            )
+        }
+
+    override val sizeTransform: AnimatedContentTransitionScope<NavBackStackEntry>.() -> SizeTransform? =
+        {
+            SizeTransform { _, _ -> tween(300) }
         }
 }

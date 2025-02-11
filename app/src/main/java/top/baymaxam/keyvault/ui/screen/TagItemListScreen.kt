@@ -57,6 +57,7 @@ import top.baymaxam.keyvault.ui.component.ConfirmDialog
 import top.baymaxam.keyvault.ui.component.KeyItemLayout
 import top.baymaxam.keyvault.ui.component.TopBackBar
 import top.baymaxam.keyvault.ui.theme.AppTheme
+import top.baymaxam.keyvault.util.SlideTransitions
 import top.baymaxam.keyvault.util.errorToast
 import top.baymaxam.keyvault.util.successToast
 import top.baymaxam.keyvault.vm.TagItemListViewModel
@@ -66,7 +67,7 @@ import top.baymaxam.keyvault.vm.TagItemListViewModel
  * @author John
  * @since 31 1月 2025
  */
-@Destination<RootGraph>
+@Destination<RootGraph>(style = SlideTransitions::class)
 @Composable
 fun TagItemListScreen(
     navigator: DestinationsNavigator,

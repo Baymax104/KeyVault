@@ -66,6 +66,7 @@ import top.baymaxam.keyvault.ui.component.InputField
 import top.baymaxam.keyvault.ui.component.TopBackBar
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.ui.theme.IconColors
+import top.baymaxam.keyvault.util.SlideTransitions
 import top.baymaxam.keyvault.util.errorToast
 import top.baymaxam.keyvault.util.successToast
 import top.baymaxam.keyvault.util.toDateString
@@ -76,7 +77,7 @@ import top.baymaxam.keyvault.vm.ItemViewModel
  * @author John
  * @since 08 8月 2024
  */
-@Destination<RootGraph>
+@Destination<RootGraph>(style = SlideTransitions::class)
 @Composable
 fun ItemInfoScreen(
     navigator: DestinationsNavigator,

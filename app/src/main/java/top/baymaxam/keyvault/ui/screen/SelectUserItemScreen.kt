@@ -30,7 +30,6 @@ import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.bottomsheet.spec.DestinationStyleBottomSheet
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import org.koin.androidx.compose.koinViewModel
-import top.baymaxam.keyvault.vm.SelectUserItemViewModel
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.UserItem
 import top.baymaxam.keyvault.ui.component.SearchField
@@ -38,13 +37,15 @@ import top.baymaxam.keyvault.ui.component.SelectUserItemLayout
 import top.baymaxam.keyvault.ui.component.TitleHeader
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.util.AddItemGraph
+import top.baymaxam.keyvault.util.SlideTransitions
+import top.baymaxam.keyvault.vm.SelectUserItemViewModel
 
 /**
  * 添加页选择授权页
  * @author John
  * @since 03 8月 2024
  */
-@Destination<AddItemGraph>
+@Destination<AddItemGraph>(style = SlideTransitions::class)
 @Destination<RootGraph>(style = DestinationStyleBottomSheet::class)
 @Composable
 fun SelectUserItemScreen(navigator: ResultBackNavigator<UserItem>) {

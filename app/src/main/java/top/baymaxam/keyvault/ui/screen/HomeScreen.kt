@@ -140,7 +140,9 @@ private fun Header(
         ) {
 
             Box(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
             ) {
                 Text(
                     text = stringResource(id = R.string.app_name),
@@ -387,7 +389,7 @@ private fun RecentItem(
 }
 
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun Preview() {
     val list = remember {

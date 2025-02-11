@@ -66,6 +66,7 @@ import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.util.AddItemGraph
 import top.baymaxam.keyvault.util.LocalNavigator
 import top.baymaxam.keyvault.util.NavigatorProvider
+import top.baymaxam.keyvault.util.SlideTransitions
 import top.baymaxam.keyvault.util.errorToast
 import top.baymaxam.keyvault.util.successToast
 import top.baymaxam.keyvault.vm.AddItemViewModel
@@ -83,7 +84,7 @@ fun AddItemScreen(navigator: DestinationsNavigator) {
     }
 }
 
-@Destination<AddItemGraph>(start = true)
+@Destination<AddItemGraph>(start = true, style = SlideTransitions::class)
 @Composable
 fun AddInputScreen(
     navigator: DestinationsNavigator,

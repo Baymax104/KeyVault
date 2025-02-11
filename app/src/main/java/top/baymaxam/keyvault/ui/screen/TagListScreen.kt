@@ -54,6 +54,7 @@ import top.baymaxam.keyvault.ui.component.FloatingButton
 import top.baymaxam.keyvault.ui.component.TagItemLayout
 import top.baymaxam.keyvault.ui.component.TopBackBar
 import top.baymaxam.keyvault.ui.theme.AppTheme
+import top.baymaxam.keyvault.util.SlideTransitions
 import top.baymaxam.keyvault.util.errorToast
 import top.baymaxam.keyvault.util.successToast
 import top.baymaxam.keyvault.vm.TagListViewModel
@@ -63,7 +64,7 @@ import top.baymaxam.keyvault.vm.TagListViewModel
  * @author John
  * @since 12 9月 2024
  */
-@Destination<RootGraph>()
+@Destination<RootGraph>(style = SlideTransitions::class)
 @Composable
 fun TagListScreen(navigator: DestinationsNavigator) {
     val vm = koinViewModel<TagListViewModel>()

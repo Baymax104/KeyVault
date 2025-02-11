@@ -27,6 +27,7 @@ import top.baymaxam.keyvault.model.domain.Expiry
 import top.baymaxam.keyvault.ui.component.ContainerButton
 import top.baymaxam.keyvault.ui.component.TopBackBar
 import top.baymaxam.keyvault.ui.theme.AppTheme
+import top.baymaxam.keyvault.util.SlideTransitions
 import top.baymaxam.keyvault.vm.PreferenceStateHolder
 
 /**
@@ -34,7 +35,7 @@ import top.baymaxam.keyvault.vm.PreferenceStateHolder
  * @author John
  * @since 11 2月 2025
  */
-@Destination<RootGraph>
+@Destination<RootGraph>(style = SlideTransitions::class)
 @Composable
 fun AuthScreen(
     navigator: DestinationsNavigator,

@@ -37,6 +37,7 @@ import top.baymaxam.keyvault.R
 import top.baymaxam.keyvault.ui.component.PasswordField
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.ui.theme.robotoFont
+import top.baymaxam.keyvault.util.SlideTransitions
 import top.baymaxam.keyvault.util.errorToast
 import top.baymaxam.keyvault.util.successToast
 import top.baymaxam.keyvault.vm.PreferenceStateHolder
@@ -46,7 +47,7 @@ import top.baymaxam.keyvault.vm.PreferenceStateHolder
  * @author John
  * @since 07 2月 2025
  */
-@Destination<RootGraph>
+@Destination<RootGraph>(style = SlideTransitions::class)
 @Composable
 fun VerifyScreen(navigator: DestinationsNavigator) {
     val passwordState = remember { mutableStateOf("") }

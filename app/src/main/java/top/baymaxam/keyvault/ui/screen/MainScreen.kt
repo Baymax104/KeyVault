@@ -18,13 +18,14 @@ import top.baymaxam.keyvault.ui.component.BottomBar
 import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.util.MainTabDestination
 import top.baymaxam.keyvault.util.NavigatorProvider
+import top.baymaxam.keyvault.util.SlideTransitions
 
 /**
  * 主页面
  * @author John
  * @since 23 6月 2024
  */
-@Destination<RootGraph>(start = true)
+@Destination<RootGraph>(start = true, style = SlideTransitions::class)
 @Composable
 fun MainScreen(navigator: DestinationsNavigator) {
     val pagerState = rememberPagerState { 2 }

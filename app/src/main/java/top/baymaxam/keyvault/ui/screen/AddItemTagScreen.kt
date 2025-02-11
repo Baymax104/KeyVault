@@ -44,7 +44,6 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
-import top.baymaxam.keyvault.vm.AddItemTagViewModel
 import top.baymaxam.keyvault.model.domain.KeyItem
 import top.baymaxam.keyvault.model.domain.Tag
 import top.baymaxam.keyvault.model.domain.UserItem
@@ -54,8 +53,10 @@ import top.baymaxam.keyvault.ui.theme.AppTheme
 import top.baymaxam.keyvault.util.AddItemTagGraph
 import top.baymaxam.keyvault.util.LocalNavigator
 import top.baymaxam.keyvault.util.NavigatorProvider
+import top.baymaxam.keyvault.util.SlideTransitions
 import top.baymaxam.keyvault.util.errorToast
 import top.baymaxam.keyvault.util.successToast
+import top.baymaxam.keyvault.vm.AddItemTagViewModel
 
 /**
  * 添加条目标签页
@@ -80,7 +81,7 @@ fun AddItemTagScreen(
     }
 }
 
-@Destination<AddItemTagGraph>(start = true)
+@Destination<AddItemTagGraph>(start = true, style = SlideTransitions::class)
 @Composable
 fun SelectTagScreen(
     navigator: DestinationsNavigator,

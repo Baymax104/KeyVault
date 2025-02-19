@@ -33,4 +33,6 @@ interface TagDao : BaseDao<TagEntity> {
     )
     fun queryByKeyId(keyId: String): Flow<List<TagEntity>>
 
+    @Query("delete from t_tag")
+    suspend fun deleteAll()
 }

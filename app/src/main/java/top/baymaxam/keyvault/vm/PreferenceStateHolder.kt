@@ -60,6 +60,11 @@ class PreferenceStateHolder(private val store: KVStore) {
         darkModeFlow.value = darkMode
     }
 
+    fun clearAuthorization() {
+        store -= authKey
+        store -= lastVerifyTimeKey
+    }
+
     fun matchKey(password: String): Boolean = BCrypt.checkpw(password, store[authKey])
 
     fun verify(password: String): Result<Unit> {

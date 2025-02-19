@@ -42,4 +42,7 @@ interface KeyDao : BaseDao<KeyEntity> {
         """
     )
     fun queryByTagId(tagId: String): Flow<List<KeyEntity>>
+
+    @Query("delete from t_key")
+    suspend fun deleteAll()
 }

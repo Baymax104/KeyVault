@@ -170,7 +170,7 @@ private fun ContentLayout(
                     onDialogConfirm()
                 }
             ) {
-                Text("确认 ")
+                Text("确认")
             }
         },
         cancelButton = {

@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ramcosta.composedestinations.generated.destinations.ItemInfoScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.ItemListScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.SearchScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.TagListScreenDestination
 import kotlinx.coroutines.flow.map
 import org.koin.compose.koinInject
@@ -85,7 +86,7 @@ fun HomeScreen() {
         resentUsedItems = resentUsedItems.value,
         passwordCountState = passwordCountState,
         tagCountState = tagCountState,
-        onSearch = {},
+        onSearch = { navigator.navigate(SearchScreenDestination) },
         onItemClick = { navigator.navigate(ItemListScreenDestination) },
         onTagClick = { navigator.navigate(TagListScreenDestination) },
         onResentItemClick = { navigator.navigate(ItemInfoScreenDestination(it)) }
@@ -138,7 +139,6 @@ private fun Header(
                 .padding(horizontal = 15.dp)
                 .statusBarsPadding()
         ) {
-
             Box(
                 modifier = Modifier
                     .fillMaxWidth()

@@ -41,10 +41,7 @@ fun TopBackBar(
         title = content,
         navigationIcon = {
             IconButton(onClick = onBack) {
-                Icon(
-                    imageVector = Icons.Rounded.ArrowBackIosNew,
-                    contentDescription = null
-                )
+                Icon(Icons.Rounded.ArrowBackIosNew, contentDescription = null)
             }
         },
         actions = actions,

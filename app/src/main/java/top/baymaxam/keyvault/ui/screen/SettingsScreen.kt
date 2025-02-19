@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ramcosta.composedestinations.generated.destinations.AuthScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.DarkModeScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.InfoScreenDestination
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import top.baymaxam.keyvault.R
@@ -68,7 +69,7 @@ fun SettingScreen() {
         darkModeState = darkModeState,
         onKeyClick = { navigator.navigate(AuthScreenDestination) },
         onDarkClick = { navigator.navigate(DarkModeScreenDestination) },
-        onInfoClick = {},
+        onInfoClick = { navigator.navigate(InfoScreenDestination) },
         onClear = {
             scope.launch {
                 transaction {

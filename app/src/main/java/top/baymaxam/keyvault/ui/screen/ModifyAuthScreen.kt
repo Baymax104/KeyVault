@@ -3,17 +3,12 @@ package top.baymaxam.keyvault.ui.screen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material.icons.rounded.Done
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -26,12 +21,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
-import com.ramcosta.composedestinations.bottomsheet.spec.DestinationStyleBottomSheet
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.compose.koinInject
 import top.baymaxam.keyvault.ui.component.PasswordField
-import top.baymaxam.keyvault.ui.component.TitleHeader
+import top.baymaxam.keyvault.ui.component.TopBackBar
 import top.baymaxam.keyvault.ui.theme.AppTheme
+import top.baymaxam.keyvault.util.SlideTransitions
 import top.baymaxam.keyvault.util.errorToast
 import top.baymaxam.keyvault.util.successToast
 import top.baymaxam.keyvault.vm.PreferenceStateHolder
@@ -41,7 +36,7 @@ import top.baymaxam.keyvault.vm.PreferenceStateHolder
  * @author John
  * @since 11 2月 2025
  */
-@Destination<RootGraph>(style = DestinationStyleBottomSheet::class)
+@Destination<RootGraph>(style = SlideTransitions::class)
 @Composable
 fun ModifyAuthScreen(navigator: DestinationsNavigator) {
     val preferenceStateHolder = koinInject<PreferenceStateHolder>()
@@ -107,29 +102,27 @@ private fun ContentLayout(
     val oldVisualState = remember { mutableStateOf(false) }
     val newVisualState = remember { mutableStateOf(false) }
     val repeatVisualState = remember { mutableStateOf(false) }
-    Surface(color = MaterialTheme.colorScheme.background) {
+    Scaffold(
+        topBar = {
+            TopBackBar(
+                onBack = onBack,
+                actions = {
+                    TextButton(onClick = onDone) {
+                        Text("保存")
+                    }
+                }
+            ) {
+                Text("修改密钥")
+            }
+        }
+    ) { paddingValues ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
+                .padding(paddingValues)
                 .fillMaxWidth()
-                .fillMaxHeight(0.5f)
         ) {
-            TitleHeader(
-                title = "修改密钥",
-                leadingIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Rounded.Close, contentDescription = null)
-                    }
-                },
-                trailingIcon = {
-                    IconButton(onClick = onDone) {
-                        Icon(Icons.Rounded.Done, contentDescription = null)
-                    }
-                }
-            )
-
-            Spacer(Modifier.height(20.dp))
-
+            Spacer(Modifier.height(30.dp))
             Column(
                 verticalArrangement = Arrangement.spacedBy(20.dp),
                 modifier = Modifier.fillMaxWidth(0.8f)

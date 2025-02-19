@@ -79,8 +79,7 @@ fun AuthScreen(
         onBack = { navigator.navigateUp() },
         onModifyClick = { navigator.navigate(ModifyAuthScreenDestination) },
         onExpiryClick = { navigator.navigate(SelectExpiryScreenDestination) },
-        onResetClick = { dialogState.show() },
-        onDialogConfirm = {
+        onReset = {
             scope.launch {
                 preferenceStateHolder.clearAuthorization()
                 if (deleteAllState.value) {
@@ -108,8 +107,7 @@ private fun ContentLayout(
     onBack: () -> Unit = {},
     onModifyClick: () -> Unit = {},
     onExpiryClick: () -> Unit = {},
-    onResetClick: () -> Unit = {},
-    onDialogConfirm: () -> Unit = {},
+    onReset: () -> Unit = {},
 ) {
     Scaffold(
         topBar = {
@@ -135,7 +133,7 @@ private fun ContentLayout(
             ContainerButton(
                 label = { Text("重置密钥") },
                 leading = { Icon(Icons.Rounded.Refresh, contentDescription = null) },
-                onClick = onResetClick
+                onClick = { dialogState.show() }
             )
         }
     }
@@ -159,7 +157,7 @@ private fun ContentLayout(
             TextButton(
                 onClick = {
                     dialogState.dismiss()
-                    onDialogConfirm()
+                    onReset()
                 }
             ) {
                 Text("确认")

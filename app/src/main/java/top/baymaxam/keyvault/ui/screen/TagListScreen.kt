@@ -93,7 +93,7 @@ fun TagListScreen(navigator: DestinationsNavigator) {
             isEditable = true
             it.selected = !it.selected
         },
-        onDialogConfirm = {
+        onDeleteTag = {
             scope.launch {
                 vm.removeSelectedTags()
                     .onSuccess { successToast("删除成功") }
@@ -114,7 +114,7 @@ private fun ContentLayout(
     onEditClick: () -> Unit = {},
     onItemClick: (Tag) -> Unit = {},
     onItemSelected: (SelectedState<Tag>) -> Unit = {},
-    onDialogConfirm: () -> Unit = {},
+    onDeleteTag: () -> Unit = {},
 ) {
     Scaffold(
         topBar = {
@@ -167,7 +167,7 @@ private fun ContentLayout(
             TextButton(
                 onClick = {
                     dialogState.dismiss()
-                    onDialogConfirm()
+                    onDeleteTag()
                 }
             ) {
                 Text("确认")

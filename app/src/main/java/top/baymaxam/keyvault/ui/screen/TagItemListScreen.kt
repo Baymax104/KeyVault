@@ -104,7 +104,7 @@ fun TagItemListScreen(
         },
         onItemClick = { navigator.navigate(ItemInfoScreenDestination(it)) },
         onAddClick = { navigator.navigate(AddTagItemScreenDestination(vm.tag)) },
-        onDialogConfirm = {
+        onDeleteTag = {
             scope.launch {
                 vm.removeSelectedItem()
                     .onSuccess { successToast("移出成功") }
@@ -126,7 +126,7 @@ private fun ContentLayout(
     onItemClick: (KeyItem) -> Unit = {},
     onSelected: (SelectedState<KeyItem>) -> Unit = {},
     onAddClick: () -> Unit = {},
-    onDialogConfirm: () -> Unit = {},
+    onDeleteTag: () -> Unit = {},
 ) {
     Scaffold(
         topBar = {
@@ -164,7 +164,7 @@ private fun ContentLayout(
             TextButton(
                 onClick = {
                     dialogState.dismiss()
-                    onDialogConfirm()
+                    onDeleteTag()
                 }
             ) {
                 Text("确认")

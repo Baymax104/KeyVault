@@ -100,7 +100,7 @@ fun ItemListScreen(navigator: DestinationsNavigator) {
             isEditable = true
             it.selected = !it.selected
         },
-        onDialogConfirm = {
+        onDeleteItem = {
             scope.launch {
                 vm.removeSelectedItems()
                     .onSuccess { successToast("删除成功") }
@@ -122,7 +122,7 @@ private fun ContentLayout(
     onSelected: (SelectedState<KeyItem>) -> Unit = {},
     onEditClick: () -> Unit = {},
     onAddClick: () -> Unit = {},
-    onDialogConfirm: () -> Unit = {},
+    onDeleteItem: () -> Unit = {},
 ) {
 
     Scaffold(
@@ -177,7 +177,7 @@ private fun ContentLayout(
             TextButton(
                 onClick = {
                     dialogState.dismiss()
-                    onDialogConfirm()
+                    onDeleteItem()
                 }
             ) {
                 Text("确认")

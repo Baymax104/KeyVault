@@ -23,9 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.rounded.CreditCard
 import androidx.compose.material.icons.rounded.Person
-import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -48,7 +46,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ramcosta.composedestinations.generated.destinations.ItemInfoScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.ItemListScreenDestination
-import com.ramcosta.composedestinations.generated.destinations.SearchScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.TagListScreenDestination
 import kotlinx.coroutines.flow.map
 import org.koin.compose.koinInject
@@ -86,7 +83,6 @@ fun HomeScreen() {
         resentUsedItems = resentUsedItems.value,
         passwordCountState = passwordCountState,
         tagCountState = tagCountState,
-        onSearch = { navigator.navigate(SearchScreenDestination) },
         onItemClick = { navigator.navigate(ItemListScreenDestination) },
         onTagClick = { navigator.navigate(TagListScreenDestination) },
         onResentItemClick = { navigator.navigate(ItemInfoScreenDestination(it)) }
@@ -99,7 +95,6 @@ private fun ContentLayout(
     resentUsedItems: List<KeyItem> = mutableStateListOf(),
     passwordCountState: State<Int> = mutableIntStateOf(0),
     tagCountState: State<Int> = mutableIntStateOf(0),
-    onSearch: () -> Unit = {},
     onItemClick: () -> Unit = {},
     onTagClick: () -> Unit = {},
     onResentItemClick: (KeyItem) -> Unit = {},
@@ -109,7 +104,6 @@ private fun ContentLayout(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Header(
-            onSearch = onSearch,
             onItemClick = onItemClick,
             onTagClick = onTagClick,
             itemCount = passwordCountState.value,
@@ -125,7 +119,6 @@ private fun ContentLayout(
 
 @Composable
 private fun Header(
-    onSearch: () -> Unit = {},
     itemCount: Int = 0,
     tagCount: Int = 0,
     onItemClick: () -> Unit = {},
@@ -146,24 +139,13 @@ private fun Header(
             ) {
                 Text(
                     text = stringResource(id = R.string.app_name),
-                    style = TextStyle(
-                        fontFamily = robotoFont,
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Black,
-                        textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.onBackground
-                    ),
+                    fontFamily = robotoFont,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Black,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.align(Alignment.Center)
                 )
-                IconButton(
-                    onClick = onSearch,
-                    modifier = Modifier.align(Alignment.CenterEnd)
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Search,
-                        contentDescription = null
-                    )
-                }
             }
 
             IndexView(
